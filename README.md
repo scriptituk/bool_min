@@ -16,8 +16,8 @@ but also incorporates algebraic operations proposed by Nagle *et al.* for improv
 
 ### Implementation
 
-<img src="assets/list.gif" alt="PL/I Listing" align="left">
-<img src="assets/prime-550.png" alt="PR1ME 550" align="right">
+<img src="assets/list.gif" alt="PL/I Listing" align="left" hspace="5">
+<img src="assets/prime-550.png" alt="PR1ME 550" align="right" hspace="5">
 
 The program was coded in [PL/I](https://en.wikipedia.org/wiki/PL/I) General Purpose Subset,
 a subset of ANSI Standard PL/I, initially developed by IBM.
