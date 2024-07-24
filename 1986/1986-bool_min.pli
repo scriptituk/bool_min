@@ -1,0 +1,858 @@
+
+
+/*
+===============================================================================
+= UTILITY PROGRAMME FOR THE MINIMISATION OF BOOLEAN FUNCTIONS                 =
+= Written by R.C.LUCKHURST, September 1986                                    =
+= for final year BSc Electrical Engineering project, Bristol Polytechnic      =
+===============================================================================
+*/
+
+
+%REPLACE true BY '1'B, false BY '0'B;
+%REPLACE low BY 1, high BY 2, cost BY 3, status BY 4;
+%REPLACE redundant BY 1, min_cost_redundant BY 2, non_essential BY 3, min_cost_essential BY 4, essential BY 5;
+
+BSc_project: PROCEDURE OPTIONS (MAIN);
+
+DECLARE (BINARY, BIT, CEIL, CHARACTER, COPY, DECIMAL, INDEX,
+        LENGTH, LOG2, MIN, SUBSTR, TRANSLATE, VERIFY) BUILTIN,
+
+        (num_minterms, num_dont_cares, num_terms, num_pis, num_ne_pis, num_inepi_sums,
+        minterm (512), dont_care (512), term (1024), p_i (4,256), ne_pi (96),
+        function_order, solution_cost) FIXED BINARY,
+
+        (unique_solution, new_data,
+        epi_covers_minterm (256), pi_covers_minterm (256,256)) BIT STATIC,
+        inepi_sum (3000) BIT (96) ALIGNED,
+
+        version CHARACTER (4) STATIC INITIAL ('V1.0'),
+        continue CHARACTER (30) VARYING,
+        pi_status (5) CHARACTER(30) VARYING STATIC INITIAL
+        ('redundant','minimum-cost redundant','non-essential','minimum-cost essential','essential'),
+        results_file FILE;
+
+
+
+/*
+###############################################################################
+#                          UTILITY PROCEDURES                                 #
+###############################################################################
+*/
+
+
+/******************************************************************************
+* PROCEDURE equivalent: Returns logical equivalence between 2 integers        *
+*******************************************************************************/
+equivalent: PROCEDURE (x,y) RETURNS (FIXED BINARY);
+     DECLARE (x,y) FIXED BINARY;
+     RETURN (x & y  |  ^ x & ^ y);
+END equivalent;
+
+
+/******************************************************************************
+* PROCEDURE trim: Returns integer with no leading spaces                      *
+*******************************************************************************/
+trim: PROCEDURE (value) RETURNS (CHARACTER (10) VARYING);
+     DECLARE value FIXED BINARY;
+     RETURN (SUBSTR(CHARACTER(value),VERIFY(CHARACTER(value),' ')));
+END trim;
+
+
+/******************************************************************************
+* PROCEDURE sort_data: Sorts minterms and don't cares into ascending order    *
+*           and deletes duplicate terms and terms out of range                *
+*******************************************************************************/
+sort_data: PROCEDURE;
+     DECLARE (i, j, t) FIXED BINARY, (b, sorted, excess_terms, type (512)) BIT ALIGNED;
+
+     /* first make an all-term list */
+     DO t = 1 TO num_minterms;
+          term(t) = minterm(t);
+          type(t) = true; /* ie minterm */
+          END;
+     DO t = 1 TO num_dont_cares;
+          term(num_minterms + t) = dont_care(t);
+          type(num_minterms + t) = false; /* ie dont-care */
+          END;
+     num_terms = num_minterms + num_dont_cares;
+
+     /* then sort into ascending order */
+     excess_terms = true;
+     DO WHILE (excess_terms);
+          excess_terms = false; sorted = false;
+          DO i = num_terms TO 1 BY -1 WHILE (^ (sorted | excess_terms));
+               /* erase terms which are out of range */
+               IF term(i) < 0 | term(i) > 255 THEN DO;
+                    term(i) = term(num_terms);
+                    type(i) = type(num_terms);
+                    num_terms = num_terms - 1;
+                    excess_terms = true;
+                    END;
+               sorted = true;
+               DO j = 1 TO i - 1 WHILE (^ excess_terms);
+                    IF term(j) < 0 THEN sorted = false;
+                    /* if terms not in ascending order then swap them */
+                    IF term(j) > term(j + 1) THEN DO;
+                         t = term(j); term(j) = term(j + 1); term(j + 1) = t;
+                         b = type(j); type(j) = type(j + 1); type(j + 1) = b;
+                         sorted = false;
+                         END;
+                    /* erase duplicate terms and give minterm priority */
+                    ELSE IF term(j) = term(j + 1) THEN DO;
+                         type(j) = (type(j) | type(j + 1));
+                         term(j + 1) = term(num_terms);
+                         type(j + 1) = type(num_terms);
+                         num_terms = num_terms - 1;
+                         excess_terms = true;
+                         END;
+                    END;
+               END;
+          END;
+
+     /* now extract sorted terms back into ordered minterm & dont-care arrays */
+     num_minterms = 0; num_dont_cares = 0;
+     DO t = i TO num_terms;
+          IF type(t) THEN DO;
+               num_minterms = num_minterms + 1;
+               minterm(num_minterms) = term(t);
+               END;
+          ELSE DO;
+               num_dont_cares = num_dont_cares + 1;
+               dont_care(num_dont_cares) = term(t);
+               END;
+          END;
+END sort_data;
+
+
+/*
+###############################################################################
+#                           INPUT PROCEDURES                                  #
+###############################################################################
+*/
+
+
+/******************************************************************************
+* PROCEDURE menu_selection: Returns menu item requested: 1 - 5                *
+*******************************************************************************/
+menu_selection: PROCEDURE RETURNS (FIXED BINARY);
+     DECLARE menu_item CHARACTER (30) VARYING, m FIXED BINARY;
+     DO WHILE (true);
+          GET LIST (menu_item);
+          IF VERIFY(menu_item, '12345') = 0 THEN DO;
+               m = BINARY(menu_item);
+               IF m >= 1 & m <= 5 THEN RETURN (m);
+               END;
+          END;
+END menu_selection;
+
+
+/******************************************************************************
+* PROCEDURE continue_prompt: Stops screen scrolling                           *
+*******************************************************************************/
+continue_prompt: PROCEDURE;
+     PUT SKIP(2) LIST ('Press RETURN to continue -->');
+     GET LIST (continue);
+END continue_prompt;
+
+
+/******************************************************************************
+* PROCEDURE enter_data: Used to enter minterms and don't cares                *
+*******************************************************************************/
+enter_data: PROCEDURE;
+     DECLARE action CHARACTER (30) VARYING, deleted BIT ALIGNED, (i, t) FIXED BINARY;
+
+     get_input_list: PROCEDURE;
+          DECLARE (upper, lower) FIXED BINARY,
+                  input_item CHARACTER (30) VARYING,
+                  illegal_entry BIT ALIGNED;
+
+               num_terms = 0;
+               illegal_entry = false;
+               PUT EDIT ('Enter values in the range 0 to 255 seperated by commas or blanks or returns. ',
+                              'A range of values may be entered using a hyphen, e.g. 10-15. ',
+                              'Type E after the last entry. ',
+                              '--> ') (SKIP, A);
+               DO WHILE (true);
+                    GET LIST (input_item);
+                    IF TRANSLATE(input_item, 'E', 'e') = 'E' THEN RETURN;
+                    ELSE IF VERIFY(input_item, '-0123456789') = 0 & INDEX(input_item, '-') ^= 1 THEN DO;
+                         t = INDEX(input_item, '-');
+                         IF t = 0 THEN DO;
+                              IF num_terms <= 255 THEN DO;
+                                   num_terms = num_terms + 1;
+                                   term(num_terms) = BINARY(input_item);
+                                   END;
+                              END;
+                         ELSE IF t <= 5 & LENGTH(input_item) - t < 5 THEN DO;
+                              upper = BINARY(SUBSTR(input_item,t + 1)); IF upper > 255 THEN upper = 255;
+                              lower = BINARY(SUBSTR(input_item, 1,t - 1)); IF lower > 255 THEN lower = 255;
+                              IF lower > upper THEN DO; t = lower; lower = upper; upper = t; END;
+                              DO t = lower TO upper WHILE (num_terms <= 255);
+                                   num_terms = num_terms + 1;
+                                   term(num_terms) = t;
+                                   END;
+                              END;
+                         END;
+                    ELSE illegal_entry = true;
+                    END;
+               IF illegal_entry THEN PUT SKIP LIST ('Illegal entries have been disregarded. ');
+          END get_input_list;
+
+          DO WHILE (true);
+          PUT SKIP(3);
+               CALL sort_data;
+               CALL print_header_message(SYSPRINT);
+               CALL print_input_data(SYSPRINT);
+               PUT SKIP(3) EDIT ('C = Clear data',
+                                 'AM = Add Minterms',
+                                 'DM = Delete Minterms',
+                                 'AD = Add Don''t cares',
+                                 'DD = Delete Don''t cares',
+                                 'E = End data entry',
+                                 'Enter C/AM/DM/AD/DD/E --> ') (6(COLUMN(24),A,SKIP),SKIP,COLUMN(24),A);
+               action = ' ';
+               DO WHILE (VERIFY(action,'ACDEM') ^= 0);
+                    GET LIST (action);
+                    action = TRANSLATE(action, 'ACDEM', 'acdem');
+                    END;
+               IF action = 'E' THEN RETURN;
+               IF action = 'C' THEN DO;
+                    num_minterms = 0; num_dont_cares = 0;
+                    END;
+               IF action = 'AM' | action = 'DM' | action = 'AD' | action = 'DD' THEN DO;
+                    CALL get_input_list;
+                    IF action = 'AM' THEN DO; /* add input list to minterms */
+                         DO t = 1 TO num_terms;
+                              minterm(num_minterms + t) = term(t);
+                              END;
+                         num_minterms = num_minterms + num_terms;
+                    END;
+               ELSE IF action = 'DM' THEN DO; /* make minterms contained in i/p list out of range for deletion */
+                    DO t = 1 TO num_terms;
+                         deleted = false;
+                         DO i = 1 TO num_minterms WHILE (^ deleted);
+                              IF minterm(i) = term(t) THEN DO;
+                                   minterm(i) = -1;
+                                   deleted = true;
+                                   END;
+                              END;
+                         END;
+                    END;
+               ELSE IF action = 'AD' THEN DO; /* add input list to dont-cares */
+                    DO t = 1 TO num_terms;
+                         dont_care(num_dont_cares + t) = term(t);
+                         END;
+                    num_dont_cares = num_dont_cares + num_terms;
+                    END;
+               ELSE DO; /* make dont-cares contained in i/p list out of range for deletion when sorted */
+                    DO t = 1 TO num_terms;
+                         deleted = false;
+                         DO i = 1 TO num_dont_cares WHILE (^ deleted);
+                              IF dont_care(i) = term(t) THEN DO;
+                                   dont_care(i) = -1;
+                                   deleted = true;
+                                   END;
+                              END;
+                         END;
+                    END;
+               IF num_terms > 0 THEN new_data = true;
+               END;
+          END;
+END enter_data;
+
+
+/*
+###############################################################################
+#                       MINIMISATION PROCEDURES                               #
+###############################################################################
+*/
+
+
+/******************************************************************************
+* PROCEDURE prime_implicants: Generates complete list of PIs                  *
+*******************************************************************************/
+prime_implicants: PROCEDURE;
+
+DECLARE (i, j, term_i, term_j, i_eqv_j, vertex, p, m) FIXED BINARY,
+        (all_vertices_contained, covered) BIT ALIGNED;
+
+     /* generate the prime implicants */
+     num_pis = 0;
+     DO i = 1 TO num_terms;
+          DO j = num_terms TO i BY -1;
+          /* choose the pair (i,j) */
+          term_i = term(i); term_j = term(j);
+          /* is (i,j) a cell? */
+          IF (term_i & term_j) = term_i THEN DO;
+               /* are all the vertices of (i,j) in the function? */
+               i_eqv_j = equivalent(term_i, term_j);
+               all_vertices_contained = true; m = i + 1;
+               DO vertex = term_i + 1 TO term_j - 1 WHILE (all_vertices_contained);
+                    IF (i_eqv_j & vertex) = term_i THEN DO;
+                         DO WHILE (term(m) < vertex); m = m + 1; END;
+                         all_vertices_contained = (term(m) = vertex);
+                         m = m + 1;
+                         END;
+                    END;
+               IF all_vertices_contained THEN DO;
+                    /* is (i,j) covered by an entry in the p.i. table? */
+                    covered = false;
+                    IF num_pis ^= 0 THEN DO p = 1 TO num_pis WHILE (^ covered);
+                         IF term_j <= p_i(high,p) THEN
+                              IF (p_i(low,p) & term_i) = p_i(low,p) THEN
+                                   covered = ((term_j & p_i(high,p)) = term_j);
+                              END;
+                    IF ^ covered THEN DO;
+                         num_pis = num_pis + 1;
+                         p_i(low,num_pis) = term_i;
+                         p_i(high,num_pis) = term_j;
+                         END;
+                    END;
+               END;
+          END;
+     END;
+
+END prime_implicants;
+
+
+/******************************************************************************
+* PROCEDURE p_i_chart: Makes a PI chart as a bit array                        *
+*******************************************************************************/
+p_i_chart: PROCEDURE;
+     DECLARE (m, p) FIXED BINARY;
+     /* generate the prime implicant chart */
+     DO m = 1 TO num_minterms;
+          DO p = 1 TO num_pis;
+               pi_covers_minterm(p,m) = ((p_i(low,p) & minterm(m)) = p_i(low, p)
+                                        & (minterm(m) & p_i(high,p)) = minterm(m));
+               END;
+          END;
+END p_i_chart;
+
+
+/******************************************************************************
+* PROCEDURE p_i_status: Categorises PIs as essential/nonessential/redundant   *
+*******************************************************************************/
+p_i_status: PROCEDURE;
+    DECLARE (m, p, epi, num_covers) FIXED BINARY;
+
+     /* initialise all p.i. status to redundant */
+     DO p = 1 TO num_pis; p_i(status,p) = redundant; END;
+     /* find essential p.i.s */
+     DO m = 1 TO num_minterms;
+          num_covers = 0;
+          DO p = 1 TO num_pis;
+          IF pi_covers_minterm(p,m) THEN DO;
+               epi = p;
+               num_covers = num_covers + 1;
+               END;
+          END;
+     IF num_covers = 1 THEN p_i(status, epi) = essential;
+     END;
+/* find minterms covered by essential p.i.s */
+num_covers = 0;
+DO m = 1 TO num_minterms;
+epi_covers_minterm(m) = false;
+     DO p = 1 TO num_pis WHILE (^ epi_covers_minterm(m));
+          IF p_i(status,p) = essential & pi_covers_minterm(p,m) THEN DO;
+               epi_covers_minterm(m) = true;
+               num_covers = num_covers + 1;
+               END;
+          END;
+     END;
+/* determine whether 1 solution or more */
+unique_solution = (num_covers = num_minterms);
+/* find non-essential p.i.s */
+IF ^ unique_solution THEN DO;
+     DO m = 1 TO num_minterms;
+          IF ^ epi_covers_minterm(m) THEN DO p = 1 TO num_pis;
+               IF p_i(status,p) = redundant & pi_covers_minterm(p,m) THEN p_i(status,p) = non_essential;
+               END;
+          END;
+     /* make a table of n.e.p.i. pointers */
+     num_ne_pis = 0;
+     DO p = 1 TO num_pis;
+          IF p_i(status,p) = non_essential THEN DO;
+               num_ne_pis = num_ne_pis + 1;   ne_pi(num_ne_pis) = p;
+               END;
+          END;
+     END;
+
+END p_i_status;
+
+
+/******************************************************************************
+* PROCEDURE p_i_cost: Calculates literal costs of PIs                         *
+*******************************************************************************/
+p_i_cost: PROCEDURE;
+     DECLARE (p, l, b, literals) FIXED BINARY;
+     DO p = 1 TO num_pis;
+          p_i(cost,p) = 0; b= 1;
+          literals = equivalent(p_i(low,p),p_i(high,p));
+          DO l = 1 TO function_order;
+               IF (b & literals) ^= 0 THEN p_i(cost,p) = p_i(cost,p) + 1;
+               b= b + b;
+               END;
+          END;
+END p_i_cost;
+
+
+/******************************************************************************
+* PROCEDURE irredundand_nepi_sums: Performs algebraic conversion of           *
+*                                  nonessential PI product-of-sums to         *
+*                                  sum-of-products                            *
+*******************************************************************************/
+irredundant_nepi_sums: PROCEDURE;
+     DECLARE (m, p, c, s, num_umin_nepis) FIXED BINARY,
+             (b, umin_nepis(256)) BIT (96) ALIGNED,
+             redundant_sums BIT ALIGNED;
+
+     /* make an array of bit strings holding non-ess p.i. coverage of uncovered minterms */
+     num_umin_nepis = 0;
+     DO m = 1 TO num_minterms;
+          IF ^ epi_covers_minterm(m) THEN DO;
+              num_umin_nepis = num_umin_nepis + 1;
+              umin_nepis(num_umin_nepis) = 0;
+              b = BIT(0,95) || '1'B;
+              DO p = 1 TO num_ne_pis;
+                  IF pi_covers_minterm(ne_pi(p),m) THEN
+                      umin_nepis(num_umin_nepis) = umin_nepis(num_umin_nepis) | b;
+                  b = SUBSTR(b, 2);
+                  END;
+              END;
+          END;
+
+     /* first pass - i.n.e.p.i. sums ate those covering 1st uncovered minterm */
+     num_inepi_sums = 0;  b = BIT(0,95) || '1'B;
+     DO p = 1 TO num_ne_pis;
+          /* if 1st uncovered minterm is covered by this n.e.p.i. then ... */
+          IF (umin_nepis(1) & b) ^= BIT(0,96) THEN DO;
+              /* ... this sum is initially this n.e-p.i. */
+              num_inepi_sums = num_inepi_sums + 1; inepi_sum(num_inepi_sums) = b;
+              END;
+          b = SUBSTR(b, 2);
+          END;
+
+     /* continue by repeatediy combining with n.e.p.i.  terms of succeeding minterms algebraically */
+     DO m = 2 TO num_umin_nepis;
+          /* initialise cover counter and n.e.p.i. pointer */
+          c= -1;  b = BIT(0,95) || '1'B;
+          /* add each n.e.p.i. covering this minterm successively to each sum */
+          DO p = 1 TO num_ne_pis;
+              /* if this n.e.p.i. covers this minterm then ... */
+              IF (umin_nepis(m) & b) ^= BIT(0, 96) THEN DO;
+                  /* ... increment cover counter for this minterm ... */
+                  c = c + 1;
+                  /* ... step through the sums for this cover ... */
+                  DO s = c * num_inepi_sums + 1 TO (c + 1) * num_inepi_sums;
+                      /* ... make a copy of current sums for next cover ... */
+                      inepi_sum(s + num_inepi_sums) = inepi_sum(s);
+                      /* ... add this cover to the sum */
+                      inepi_sum(s) = inepi_sum(s) | b;
+                      END;
+                  END;
+              b = SUBSTR(b, 2);
+              END;
+          /* calculate the new number of sums resulting from above */
+          num_inepi_sums = (c + 1) * num_inepi_sums;
+          /* some sums may cover others so minimise by nulling redundant sums */
+          redundant_sums = false;
+          DO s = 1 TO num_inepi_sums;
+              IF inepi_sum(s) ^= BIT(0,96) THEN DO c = 1 TO num_inepi_sums;
+                  IF c ^= s & inepi_sum(c) ^= BIT(0,96) & (inepi_sum(s) & inepi_sum(c)) = inepi_sum(s) THEN DO;
+                      inepi_sum(c) = BIT(0, 96);
+                      redundant_sums = true;
+                      END;
+                  END;
+              END;
+          /* remove redundant sums and calculate the new number of sums Tesulting */
+          IF redundant_sums THEN CALL remove_redundant_sums;
+          END;
+
+END irredundant_nepi_sums;
+
+
+/******************************************************************************
+* PROCEDURE minimum_cost_solution: Finds set of minimum literal cost          *
+*                                  nonessential PI sums                       *
+*******************************************************************************/
+minimum_cost_solution: PROCEDURE;
+     DECLARE (s, min_cost, sum_cost(1000)) FIXED BINARY,
+             redundant_sums BIT ALIGNED;
+
+     /* make a table of irredundant n.e.p.i. literal costs */
+     DO s = 1 TO num_inepi_sums;
+          sum_cost(s) = nonessential_cost(s);
+          END;
+     /* find the minimum cost */
+     min_cost = sum_cost(1);
+     DO s = 2 TO num_inepi_sums;
+          IF sum_cost(s) < min_cost THEN min_cost = sum_cost(s);
+          END;
+     /* remove a11 but minimum cost sums */
+     DO s = 1 TO num_inepi_sums;
+          IF sum_cost(s) > min_cost THEN DO;
+               inepi_sum(s) = BIT(0, 96);
+               redundant_sums = true;
+               END;
+          END;
+     IF redundant_sums THEN CALL remove_redundant_sums;
+
+END minimum_cost_solution;
+
+
+/******************************************************************************
+* PROCEDURE ammend_p_i_status: Recategorises some nonessential PIs as         *
+*                              minimum cost essential/minimum cost redundant  *
+*******************************************************************************/
+ammend_p_i_status: PROCEDURE;
+     DECLARE (ess_pis, red_pis, b) BIT (96) ALIGNED,
+             s FIXED BINARY;
+
+     /* find n.e.p.i.s common to each sum and those which have been removed */
+     ess_pis = inepi_sum(1);
+     red_pis = ^ ess_pis;
+     DO s = 2 TO num_inepi_sums;
+          ess_pis = ess_pis & inepi_sum(s);
+          red_pis = red_pis & ^ inepi_sum(s);
+          END;
+     /* remove common n.e.p.i.s from the sums - these are minimum-cost essential */
+     DO s = 1 TO num_inepi_sums;
+          inepi_sum(s) = inepi_sum(s) & ^ ess_pis;
+          END;
+     /* ammend p.i. status table to show minimum-cost essential/redundant p.i.s */
+     b = BIT(0,95) || '1'B;
+     DO s = 1 TO num_ne_pis;
+          IF (ess_pis & b) ^= BIT(0,96) THEN p_i(status,ne_pi(s)) = min_cost_essential;
+          ELSE IF (red_pis & b) ^= BIT(0,96) THEN p_i(status, ne_pi(s)) = min_cost_redundant;
+          b = SUBSTR(b,2);
+          END;
+
+END ammend_p_i_status;
+
+
+/******************************************************************************
+* PROCEDURE remove_redundant_sums: Cleans up irredundant nonessential PI      *
+*                                  sum-of-products array                      *
+*******************************************************************************/
+remove_redundant_sums: PROCEDURE;
+     DECLARE (i, j) FIXED BINARY, sum_moved BIT ALIGNED;
+
+     DO i = 1 TO num_inepi_sums;
+          IF inepi_sum(i) = BIT(0,96) THEN DO;
+               sum_moved = false;
+               DO j = i + 1 TO num_inepi_sums WHILE (^ sum_moved);
+                    IF inepi_sum(j) ^= BIT(0,96) THEN DO;
+                         inepi_sum(i) = inepi_sum(j);  inepi_sum(j) = BIT(0, 96);
+                         sum_moved = true;
+                         END;
+                    END;
+               IF ^ sum_moved THEN DO;
+                    num_inepi_sums = i - i;
+                    RETURN;
+                    END;
+               END;
+          END;
+
+END remove_redundant_sums;
+
+
+/******************************************************************************
+* PROCEDURE essential_cost: Returns literal cost of all essential PIs         *
+*******************************************************************************/
+essential_cost: PROCEDURE RETURNS (FIXED BINARY);
+     DECLARE (p, e_cost) FIXED BINARY;
+     e_cost = 0;
+     DO p = 1 TO num_pis;
+          IF p_i(status,p) > non_essential THEN e_cost = e_cost + p_i(cost,p);
+          END;
+     RETURN (e_cost);
+END essential_cost;
+
+
+/******************************************************************************
+* PROCEDURE nonessential_cost: Returns literal cost of all nonessential PIs   *
+*                              in specified sum-of-product sum                *
+*******************************************************************************/
+nonessential_cost: PROCEDURE (s) RETURNS (FIXED BINARY);
+     DECLARE (s, p, ne_cost) FIXED BINARY,
+              b BIT (96) ALIGNED;
+     ne_cost = 0;  b = BIT(0,95) || '1'B;
+     DO p = 1 TO num_ne_pis;
+          IF (inepi_sum(s) & b) ^= BIT(0,96) THEN ne_cost = ne_cost + p_i(cost,ne_pi(p));
+          b = SUBSTR(b, 2);
+          END;
+     RETURN (ne_cost);
+END nonessential_cost;
+
+
+/******************************************************************************
+* PROCEDURE run_minimisation: Performs minimisation of switching function     *
+*******************************************************************************/
+run_minimisation: PROCEDURE;
+     function_order = LOG2(term(num_terms)) + 1;
+     PUT SKIP LIST ('(finding prime implicants)');
+     CALL prime_implicants; /* generates complete set of prime implicants */
+     CALL p_i_chart; /* generates array of pi coverage of minterms */
+     CALL p_i_status; /* gives ess/noness/red status to p.i.s & e.p.i. cover status to minterms & decides if unique */
+     CALL p_i_cost; /* finds literal costs of p.i.s */
+     IF ^ unique_solution THEN DO;
+          PUT SKIP LIST ('(finding minimum cost solution)');
+          CALL irredundant_nepi_sums; /* generate irredundant n.e.p.i. sums to caver Temaining minterms */
+          CALL minimum_cost_solution; /* finds lowest literal cost solutions from irredundant n.e.p.i. sums */
+          CALL ammend_p_i_status; /* gives min-cost-ess/min-cost-red status to n.e.p.i.s */
+          END;
+     solution_cost = essential_cost();
+     IF ^ unique_solution THEN solution_cost = solution_cost + nonessential_cost(1);
+END run_minimisation;
+
+
+/*
+###############################################################################
+#                          OUTPUT PROCEDURES                                  #
+###############################################################################
+*/
+
+
+/******************************************************************************
+* PROCEDURE print_header_message: Prints title and version no to screen/file  *
+*******************************************************************************/
+print_header_message: PROCEDURE (f);
+     DECLARE f FILE VARIABLE;
+     PUT FILE (f) EDIT ('BOOLEAN MINIMISATION  ', version, COPY('=',26))
+          (COLUMN(20),A,A,SKIP,COLUMN(20),A);
+END print_header_message;
+
+
+/******************************************************************************
+* PROCEDURE print_menu: Prints programme menu                                 *
+*******************************************************************************/
+print_menu: PROCEDURE;
+     CALL print_header_message(SYSPRINT);
+     PUT SKIP(3) LIST ('  A utility for the logical minimisation of boolean functions.');
+     PUT SKIP(4) EDIT ('Menu',
+                       '----',
+                   '1. Enter data',
+                   '2. Minimise',
+                   '3. File results',
+                   '4. Information',
+                   '5. Quit',
+                   'Enter 1-5 --> ')
+          (COLUMN(28),A,SKIP,COLUMN(28),A,SKIP(2),5(COLUMN(24),A,SKIP),SKIP,COLUMN(24),A);
+END print_menu;
+
+
+/******************************************************************************
+* PROCEDURE print_input_data: Prints minterms and don't cares to screen/file  *
+*******************************************************************************/
+print_input_data: PROCEDURE (f);
+     DECLARE f FILE VARIABLE, t FIXED BINARY;
+     /* list the minterms */
+     PUT FILE(f) SKIP(3) LIST ('Minterms:');
+     IF num_minterms = 0 THEN PUT FILE(f) SKIP LIST ('*** none ***');
+     ELSE PUT FILE(f) SKIP EDIT ((trim(minterm(t)) DO t = 1 TO num_minterms)) (A,X(1));
+     /* list the dont-cares */
+     PUT FILE(f) SKIP(3) LIST ('Don''t cares:');
+     IF num_dont_cares = 0 THEN PUT FILE(f) SKIP LIST ('*** none ***');
+     ELSE PUT FILE(f) SKIP EDIT ((trim(dont_care(t)) DO t = 1 TO num_dont_cares)) (A, X(1));
+END print_input_data;
+
+
+/******************************************************************************
+* PROCEDURE output_results: Prints minimisation results to screen/file        *
+*******************************************************************************/
+output_results: PROCEDURE (f);
+     DECLARE f FILE VARIABLE;
+
+     /* print header message */
+     CALL print_header_message(f);
+
+     /* list minterms and dont-cares */
+     CALL print_input_data(f);
+
+     /* print the function order */
+     PUT FILE(f) SKIP(3) EDIT ('The function order is ',trim(function_order)) (A);
+
+     /* list the prime implicants and associated qualities */
+     cell: PROCEDURE (p) RETURNS (CHARACTER (10) VARYING);
+          DECLARE p FIXED BINARY;
+          RETURN (trim(p_i(low,p)) || ',' || trim(p_i(high, p)));
+     END cell;
+     literals: PROCEDURE (p) RETURNS (CHARACTER (10) VARYING);
+          DECLARE (p, l, b) FIXED BINARY, lits CHARACTER (10) VARYING;
+          lits = ''; b = 1;
+          DO l = 1 TO function_order;
+               IF (equivalent(p_i(low,p),p_i(high,p)) & b) ^= 0 THEN
+                    IF (p_i(low,p) & b) ^= 0 THEN lits = '1' || lits;
+                    ELSE lits = '0' || lits;
+               ELSE lits = '-' || lits;
+               b = b + b;
+               END;
+          RETURN (lits);
+     END literals;
+     BEGIN;
+          DECLARE p FIXED BINARY;
+          PUT FILE(f) SKIP(3) LIST ('Prime Implicants:');
+          PUT FILE(f) SKIP EDIT (' p.i.','cell', 'literals', 'cost', 'status')
+               (A,COLUMN(11),A, COLUMN(25),A,COLUMN(40),A,COLUMN(50),A);
+          DO p = 1 TO num_pis;
+               PUT FILE(f) SKIP EDIT (p,cell(p),literals(p),p_i(cost,p),pi_status(p_i(status, p)))
+                    (F(4),COLUMN(11),A,COLUMN(25),A,COLUMN(40),F(3),COLUMN(50),A);
+               END;
+          END;
+
+     /* abort if no minterms */
+     IF num_minterms = 0 THEN RETURN;
+
+     /* print the prime implicant chart */
+     tick: PROCEDURE (b) RETURNS (CHARACTER);
+          DECLARE b BIT;
+          IF b THEN RETURN ('*');
+          RETURN (' ');
+     END tick;
+     BEGIN;
+          DECLARE (m, b, p, num_blocks, mins_per_block) FIXED BINARY;
+          PUT FILE(f) SKIP(3) LIST ('Prime Implicant Chart:');
+          num_blocks = CEIL(DECIMAL(num_minterms) / 19.0);
+          mins_per_block = CEIL(DECIMAL(num_minterms) / DECIMAL(num_blocks));
+          DO b = 1 TO num_blocks;
+               PUT FILE(f) SKIP LIST ('      minterm -->');
+               PUT FILE(f) SKIP EDIT
+                    (' p.i.',(minterm(m)
+                    DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (A,F(3),18(F(4))); /*?*/
+               DO p = 1 TO num_pis;
+                    IF p_i(status,p) > redundant THEN PUT FILE(f) SKIP EDIT
+                         (p, (tick(pi_covers_minterm(p,m))
+                         DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (F(4),19(X(1))); /*?*/
+                    END;
+               END;
+          END;
+     
+     /* print the solution */
+     BEGIN;
+          DECLARE (p, s) FIXED BINARY, or CHARACTER (2) VARYING, all_covered BIT ALIGNED, b BIT (96) ALIGNED;
+          IF unique_solution THEN PUT FILE(f) SKIP(3) LIST ('Unique Solution:');
+          ELSE PUT FILE(f) SKIP(3) LIST ('Minimum Cost Solution:');
+          PUT FILE(f) SKIP EDIT (' F = ') (A);
+          /* essentials first */
+          or = '';
+          DO p = 1 TO num_pis;
+               IF p_i(status,p) > non_essential THEN DO;
+                    PUT FILE(f) EDIT (or, trim(p)) (A);
+                    or = '+';
+                    END;
+               END;
+          /* if these do not cover all minterms then ... */
+          all_covered = true;
+          IF ^ unique_solution THEN DO s = 1 TO num_minterms WHILE (all_covered);
+               all_covered = false;
+               DO p = 1 TO num_pis WHILE (^ all_covered);
+                    IF p_i(status,p) > non_essential THEN
+                         all_covered = pi_covers_minterm(p,s);
+                    END;
+               END;
+          /* ... minimum cost nonessentials */
+          IF ^ all_covered THEN DO;
+               PUT FILE(f) EDIT (or) (A);
+               DO s = 1 TO num_inepi_sums;
+                    PUT FILE(f) EDIT ('(') (A);
+                    or = ''; b = BIT(0,95) || '1'B;
+                    DO p = 1 TO num_ne_pis;
+                         IF (inepi_sum(s) & b) ^= BIT(0,96) THEN DO;
+                              PUT FILE(f) EDIT (or,trim(ne_pi(p))) (A);
+                              or = '+';
+                              END;
+                         b = SUBSTR(b,2);
+                         END;
+                    PUT FILE(f) EDIT (')') (A);
+                    END;
+               PUT FILE(f) SKIP LIST ('(parenthesised expressions are alternatives)');
+               END;
+          END;
+
+     /* print the literal cost of the solution */
+     PUT FILE(f) SKIP(3) EDIT ('Cost = ',trim(solution_cost),' literals')  (A);
+
+END output_results;
+
+
+/******************************************************************************
+* PROCEDURE print information: Prints information about the pregramme         *
+*******************************************************************************/
+print_information: PROCEDURE;
+     PUT SKIP(2) EDIT (
+     '  This utility determines the minimal 2-level solution for a Boolean switching',
+     'function. This function must be fully specified as minterm and don''t care',
+     'arrays. The maximum number of input variables is 8. Data is entered as decimal',
+     'values in the range 0 to 255 in any order. Ranges of values may be entered by',
+     'using a hyphen. e.g. 10-15. This data is sorted by the programme. If any value',
+     'is specified as both a minterm and a don''t care term then it is assumed to be',
+     'a minterm. Values which are out of range are ignored.',
+     '  Minimisation is done by first finding the prime implicants of the function',
+     'and then reducing the PI chart. Prime implicants are found by taking pairs of',
+     'terms (minterms or don''t cares) and testing to see if they form a cell. If they',
+     'do then a search is made to determine whether all the vertices of the cell are',
+     'either minterms or don''t cares. If so the cell is tested for containment by',
+     'any PI already found. If it is not contained then this cell is a PI. PI chart',
+     'reduction is done using the algebraic method after removing essential PIs and',
+     'the minterms they cover') (SKIP,A);
+END print_information;
+
+
+/*
+###############################################################################
+#                            MAIN PROGRAMME                                   #
+###############################################################################
+*/
+
+
+/* initialisation */
+num_minterms = 0;  num_dont_cares = 0;  num_terms = 0;
+new_data = true;
+
+/* main loop */
+DO WHILE (true);
+     /* get menu selection */
+     menu:
+     PUT SKIP(3);
+     CALL print_menu;
+     GO TO menu_option(menu_selection());
+
+     menu_option(1): /* enter data */
+          CALL enter_data;
+          GO TO menu;
+
+     menu_option(2): /* minimise */
+          IF num_terms < 2 THEN
+               PUT SKIP LIST ('Insufficient data - cannot minimise.');
+          ELSE DO;
+               IF new_data THEN CALL run_minimisation;
+               PUT SKIP(2);
+               CALL output_results(SYSPRINT);
+               new_data = false;
+               CALL continue_prompt;
+               END;
+          GO TO menu;
+
+     menu_option(3): /* file results */
+          IF ^ new_data THEN DO;
+               OPEN FILE(results_file) TITLE ('BOOL_MIN -APPEND') LINESIZE(80) STREAM OUTPUT PRINT;
+               CALL output_results(results_file);
+               PUT PAGE FILE(results_file);
+               CLOSE FILE(results_file);
+               PUT SKIP LIST ('Results appended to file BOOL_MIN.');
+               END;
+          ELSE PUT SKIP LIST ('No results to file.');
+          GO TO menu;
+
+     menu_option(4): /* information */
+          CALL print_information;
+          CALL continue_prompt;
+          GO TO menu;
+
+     menu_option(5): /* quit */
+          STOP;
+     END;
+
+END BSc_project;
