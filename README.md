@@ -11,8 +11,8 @@ the design and implementation of minimal logic circuitry.
 ### Concept
 
 This is a version of the [Quine–McCluskey](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm) algorithm
-but also incorporates algebraic operations proposed by Nagle at al for improved efficiency
-(ref. *An Introduction to Computer Logic; H.T.Nagle, B.D.CARROLL & J.D.Irwin; Prentice-Hall, 1975*).
+but also incorporates algebraic operations proposed by Nagle et al. for improved efficiency
+(ref. *An Introduction to Computer Logic; H.T.Nagle, B.D.Carroll & J.D.Irwin; Prentice-Hall, 1975*).
 
 ### Implementation
 
@@ -20,8 +20,8 @@ but also incorporates algebraic operations proposed by Nagle at al for improved 
 <img src="assets/prime-550.png" alt="PR1ME 550" align="right">
 
 It was coded in [PL/I](https://en.wikipedia.org/wiki/PL/I) General Purpose Subset,
-a subset of ANSI Standard PL/I initially developed by IBM.
-It ran on a 1979 PR1ME 550 System by [Prime Computer, Inc.](https://en.wikipedia.org/wiki/Prime_Computer)
+a subset of ANSI Standard PL/I, initially developed by IBM.
+It ran on a 1979 PRIME 550 System by [Prime Computer, Inc.](https://en.wikipedia.org/wiki/Prime_Computer)
 running the [PRIMOS](https://en.wikipedia.org/wiki/PRIMOS) operating system
 and accessed by dumb terminals.
 The image shows a similar system at Chilten ACL.
@@ -47,3 +47,4 @@ when minor outstanding compiler compatibility issues are fixed.
 
 This project is not intended as a solution for modern applications.
 It is presented for historic interest and to demonstrate the algebraic method of prime implicant production.
+
