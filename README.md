@@ -43,9 +43,13 @@ via scanning, optical character recognition and extensive correction
 The [test runs](https://scriptit.uk/download/1986-runs-lineprint.pdf) were also scanned
 from 14.5" x 11" fan-fold printouts.
 
-Recently (2024) I managed to get the program running again using
-the [Iron Spring PL/I compiler](http://www.iron-spring.com/) introduced in 2007,
+Recently (2024) I managed to get the program running again using the excellent
+[Iron Spring PL/I compiler](http://www.iron-spring.com/) introduced in 2007,
 on Ubuntu Linux under [VirtualBox](https://www.virtualbox.org/) on a Mac Pro.
 
-I shall publish the amended source code here
-when minor outstanding compiler compatibility issues are fixed.
+After fixing minor compatibility issues it works like a charm.
+
+The amended source code is [bool_min.pli](src/bool_min.pli)
+and that [src/](src/) directory also contains everything needed to build it on Linux.
+
+The [test/](test/) directory replicates the original [test runs](https://scriptit.uk/download/1986-runs-lineprint.pdf).
