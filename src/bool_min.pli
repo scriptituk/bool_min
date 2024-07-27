@@ -3,6 +3,7 @@
 = UTILITY PROGRAMME FOR THE MINIMISATION OF BOOLEAN FUNCTIONS                 =
 = Written by R.C.LUCKHURST, September 1986                                    =
 = for final year BSc Electrical Engineering project, Bristol Polytechnic      =
+= Amended July 2024, see https://github.com/scriptituk/bool_min               =
 ===============================================================================
 */
 

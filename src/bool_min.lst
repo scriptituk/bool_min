@@ -1,1544 +1,1545 @@
-Jul 27, 2024  01:55                                       /*                                                            
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 1     
     1 /*
     2 ===============================================================================
     3 = UTILITY PROGRAMME FOR THE MINIMISATION OF BOOLEAN FUNCTIONS                 =
     4 = Written by R.C.LUCKHURST, September 1986                                    =
     5 = for final year BSc Electrical Engineering project, Bristol Polytechnic      =
-    6 ===============================================================================
-    7 */
-    8 
+    6 = Amended July 2024, see https://github.com/scriptituk/bool_min               =
+    7 ===============================================================================
+    8 */
     9 
-   10 BSc_project: PROCEDURE OPTIONS (MAIN);
-   11 
-   12 %REPLACE $true BY '1'B;
-   13 %REPLACE $false BY '0'B;
-   14 %REPLACE $low BY 1;
-   15 %REPLACE $high BY 2;
-   16 %REPLACE $cost BY 3;
-   17 %REPLACE $status BY 4;
-   18 %REPLACE $redundant BY 1;
-   19 %REPLACE $min_cost_redundant BY 2;
-   20 %REPLACE $non_essential BY 3;
-   21 %REPLACE $min_cost_essential BY 4;
-   22 %REPLACE $essential BY 5;
-   23 
-   24 DECLARE SYSIN FILE STREAM INPUT ENVIRONMENT(INTERACTIVE);
-   25 DECLARE SYSPRINT FILE STREAM OUTPUT PRINT ENVIRONMENT(INTERACTIVE);
-   26 
-   27 DECLARE (BINARY, BIT, CEIL, CHARACTER, COPY, DECIMAL, INDEX,
-   28         LENGTH, LOG2, MIN, SUBSTR, TRANSLATE, VERIFY) BUILTIN,
-   29 
-   30         (num_minterms, num_dont_cares, num_terms, num_pis, num_ne_pis, num_inepi_sums,
-   31         minterm (512), dont_care (512), term (1024), p_i (4,256), ne_pi (96),
-   32         function_order, solution_cost) FIXED BINARY,
-   33 
-   34         (unique_solution, new_data,
-   35         epi_covers_minterm (256), pi_covers_minterm (256,256)) BIT STATIC,
-   36         inepi_sum (3000) BIT (96) ALIGNED,
-   37 
-   38         version CHARACTER (4) STATIC INITIAL ('V1.0'),
-   39         continue CHARACTER (30) VARYING,
-   40         pi_status (5) CHARACTER(30) VARYING STATIC INITIAL
-   41         ('redundant','minimum-cost redundant','non-essential','minimum-cost essential','essential'),
+   10 
+   11 BSc_project: PROCEDURE OPTIONS (MAIN);
+   12 
+   13 %REPLACE $true BY '1'B;
+   14 %REPLACE $false BY '0'B;
+   15 %REPLACE $low BY 1;
+   16 %REPLACE $high BY 2;
+   17 %REPLACE $cost BY 3;
+   18 %REPLACE $status BY 4;
+   19 %REPLACE $redundant BY 1;
+   20 %REPLACE $min_cost_redundant BY 2;
+   21 %REPLACE $non_essential BY 3;
+   22 %REPLACE $min_cost_essential BY 4;
+   23 %REPLACE $essential BY 5;
+   24 
+   25 DECLARE SYSIN FILE STREAM INPUT ENVIRONMENT(INTERACTIVE);
+   26 DECLARE SYSPRINT FILE STREAM OUTPUT PRINT ENVIRONMENT(INTERACTIVE);
+   27 
+   28 DECLARE (BINARY, BIT, CEIL, CHARACTER, COPY, DECIMAL, INDEX,
+   29         LENGTH, LOG2, MIN, SUBSTR, TRANSLATE, VERIFY) BUILTIN,
+   30 
+   31         (num_minterms, num_dont_cares, num_terms, num_pis, num_ne_pis, num_inepi_sums,
+   32         minterm (512), dont_care (512), term (1024), p_i (4,256), ne_pi (96),
+   33         function_order, solution_cost) FIXED BINARY,
+   34 
+   35         (unique_solution, new_data,
+   36         epi_covers_minterm (256), pi_covers_minterm (256,256)) BIT STATIC,
+   37         inepi_sum (3000) BIT (96) ALIGNED,
+   38 
+   39         version CHARACTER (4) STATIC INITIAL ('V1.0'),
+   40         continue CHARACTER (30) VARYING,
+   41         pi_status (5) CHARACTER(30) VARYING STATIC INITIAL
+   42         ('redundant','minimum-cost redundant','non-essential','minimum-cost essential','essential'),
       
-   42         results_file FILE;
-   43 
+   43         results_file FILE;
    44 
-   45 /*
-   46 ###############################################################################
-   47 #                          UTILITY PROCEDURES                                 #
-   48 ###############################################################################
-   49 */
-   50 
+   45 
+   46 /*
+   47 ###############################################################################
+   48 #                          UTILITY PROCEDURES                                 #
+   49 ###############################################################################
+   50 */
    51 
-   52 /******************************************************************************
-   53 * PROCEDURE equivalent: Returns logical equivalence between 2 integers        *
-   54 *******************************************************************************/
-   55 equivalent: PROCEDURE (x,y) RETURNS (FIXED BINARY);
-   56      DECLARE (x,y) FIXED BINARY;
-   57      RETURN (x & y  |  ^ x & ^ y);
-Jul 27, 2024  01:55                                       /*                                                            
+   52 
+   53 /******************************************************************************
+   54 * PROCEDURE equivalent: Returns logical equivalence between 2 integers        *
+   55 *******************************************************************************/
+   56 equivalent: PROCEDURE (x,y) RETURNS (FIXED BINARY);
+   57      DECLARE (x,y) FIXED BINARY;
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 2     
-   58 END equivalent;
-   59 
+   58      RETURN (x & y  |  ^ x & ^ y);
+   59 END equivalent;
    60 
-   61 /******************************************************************************
-   62 * PROCEDURE trim: Returns integer with no leading spaces                      *
-   63 *******************************************************************************/
-   64 trim: PROCEDURE (value) RETURNS (CHARACTER (10) VARYING);
-   65      DECLARE value FIXED BINARY;
-   66      RETURN (SUBSTR(CHARACTER(value),VERIFY(CHARACTER(value),' ')));
-   67 END trim;
-   68 
+   61 
+   62 /******************************************************************************
+   63 * PROCEDURE trim: Returns integer with no leading spaces                      *
+   64 *******************************************************************************/
+   65 trim: PROCEDURE (value) RETURNS (CHARACTER (10) VARYING);
+   66      DECLARE value FIXED BINARY;
+   67      RETURN (SUBSTR(CHARACTER(value),VERIFY(CHARACTER(value),' ')));
+   68 END trim;
    69 
-   70 /******************************************************************************
-   71 * PROCEDURE sort_data: Sorts minterms and don't cares into ascending order    *
-   72 *           and deletes duplicate terms and terms out of range                *
-   73 *******************************************************************************/
-   74 sort_data: PROCEDURE;
-   75      DECLARE (i, j, t) FIXED BINARY, (b, sorted, excess_terms, type (512)) BIT ALIGNED;
-   76 
-   77      /* first make an all-term list */
-   78      DO t = 1 TO num_minterms;
-   79           term(t) = minterm(t);
-   80           type(t) = $true; /* ie minterm */
-   81           END;
-   82      DO t = 1 TO num_dont_cares;
-   83           term(num_minterms + t) = dont_care(t);
-   84           type(num_minterms + t) = $false; /* ie dont-care */
-   85           END;
-   86      num_terms = num_minterms + num_dont_cares;
-   87 
-   88      /* then sort into ascending order */
-   89      excess_terms = $true;
-   90      DO WHILE (excess_terms);
-   91           excess_terms = $false; sorted = $false;
-   92           DO i = num_terms TO 1 BY -1 WHILE (^ (sorted | excess_terms));
-   93                /* erase terms which are out of range */
-   94                IF term(i) < 0 | term(i) > 255 THEN DO;
-   95                     term(i) = term(num_terms);
-   96                     type(i) = type(num_terms);
-   97                     num_terms = num_terms - 1;
-   98                     excess_terms = $true;
-   99                     END;
-  100                sorted = $true;
-  101                DO j = 1 TO i - 1 WHILE (^ excess_terms);
-  102                     IF term(j) < 0 THEN sorted = $false;
-  103                     /* if terms not in ascending order then swap them */
-  104                     IF term(j) > term(j + 1) THEN DO;
-  105                          t = term(j); term(j) = term(j + 1); term(j + 1) = t;
-  106                          b = type(j); type(j) = type(j + 1); type(j + 1) = b;
-  107                          sorted = $false;
-  108                          END;
-  109                     /* erase duplicate terms and give minterm priority */
-  110                     ELSE IF term(j) = term(j + 1) THEN DO;
-  111                          type(j) = (type(j) | type(j + 1));
-  112                          term(j + 1) = term(num_terms);
-  113                          type(j + 1) = type(num_terms);
-  114                          num_terms = num_terms - 1;
-  115                          excess_terms = $true;
-Jul 27, 2024  01:55                                       /*                                                            
+   70 
+   71 /******************************************************************************
+   72 * PROCEDURE sort_data: Sorts minterms and don't cares into ascending order    *
+   73 *           and deletes duplicate terms and terms out of range                *
+   74 *******************************************************************************/
+   75 sort_data: PROCEDURE;
+   76      DECLARE (i, j, t) FIXED BINARY, (b, sorted, excess_terms, type (512)) BIT ALIGNED;
+   77 
+   78      /* first make an all-term list */
+   79      DO t = 1 TO num_minterms;
+   80           term(t) = minterm(t);
+   81           type(t) = $true; /* ie minterm */
+   82           END;
+   83      DO t = 1 TO num_dont_cares;
+   84           term(num_minterms + t) = dont_care(t);
+   85           type(num_minterms + t) = $false; /* ie dont-care */
+   86           END;
+   87      num_terms = num_minterms + num_dont_cares;
+   88 
+   89      /* then sort into ascending order */
+   90      excess_terms = $true;
+   91      DO WHILE (excess_terms);
+   92           excess_terms = $false; sorted = $false;
+   93           DO i = num_terms TO 1 BY -1 WHILE (^ (sorted | excess_terms));
+   94                /* erase terms which are out of range */
+   95                IF term(i) < 0 | term(i) > 255 THEN DO;
+   96                     term(i) = term(num_terms);
+   97                     type(i) = type(num_terms);
+   98                     num_terms = num_terms - 1;
+   99                     excess_terms = $true;
+  100                     END;
+  101                sorted = $true;
+  102                DO j = 1 TO i - 1 WHILE (^ excess_terms);
+  103                     IF term(j) < 0 THEN sorted = $false;
+  104                     /* if terms not in ascending order then swap them */
+  105                     IF term(j) > term(j + 1) THEN DO;
+  106                          t = term(j); term(j) = term(j + 1); term(j + 1) = t;
+  107                          b = type(j); type(j) = type(j + 1); type(j + 1) = b;
+  108                          sorted = $false;
+  109                          END;
+  110                     /* erase duplicate terms and give minterm priority */
+  111                     ELSE IF term(j) = term(j + 1) THEN DO;
+  112                          type(j) = (type(j) | type(j + 1));
+  113                          term(j + 1) = term(num_terms);
+  114                          type(j + 1) = type(num_terms);
+  115                          num_terms = num_terms - 1;
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 3     
-  116                          END;
-  117                     END;
-  118                END;
-  119           END;
-  120 
-  121      /* now extract sorted terms back into ordered minterm & dont-care arrays */
-  122      num_minterms = 0; num_dont_cares = 0;
-  123      DO t = 1 TO num_terms;
-  124           IF type(t) THEN DO;
-  125                num_minterms = num_minterms + 1;
-  126                minterm(num_minterms) = term(t);
-  127                END;
-  128           ELSE DO;
-  129                num_dont_cares = num_dont_cares + 1;
-  130                dont_care(num_dont_cares) = term(t);
-  131                END;
-  132           END;
-  133 END sort_data;
-  134 
+  116                          excess_terms = $true;
+  117                          END;
+  118                     END;
+  119                END;
+  120           END;
+  121 
+  122      /* now extract sorted terms back into ordered minterm & dont-care arrays */
+  123      num_minterms = 0; num_dont_cares = 0;
+  124      DO t = 1 TO num_terms;
+  125           IF type(t) THEN DO;
+  126                num_minterms = num_minterms + 1;
+  127                minterm(num_minterms) = term(t);
+  128                END;
+  129           ELSE DO;
+  130                num_dont_cares = num_dont_cares + 1;
+  131                dont_care(num_dont_cares) = term(t);
+  132                END;
+  133           END;
+  134 END sort_data;
   135 
-  136 /*
-  137 ###############################################################################
-  138 #                           INPUT PROCEDURES                                  #
-  139 ###############################################################################
-  140 */
-  141 
+  136 
+  137 /*
+  138 ###############################################################################
+  139 #                           INPUT PROCEDURES                                  #
+  140 ###############################################################################
+  141 */
   142 
-  143 /******************************************************************************
-  144 * PROCEDURE menu_selection: Returns menu item requested: 1 - 5                *
-  145 *******************************************************************************/
-  146 menu_selection: PROCEDURE RETURNS (FIXED BINARY);
-  147      DECLARE menu_item CHARACTER (30) VARYING, m FIXED BINARY;
-  148      DO WHILE ($true);
-  149           GET EDIT (menu_item) (A);
-  150           IF VERIFY(menu_item, '12345') = 0 THEN DO;
-  151                m = BINARY(menu_item);
-  152                IF m >= 1 & m <= 5 THEN RETURN (m);
-  153                END;
-  154           END;
-  155 END menu_selection;
-  156 
+  143 
+  144 /******************************************************************************
+  145 * PROCEDURE menu_selection: Returns menu item requested: 1 - 5                *
+  146 *******************************************************************************/
+  147 menu_selection: PROCEDURE RETURNS (FIXED BINARY);
+  148      DECLARE menu_item CHARACTER (30) VARYING, m FIXED BINARY;
+  149      DO WHILE ($true);
+  150           GET EDIT (menu_item) (A);
+  151           IF VERIFY(menu_item, '12345') = 0 THEN DO;
+  152                m = BINARY(menu_item);
+  153                IF m >= 1 & m <= 5 THEN RETURN (m);
+  154                END;
+  155           END;
+  156 END menu_selection;
   157 
-  158 /******************************************************************************
-  159 * PROCEDURE continue_prompt: Stops screen scrolling                           *
-  160 *******************************************************************************/
-  161 continue_prompt: PROCEDURE;
-  162      PUT SKIP(2) LIST ('Press RETURN to continue -->');
-  163      GET EDIT (continue) (A);
-  164 END continue_prompt;
-  165 
+  158 
+  159 /******************************************************************************
+  160 * PROCEDURE continue_prompt: Stops screen scrolling                           *
+  161 *******************************************************************************/
+  162 continue_prompt: PROCEDURE;
+  163      PUT SKIP(2) LIST ('Press RETURN to continue -->');
+  164      GET EDIT (continue) (A);
+  165 END continue_prompt;
   166 
-  167 /******************************************************************************
-  168 * PROCEDURE enter_data: Used to enter minterms and don't cares                *
-  169 *******************************************************************************/
-  170 enter_data: PROCEDURE;
-  171      DECLARE action CHARACTER (30) VARYING, deleted BIT ALIGNED, (i, t) FIXED BINARY;
-  172 
-  173      get_input_list: PROCEDURE;
-Jul 27, 2024  01:55                                       /*                                                            
+  167 
+  168 /******************************************************************************
+  169 * PROCEDURE enter_data: Used to enter minterms and don't cares                *
+  170 *******************************************************************************/
+  171 enter_data: PROCEDURE;
+  172      DECLARE action CHARACTER (30) VARYING, deleted BIT ALIGNED, (i, t) FIXED BINARY;
+  173 
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 4     
-  174           DECLARE (upper, lower) FIXED BINARY,
-  175                   input_item CHARACTER (30) VARYING,
-  176                   illegal_entry BIT ALIGNED;
-  177 
-  178                num_terms = 0;
-  179                illegal_entry = $false;
-  180                PUT EDIT ('Enter values in the range 0 to 255 seperated by commas or blanks or return
+  174      get_input_list: PROCEDURE;
+  175           DECLARE (upper, lower) FIXED BINARY,
+  176                   input_item CHARACTER (30) VARYING,
+  177                   illegal_entry BIT ALIGNED;
+  178 
+  179                num_terms = 0;
+  180                illegal_entry = $false;
+  181                PUT EDIT ('Enter values in the range 0 to 255 seperated by commas or blanks or return
       s. ',
-  181                               'A range of values may be entered using a hyphen, e.g. 10-15. ',
-  182                               'Type E after the last entry. ',
-  183                               '--> ') (SKIP, A);
-  184                DO WHILE ($true);
-  185                     GET EDIT (input_item) (A);
-  186                     IF TRANSLATE(input_item, 'E', 'e') = 'E' THEN RETURN;
-  187                     ELSE IF VERIFY(input_item, '-0123456789') = 0 & INDEX(input_item, '-') ^= 1 THEN
+  182                               'A range of values may be entered using a hyphen, e.g. 10-15. ',
+  183                               'Type E after the last entry. ',
+  184                               '--> ') (SKIP, A);
+  185                DO WHILE ($true);
+  186                     GET EDIT (input_item) (A);
+  187                     IF TRANSLATE(input_item, 'E', 'e') = 'E' THEN RETURN;
+  188                     ELSE IF VERIFY(input_item, '-0123456789') = 0 & INDEX(input_item, '-') ^= 1 THEN
        DO;
-  188                          t = INDEX(input_item, '-');
-  189                          IF t = 0 THEN DO;
-  190                               IF num_terms <= 255 THEN DO;
-  191                                    num_terms = num_terms + 1;
-  192                                    term(num_terms) = BINARY(input_item);
-  193                                    END;
-  194                               END;
-  195                          ELSE IF t <= 5 & LENGTH(input_item) - t < 5 THEN DO;
-  196                               upper = BINARY(SUBSTR(input_item,t + 1)); IF upper > 255 THEN upper = 
+  189                          t = INDEX(input_item, '-');
+  190                          IF t = 0 THEN DO;
+  191                               IF num_terms <= 255 THEN DO;
+  192                                    num_terms = num_terms + 1;
+  193                                    term(num_terms) = BINARY(input_item);
+  194                                    END;
+  195                               END;
+  196                          ELSE IF t <= 5 & LENGTH(input_item) - t < 5 THEN DO;
+  197                               upper = BINARY(SUBSTR(input_item,t + 1)); IF upper > 255 THEN upper = 
       255;
-  197                               lower = BINARY(SUBSTR(input_item, 1,t - 1)); IF lower > 255 THEN lower
+  198                               lower = BINARY(SUBSTR(input_item, 1,t - 1)); IF lower > 255 THEN lower
        = 255;
-  198                               IF lower > upper THEN DO; t = lower; lower = upper; upper = t; END;
-  199                               DO t = lower TO upper WHILE (num_terms <= 255);
-  200                                    num_terms = num_terms + 1;
-  201                                    term(num_terms) = t;
-  202                                    END;
-  203                               END;
-  204                          END;
-  205                     ELSE illegal_entry = $true;
-  206                     END;
-  207                IF illegal_entry THEN PUT SKIP LIST ('Illegal entries have been disregarded. ');
-  208           END get_input_list;
-  209 
-  210           DO WHILE ($true);
-  211           PUT SKIP(3);
-  212                CALL sort_data;
-  213                CALL print_header_message(SYSPRINT);
-  214                CALL print_input_data(SYSPRINT);
-  215                PUT SKIP(3) EDIT ('C = Clear data',
-  216                                  'AM = Add Minterms',
-  217                                  'DM = Delete Minterms',
-  218                                  'AD = Add Don''t cares',
-  219                                  'DD = Delete Don''t cares',
-  220                                  'E = End data entry',
-  221                                  'Enter C/AM/DM/AD/DD/E --> ') (6(COLUMN(24),A,SKIP),SKIP,COLUMN(24)
+  199                               IF lower > upper THEN DO; t = lower; lower = upper; upper = t; END;
+  200                               DO t = lower TO upper WHILE (num_terms <= 255);
+  201                                    num_terms = num_terms + 1;
+  202                                    term(num_terms) = t;
+  203                                    END;
+  204                               END;
+  205                          END;
+  206                     ELSE illegal_entry = $true;
+  207                     END;
+  208                IF illegal_entry THEN PUT SKIP LIST ('Illegal entries have been disregarded. ');
+  209           END get_input_list;
+  210 
+  211           DO WHILE ($true);
+  212           PUT SKIP(3);
+  213                CALL sort_data;
+  214                CALL print_header_message(SYSPRINT);
+  215                CALL print_input_data(SYSPRINT);
+  216                PUT SKIP(3) EDIT ('C = Clear data',
+  217                                  'AM = Add Minterms',
+  218                                  'DM = Delete Minterms',
+  219                                  'AD = Add Don''t cares',
+  220                                  'DD = Delete Don''t cares',
+  221                                  'E = End data entry',
+  222                                  'Enter C/AM/DM/AD/DD/E --> ') (6(COLUMN(24),A,SKIP),SKIP,COLUMN(24)
       ,A);
-  222                action = ' ';
-  223                DO WHILE (VERIFY(action,'ACDEM') ^= 0);
-  224                     GET EDIT (action) (A);
-  225                     action = TRANSLATE(action, 'ACDEM', 'acdem');
-  226                     END;
-Jul 27, 2024  01:55                                       /*                                                            
+  223                action = ' ';
+  224                DO WHILE (VERIFY(action,'ACDEM') ^= 0);
+  225                     GET EDIT (action) (A);
+  226                     action = TRANSLATE(action, 'ACDEM', 'acdem');
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 5     
-  227                IF action = 'E' THEN RETURN;
-  228                IF action = 'C' THEN DO;
-  229                     num_minterms = 0; num_dont_cares = 0;
-  230                     END;
-  231                IF action = 'AM' | action = 'DM' | action = 'AD' | action = 'DD' THEN DO;
-  232                     CALL get_input_list;
-  233                     IF action = 'AM' THEN DO; /* add input list to minterms */
-  234                          DO t = 1 TO num_terms;
-  235                               minterm(num_minterms + t) = term(t);
-  236                               END;
-  237                          num_minterms = num_minterms + num_terms;
-  238                     END;
-  239                ELSE IF action = 'DM' THEN DO; /* make minterms contained in i/p list out of range fo
+  227                     END;
+  228                IF action = 'E' THEN RETURN;
+  229                IF action = 'C' THEN DO;
+  230                     num_minterms = 0; num_dont_cares = 0;
+  231                     END;
+  232                IF action = 'AM' | action = 'DM' | action = 'AD' | action = 'DD' THEN DO;
+  233                     CALL get_input_list;
+  234                     IF action = 'AM' THEN DO; /* add input list to minterms */
+  235                          DO t = 1 TO num_terms;
+  236                               minterm(num_minterms + t) = term(t);
+  237                               END;
+  238                          num_minterms = num_minterms + num_terms;
+  239                     END;
+  240                ELSE IF action = 'DM' THEN DO; /* make minterms contained in i/p list out of range fo
       r deletion */
-  240                     DO t = 1 TO num_terms;
-  241                          deleted = $false;
-  242                          DO i = 1 TO num_minterms WHILE (^ deleted);
-  243                               IF minterm(i) = term(t) THEN DO;
-  244                                    minterm(i) = -1;
-  245                                    deleted = $true;
-  246                                    END;
-  247                               END;
-  248                          END;
-  249                     END;
-  250                ELSE IF action = 'AD' THEN DO; /* add input list to dont-cares */
-  251                     DO t = 1 TO num_terms;
-  252                          dont_care(num_dont_cares + t) = term(t);
-  253                          END;
-  254                     num_dont_cares = num_dont_cares + num_terms;
-  255                     END;
-  256                ELSE DO; /* make dont-cares contained in i/p list out of range for deletion when sort
+  241                     DO t = 1 TO num_terms;
+  242                          deleted = $false;
+  243                          DO i = 1 TO num_minterms WHILE (^ deleted);
+  244                               IF minterm(i) = term(t) THEN DO;
+  245                                    minterm(i) = -1;
+  246                                    deleted = $true;
+  247                                    END;
+  248                               END;
+  249                          END;
+  250                     END;
+  251                ELSE IF action = 'AD' THEN DO; /* add input list to dont-cares */
+  252                     DO t = 1 TO num_terms;
+  253                          dont_care(num_dont_cares + t) = term(t);
+  254                          END;
+  255                     num_dont_cares = num_dont_cares + num_terms;
+  256                     END;
+  257                ELSE DO; /* make dont-cares contained in i/p list out of range for deletion when sort
       ed */
-  257                     DO t = 1 TO num_terms;
-  258                          deleted = $false;
-  259                          DO i = 1 TO num_dont_cares WHILE (^ deleted);
-  260                               IF dont_care(i) = term(t) THEN DO;
-  261                                    dont_care(i) = -1;
-  262                                    deleted = $true;
-  263                                    END;
-  264                               END;
-  265                          END;
-  266                     END;
-  267                IF num_terms > 0 THEN new_data = $true;
-  268                END;
-  269           END;
-  270 END enter_data;
-  271 
+  258                     DO t = 1 TO num_terms;
+  259                          deleted = $false;
+  260                          DO i = 1 TO num_dont_cares WHILE (^ deleted);
+  261                               IF dont_care(i) = term(t) THEN DO;
+  262                                    dont_care(i) = -1;
+  263                                    deleted = $true;
+  264                                    END;
+  265                               END;
+  266                          END;
+  267                     END;
+  268                IF num_terms > 0 THEN new_data = $true;
+  269                END;
+  270           END;
+  271 END enter_data;
   272 
-  273 /*
-  274 ###############################################################################
-  275 #                       MINIMISATION PROCEDURES                               #
-  276 ###############################################################################
-  277 */
-  278 
+  273 
+  274 /*
+  275 ###############################################################################
+  276 #                       MINIMISATION PROCEDURES                               #
+  277 ###############################################################################
+  278 */
   279 
-  280 /******************************************************************************
-  281 * PROCEDURE prime_implicants: Generates complete list of PIs                  *
-  282 *******************************************************************************/
-Jul 27, 2024  01:55                                       /*                                                            
+  280 
+  281 /******************************************************************************
+  282 * PROCEDURE prime_implicants: Generates complete list of PIs                  *
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 6     
-  283 prime_implicants: PROCEDURE;
-  284 
-  285 DECLARE (i, j, term_i, term_j, i_eqv_j, vertex, p, m) FIXED BINARY,
-  286         (all_vertices_contained, covered) BIT ALIGNED;
-  287 
-  288      /* generate the prime implicants */
-  289      num_pis = 0;
-  290      DO i = 1 TO num_terms;
-  291           DO j = num_terms TO i BY -1;
-  292           /* choose the pair (i,j) */
-  293           term_i = term(i); term_j = term(j);
-  294           /* is (i,j) a cell? */
-  295           IF (term_i & term_j) = term_i THEN DO;
-  296                /* are all the vertices of (i,j) in the function? */
-  297                i_eqv_j = equivalent(term_i, term_j);
-  298                all_vertices_contained = $true; m = i + 1;
-  299                DO vertex = term_i + 1 TO term_j - 1 WHILE (all_vertices_contained);
-  300                     IF (i_eqv_j & vertex) = term_i THEN DO;
-  301                          DO WHILE (term(m) < vertex); m = m + 1; END;
-  302                          all_vertices_contained = (term(m) = vertex);
-  303                          m = m + 1;
-  304                          END;
-  305                     END;
-  306                IF all_vertices_contained THEN DO;
-  307                     /* is (i,j) covered by an entry in the p.i. table? */
-  308                     covered = $false;
-  309                     IF num_pis ^= 0 THEN DO p = 1 TO num_pis WHILE (^ covered);
-  310                          IF term_j <= p_i($high,p) THEN
-  311                               IF (p_i($low,p) & term_i) = p_i($low,p) THEN
-  312                                    covered = ((term_j & p_i($high,p)) = term_j);
-  313                               END;
-  314                     IF ^ covered THEN DO;
-  315                          num_pis = num_pis + 1;
-  316                          p_i($low,num_pis) = term_i;
-  317                          p_i($high,num_pis) = term_j;
-  318                          END;
-  319                     END;
-  320                END;
-  321           END;
-  322      END;
-  323 
-  324 END prime_implicants;
-  325 
+  283 *******************************************************************************/
+  284 prime_implicants: PROCEDURE;
+  285 
+  286 DECLARE (i, j, term_i, term_j, i_eqv_j, vertex, p, m) FIXED BINARY,
+  287         (all_vertices_contained, covered) BIT ALIGNED;
+  288 
+  289      /* generate the prime implicants */
+  290      num_pis = 0;
+  291      DO i = 1 TO num_terms;
+  292           DO j = num_terms TO i BY -1;
+  293           /* choose the pair (i,j) */
+  294           term_i = term(i); term_j = term(j);
+  295           /* is (i,j) a cell? */
+  296           IF (term_i & term_j) = term_i THEN DO;
+  297                /* are all the vertices of (i,j) in the function? */
+  298                i_eqv_j = equivalent(term_i, term_j);
+  299                all_vertices_contained = $true; m = i + 1;
+  300                DO vertex = term_i + 1 TO term_j - 1 WHILE (all_vertices_contained);
+  301                     IF (i_eqv_j & vertex) = term_i THEN DO;
+  302                          DO WHILE (term(m) < vertex); m = m + 1; END;
+  303                          all_vertices_contained = (term(m) = vertex);
+  304                          m = m + 1;
+  305                          END;
+  306                     END;
+  307                IF all_vertices_contained THEN DO;
+  308                     /* is (i,j) covered by an entry in the p.i. table? */
+  309                     covered = $false;
+  310                     IF num_pis ^= 0 THEN DO p = 1 TO num_pis WHILE (^ covered);
+  311                          IF term_j <= p_i($high,p) THEN
+  312                               IF (p_i($low,p) & term_i) = p_i($low,p) THEN
+  313                                    covered = ((term_j & p_i($high,p)) = term_j);
+  314                               END;
+  315                     IF ^ covered THEN DO;
+  316                          num_pis = num_pis + 1;
+  317                          p_i($low,num_pis) = term_i;
+  318                          p_i($high,num_pis) = term_j;
+  319                          END;
+  320                     END;
+  321                END;
+  322           END;
+  323      END;
+  324 
+  325 END prime_implicants;
   326 
-  327 /******************************************************************************
-  328 * PROCEDURE p_i_chart: Makes a PI chart as a bit array                        *
-  329 *******************************************************************************/
-  330 p_i_chart: PROCEDURE;
-  331      DECLARE (m, p) FIXED BINARY;
-  332      /* generate the prime implicant chart */
-  333      DO m = 1 TO num_minterms;
-  334           DO p = 1 TO num_pis;
-  335                pi_covers_minterm(p,m) = ((p_i($low,p) & minterm(m)) = p_i($low, p)
-  336                                         & (minterm(m) & p_i($high,p)) = minterm(m));
-  337                END;
-  338           END;
-  339 END p_i_chart;
-  340 
-Jul 27, 2024  01:55                                       /*                                                            
+  327 
+  328 /******************************************************************************
+  329 * PROCEDURE p_i_chart: Makes a PI chart as a bit array                        *
+  330 *******************************************************************************/
+  331 p_i_chart: PROCEDURE;
+  332      DECLARE (m, p) FIXED BINARY;
+  333      /* generate the prime implicant chart */
+  334      DO m = 1 TO num_minterms;
+  335           DO p = 1 TO num_pis;
+  336                pi_covers_minterm(p,m) = ((p_i($low,p) & minterm(m)) = p_i($low, p)
+  337                                         & (minterm(m) & p_i($high,p)) = minterm(m));
+  338                END;
+  339           END;
+  340 END p_i_chart;
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 7     
   341 
-  342 /******************************************************************************
-  343 * PROCEDURE p_i_status: Categorises PIs as essential/nonessential/redundant   *
-  344 *******************************************************************************/
-  345 p_i_status: PROCEDURE;
-  346      DECLARE (m, p, epi, num_covers) FIXED BINARY;
-  347 
-  348      /* initialise all p.i. status to redundant */
-  349      DO p = 1 TO num_pis; p_i($status,p) = $redundant; END;
-  350      /* find essential p.i.s */
-  351      DO m = 1 TO num_minterms;
-  352           num_covers = 0;
-  353           DO p = 1 TO num_pis;
-  354                IF pi_covers_minterm(p,m) THEN DO;
-  355                     epi = p;
-  356                     num_covers = num_covers + 1;
-  357                     END;
-  358                END;
-  359           IF num_covers = 1 THEN p_i($status, epi) = $essential;
-  360           END;
-  361      /* find minterms covered by essential p.i.s */
-  362      num_covers = 0;
-  363      DO m = 1 TO num_minterms;
-  364           epi_covers_minterm(m) = $false;
-  365           DO p = 1 TO num_pis WHILE (^ epi_covers_minterm(m));
-  366                IF p_i($status,p) = $essential & pi_covers_minterm(p,m) THEN DO;
-  367                     epi_covers_minterm(m) = $true;
-  368                     num_covers = num_covers + 1;
-  369                     END;
-  370                END;
-  371           END;
-  372      /* determine whether 1 solution or more */
-  373      unique_solution = (num_covers = num_minterms);
-  374      /* find non-essential p.i.s */
-  375      IF ^ unique_solution THEN DO;
-  376           DO m = 1 TO num_minterms;
-  377                IF ^ epi_covers_minterm(m) THEN DO p = 1 TO num_pis;
-  378                     IF p_i($status,p) = $redundant & pi_covers_minterm(p,m) THEN p_i($status,p) = $n
+  342 
+  343 /******************************************************************************
+  344 * PROCEDURE p_i_status: Categorises PIs as essential/nonessential/redundant   *
+  345 *******************************************************************************/
+  346 p_i_status: PROCEDURE;
+  347      DECLARE (m, p, epi, num_covers) FIXED BINARY;
+  348 
+  349      /* initialise all p.i. status to redundant */
+  350      DO p = 1 TO num_pis; p_i($status,p) = $redundant; END;
+  351      /* find essential p.i.s */
+  352      DO m = 1 TO num_minterms;
+  353           num_covers = 0;
+  354           DO p = 1 TO num_pis;
+  355                IF pi_covers_minterm(p,m) THEN DO;
+  356                     epi = p;
+  357                     num_covers = num_covers + 1;
+  358                     END;
+  359                END;
+  360           IF num_covers = 1 THEN p_i($status, epi) = $essential;
+  361           END;
+  362      /* find minterms covered by essential p.i.s */
+  363      num_covers = 0;
+  364      DO m = 1 TO num_minterms;
+  365           epi_covers_minterm(m) = $false;
+  366           DO p = 1 TO num_pis WHILE (^ epi_covers_minterm(m));
+  367                IF p_i($status,p) = $essential & pi_covers_minterm(p,m) THEN DO;
+  368                     epi_covers_minterm(m) = $true;
+  369                     num_covers = num_covers + 1;
+  370                     END;
+  371                END;
+  372           END;
+  373      /* determine whether 1 solution or more */
+  374      unique_solution = (num_covers = num_minterms);
+  375      /* find non-essential p.i.s */
+  376      IF ^ unique_solution THEN DO;
+  377           DO m = 1 TO num_minterms;
+  378                IF ^ epi_covers_minterm(m) THEN DO p = 1 TO num_pis;
+  379                     IF p_i($status,p) = $redundant & pi_covers_minterm(p,m) THEN p_i($status,p) = $n
       on_essential;
-  379                     END;
-  380                END;
-  381           /* make a table of n.e.p.i. pointers */
-  382           num_ne_pis = 0;
-  383           DO p = 1 TO num_pis;
-  384                IF p_i($status,p) = $non_essential THEN DO;
-  385                     num_ne_pis = num_ne_pis + 1;   ne_pi(num_ne_pis) = p;
-  386                     END;
-  387                END;
-  388           END;
-  389 
-  390 END p_i_status;
-  391 
+  380                     END;
+  381                END;
+  382           /* make a table of n.e.p.i. pointers */
+  383           num_ne_pis = 0;
+  384           DO p = 1 TO num_pis;
+  385                IF p_i($status,p) = $non_essential THEN DO;
+  386                     num_ne_pis = num_ne_pis + 1;   ne_pi(num_ne_pis) = p;
+  387                     END;
+  388                END;
+  389           END;
+  390 
+  391 END p_i_status;
   392 
-  393 /******************************************************************************
-  394 * PROCEDURE p_i_cost: Calculates literal costs of PIs                         *
-  395 *******************************************************************************/
-  396 p_i_cost: PROCEDURE;
-  397      DECLARE (p, l, b, literals) FIXED BINARY;
-Jul 27, 2024  01:55                                       /*                                                            
+  393 
+  394 /******************************************************************************
+  395 * PROCEDURE p_i_cost: Calculates literal costs of PIs                         *
+  396 *******************************************************************************/
+  397 p_i_cost: PROCEDURE;
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 8     
-  398      DO p = 1 TO num_pis;
-  399           p_i($cost,p) = 0;  b = 1;
-  400           literals = equivalent(p_i($low,p),p_i($high,p));
-  401           DO l = 1 TO function_order;
-  402                IF (b & literals) ^= 0 THEN p_i($cost,p) = p_i($cost,p) + 1;
-  403                b = b + b;
-  404                END;
-  405           END;
-  406 END p_i_cost;
-  407 
+  398      DECLARE (p, l, b, literals) FIXED BINARY;
+  399      DO p = 1 TO num_pis;
+  400           p_i($cost,p) = 0;  b = 1;
+  401           literals = equivalent(p_i($low,p),p_i($high,p));
+  402           DO l = 1 TO function_order;
+  403                IF (b & literals) ^= 0 THEN p_i($cost,p) = p_i($cost,p) + 1;
+  404                b = b + b;
+  405                END;
+  406           END;
+  407 END p_i_cost;
   408 
-  409 /******************************************************************************
-  410 * PROCEDURE irredundand_nepi_sums: Performs algebraic conversion of           *
-  411 *                                  nonessential PI product-of-sums to         *
-  412 *                                  sum-of-products                            *
-  413 *******************************************************************************/
-  414 irredundant_nepi_sums: PROCEDURE;
-  415      DECLARE (m, p, c, s, num_umin_nepis) FIXED BINARY,
-  416              (b, umin_nepis(256)) BIT (96) ALIGNED,
-  417              redundant_sums BIT ALIGNED;
-  418 
-  419      /* make an array of bit strings holding non-ess p.i. coverage of uncovered minterms */
-  420      num_umin_nepis = 0;
-  421      DO m = 1 TO num_minterms;
-  422           IF ^ epi_covers_minterm(m) THEN DO;
-  423               num_umin_nepis = num_umin_nepis + 1;
-  424               umin_nepis(num_umin_nepis) = 0;
-  425               b = BIT(0,95) || '1'B;
-  426               DO p = 1 TO num_ne_pis;
-  427                   IF pi_covers_minterm(ne_pi(p),m) THEN
-  428                       umin_nepis(num_umin_nepis) = umin_nepis(num_umin_nepis) | b;
-  429                   b = SUBSTR(b, 2);
-  430                   END;
-  431               END;
-  432           END;
-  433 
-  434      /* first pass - i.n.e.p.i. sums are those covering 1st uncovered minterm */
-  435      num_inepi_sums = 0;  b = BIT(0,95) || '1'B;
-  436      DO p = 1 TO num_ne_pis;
-  437           /* if 1st uncovered minterm is covered by this n.e.p.i. then ... */
-  438           IF (umin_nepis(1) & b) ^= BIT(0,96) THEN DO;
-  439               /* ... this sum is initially this n.e-p.i. */
-  440               num_inepi_sums = num_inepi_sums + 1; inepi_sum(num_inepi_sums) = b;
-  441               END;
-  442           b = SUBSTR(b, 2);
-  443           END;
-  444 
-  445      /* continue by repeatediy combining with n.e.p.i. terms of succeeding minterms algebraically */
+  409 
+  410 /******************************************************************************
+  411 * PROCEDURE irredundand_nepi_sums: Performs algebraic conversion of           *
+  412 *                                  nonessential PI product-of-sums to         *
+  413 *                                  sum-of-products                            *
+  414 *******************************************************************************/
+  415 irredundant_nepi_sums: PROCEDURE;
+  416      DECLARE (m, p, c, s, num_umin_nepis) FIXED BINARY,
+  417              (b, umin_nepis(256)) BIT (96) ALIGNED,
+  418              redundant_sums BIT ALIGNED;
+  419 
+  420      /* make an array of bit strings holding non-ess p.i. coverage of uncovered minterms */
+  421      num_umin_nepis = 0;
+  422      DO m = 1 TO num_minterms;
+  423           IF ^ epi_covers_minterm(m) THEN DO;
+  424               num_umin_nepis = num_umin_nepis + 1;
+  425               umin_nepis(num_umin_nepis) = 0;
+  426               b = BIT(0,95) || '1'B;
+  427               DO p = 1 TO num_ne_pis;
+  428                   IF pi_covers_minterm(ne_pi(p),m) THEN
+  429                       umin_nepis(num_umin_nepis) = umin_nepis(num_umin_nepis) | b;
+  430                   b = SUBSTR(b, 2);
+  431                   END;
+  432               END;
+  433           END;
+  434 
+  435      /* first pass - i.n.e.p.i. sums are those covering 1st uncovered minterm */
+  436      num_inepi_sums = 0;  b = BIT(0,95) || '1'B;
+  437      DO p = 1 TO num_ne_pis;
+  438           /* if 1st uncovered minterm is covered by this n.e.p.i. then ... */
+  439           IF (umin_nepis(1) & b) ^= BIT(0,96) THEN DO;
+  440               /* ... this sum is initially this n.e-p.i. */
+  441               num_inepi_sums = num_inepi_sums + 1; inepi_sum(num_inepi_sums) = b;
+  442               END;
+  443           b = SUBSTR(b, 2);
+  444           END;
+  445 
+  446      /* continue by repeatediy combining with n.e.p.i. terms of succeeding minterms algebraically */
       
-  446      DO m = 2 TO num_umin_nepis;
-  447           /* initialise cover counter and n.e.p.i. pointer */
-  448           c = -1;  b = BIT(0,95) || '1'B;
-  449           /* add each n.e.p.i. covering this minterm successively to each sum */
-  450           DO p = 1 TO num_ne_pis;
-  451               /* if this n.e.p.i. covers this minterm then ... */
-  452               IF (umin_nepis(m) & b) ^= BIT(0, 96) THEN DO;
-  453                   /* ... increment cover counter for this minterm ... */
-  454                   c = c + 1;
-Jul 27, 2024  01:55                                       /*                                                            
+  447      DO m = 2 TO num_umin_nepis;
+  448           /* initialise cover counter and n.e.p.i. pointer */
+  449           c = -1;  b = BIT(0,95) || '1'B;
+  450           /* add each n.e.p.i. covering this minterm successively to each sum */
+  451           DO p = 1 TO num_ne_pis;
+  452               /* if this n.e.p.i. covers this minterm then ... */
+  453               IF (umin_nepis(m) & b) ^= BIT(0, 96) THEN DO;
+  454                   /* ... increment cover counter for this minterm ... */
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 9     
-  455                   /* ... step through the sums for this cover ... */
-  456                   DO s = c * num_inepi_sums + 1 TO (c + 1) * num_inepi_sums;
-  457                       /* ... make a copy of current sums for next cover ... */
-  458                       inepi_sum(s + num_inepi_sums) = inepi_sum(s);
-  459                       /* ... add this cover to the sum */
-  460                       inepi_sum(s) = inepi_sum(s) | b;
-  461                       END;
-  462                   END;
-  463               b = SUBSTR(b, 2);
-  464               END;
-  465           /* calculate the new number of sums resulting from above */
-  466           num_inepi_sums = (c + 1) * num_inepi_sums;
-  467           /* some sums may cover others so minimise by nulling redundant sums */
-  468           redundant_sums = $false;
-  469           DO s = 1 TO num_inepi_sums;
-  470               IF inepi_sum(s) ^= BIT(0,96) THEN DO c = 1 TO num_inepi_sums;
-  471                   IF c ^= s & inepi_sum(c) ^= BIT(0,96) & (inepi_sum(s) & inepi_sum(c)) = inepi_sum(
+  455                   c = c + 1;
+  456                   /* ... step through the sums for this cover ... */
+  457                   DO s = c * num_inepi_sums + 1 TO (c + 1) * num_inepi_sums;
+  458                       /* ... make a copy of current sums for next cover ... */
+  459                       inepi_sum(s + num_inepi_sums) = inepi_sum(s);
+  460                       /* ... add this cover to the sum */
+  461                       inepi_sum(s) = inepi_sum(s) | b;
+  462                       END;
+  463                   END;
+  464               b = SUBSTR(b, 2);
+  465               END;
+  466           /* calculate the new number of sums resulting from above */
+  467           num_inepi_sums = (c + 1) * num_inepi_sums;
+  468           /* some sums may cover others so minimise by nulling redundant sums */
+  469           redundant_sums = $false;
+  470           DO s = 1 TO num_inepi_sums;
+  471               IF inepi_sum(s) ^= BIT(0,96) THEN DO c = 1 TO num_inepi_sums;
+  472                   IF c ^= s & inepi_sum(c) ^= BIT(0,96) & (inepi_sum(s) & inepi_sum(c)) = inepi_sum(
       s) THEN DO;
-  472                       inepi_sum(c) = BIT(0, 96);
-  473                       redundant_sums = $true;
-  474                       END;
-  475                   END;
-  476               END;
-  477           /* remove redundant sums and calculate the new number of sums Tesulting */
-  478           IF redundant_sums THEN CALL remove_redundant_sums;
-  479           END;
-  480 
-  481 END irredundant_nepi_sums;
-  482 
+  473                       inepi_sum(c) = BIT(0, 96);
+  474                       redundant_sums = $true;
+  475                       END;
+  476                   END;
+  477               END;
+  478           /* remove redundant sums and calculate the new number of sums Tesulting */
+  479           IF redundant_sums THEN CALL remove_redundant_sums;
+  480           END;
+  481 
+  482 END irredundant_nepi_sums;
   483 
-  484 /******************************************************************************
-  485 * PROCEDURE minimum_cost_solution: Finds set of minimum literal cost          *
-  486 *                                  nonessential PI sums                       *
-  487 *******************************************************************************/
-  488 minimum_cost_solution: PROCEDURE;
-  489      DECLARE (s, min_cost, sum_cost(1000)) FIXED BINARY,
-  490              redundant_sums BIT ALIGNED;
-  491 
-  492      /* make a table of irredundant n.e.p.i. literal costs */
-  493      DO s = 1 TO num_inepi_sums;
-  494           sum_cost(s) = nonessential_cost(s);
-  495           END;
-  496      /* find the minimum cost */
-  497      min_cost = sum_cost(1);
-  498      DO s = 2 TO num_inepi_sums;
-  499           IF sum_cost(s) < min_cost THEN min_cost = sum_cost(s);
-  500           END;
-  501      /* remove all but minimum cost sums */
-  502      DO s = 1 TO num_inepi_sums;
-  503           IF sum_cost(s) > min_cost THEN DO;
-  504                inepi_sum(s) = BIT(0, 96);
-  505                redundant_sums = $true;
-  506                END;
-  507           END;
-  508      IF redundant_sums THEN CALL remove_redundant_sums;
-  509 
-  510 END minimum_cost_solution;
-  511 
-Jul 27, 2024  01:55                                       /*                                                            
+  484 
+  485 /******************************************************************************
+  486 * PROCEDURE minimum_cost_solution: Finds set of minimum literal cost          *
+  487 *                                  nonessential PI sums                       *
+  488 *******************************************************************************/
+  489 minimum_cost_solution: PROCEDURE;
+  490      DECLARE (s, min_cost, sum_cost(1000)) FIXED BINARY,
+  491              redundant_sums BIT ALIGNED;
+  492 
+  493      /* make a table of irredundant n.e.p.i. literal costs */
+  494      DO s = 1 TO num_inepi_sums;
+  495           sum_cost(s) = nonessential_cost(s);
+  496           END;
+  497      /* find the minimum cost */
+  498      min_cost = sum_cost(1);
+  499      DO s = 2 TO num_inepi_sums;
+  500           IF sum_cost(s) < min_cost THEN min_cost = sum_cost(s);
+  501           END;
+  502      /* remove all but minimum cost sums */
+  503      DO s = 1 TO num_inepi_sums;
+  504           IF sum_cost(s) > min_cost THEN DO;
+  505                inepi_sum(s) = BIT(0, 96);
+  506                redundant_sums = $true;
+  507                END;
+  508           END;
+  509      IF redundant_sums THEN CALL remove_redundant_sums;
+  510 
+  511 END minimum_cost_solution;
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 10    
   512 
-  513 /******************************************************************************
-  514 * PROCEDURE ammend_p_i_status: Recategorises some nonessential PIs as         *
-  515 *                              minimum cost essential/minimum cost redundant  *
-  516 *******************************************************************************/
-  517 ammend_p_i_status: PROCEDURE;
-  518      DECLARE (ess_pis, red_pis, b) BIT (96) ALIGNED,
-  519              s FIXED BINARY;
-  520 
-  521      /* find n.e.p.i.s common to each sum and those which have been removed */
-  522      ess_pis = inepi_sum(1);
-  523      red_pis = ^ ess_pis;
-  524      DO s = 2 TO num_inepi_sums;
-  525           ess_pis = ess_pis & inepi_sum(s);
-  526           red_pis = red_pis & ^ inepi_sum(s);
-  527           END;
-  528      /* remove common n.e.p.i.s from the sums - these are minimum-cost essential */
-  529      DO s = 1 TO num_inepi_sums;
-  530           inepi_sum(s) = inepi_sum(s) & ^ ess_pis;
-  531           END;
-  532      /* ammend p.i. status table to show minimum-cost essential/redundant p.i.s */
-  533      b = BIT(0,95) || '1'B;
-  534      DO s = 1 TO num_ne_pis;
-  535           IF (ess_pis & b) ^= BIT(0,96) THEN p_i($status,ne_pi(s)) = $min_cost_essential;
-  536           ELSE IF (red_pis & b) ^= BIT(0,96) THEN p_i($status, ne_pi(s)) = $min_cost_redundant;
-  537           b = SUBSTR(b,2);
-  538           END;
-  539 
-  540 END ammend_p_i_status;
-  541 
+  513 
+  514 /******************************************************************************
+  515 * PROCEDURE ammend_p_i_status: Recategorises some nonessential PIs as         *
+  516 *                              minimum cost essential/minimum cost redundant  *
+  517 *******************************************************************************/
+  518 ammend_p_i_status: PROCEDURE;
+  519      DECLARE (ess_pis, red_pis, b) BIT (96) ALIGNED,
+  520              s FIXED BINARY;
+  521 
+  522      /* find n.e.p.i.s common to each sum and those which have been removed */
+  523      ess_pis = inepi_sum(1);
+  524      red_pis = ^ ess_pis;
+  525      DO s = 2 TO num_inepi_sums;
+  526           ess_pis = ess_pis & inepi_sum(s);
+  527           red_pis = red_pis & ^ inepi_sum(s);
+  528           END;
+  529      /* remove common n.e.p.i.s from the sums - these are minimum-cost essential */
+  530      DO s = 1 TO num_inepi_sums;
+  531           inepi_sum(s) = inepi_sum(s) & ^ ess_pis;
+  532           END;
+  533      /* ammend p.i. status table to show minimum-cost essential/redundant p.i.s */
+  534      b = BIT(0,95) || '1'B;
+  535      DO s = 1 TO num_ne_pis;
+  536           IF (ess_pis & b) ^= BIT(0,96) THEN p_i($status,ne_pi(s)) = $min_cost_essential;
+  537           ELSE IF (red_pis & b) ^= BIT(0,96) THEN p_i($status, ne_pi(s)) = $min_cost_redundant;
+  538           b = SUBSTR(b,2);
+  539           END;
+  540 
+  541 END ammend_p_i_status;
   542 
-  543 /******************************************************************************
-  544 * PROCEDURE remove_redundant_sums: Cleans up irredundant nonessential PI      *
-  545 *                                  sum-of-products array                      *
-  546 *******************************************************************************/
-  547 remove_redundant_sums: PROCEDURE;
-  548      DECLARE (i, j) FIXED BINARY, sum_moved BIT ALIGNED;
-  549 
-  550      DO i = 1 TO num_inepi_sums;
-  551           IF inepi_sum(i) = BIT(0,96) THEN DO;
-  552                sum_moved = $false;
-  553                DO j = i + 1 TO num_inepi_sums WHILE (^ sum_moved);
-  554                     IF inepi_sum(j) ^= BIT(0,96) THEN DO;
-  555                          inepi_sum(i) = inepi_sum(j);  inepi_sum(j) = BIT(0, 96);
-  556                          sum_moved = $true;
-  557                          END;
-  558                     END;
-  559                IF ^ sum_moved THEN DO;
-  560                     num_inepi_sums = i - 1;
-  561                     RETURN;
-  562                     END;
-  563                END;
-  564           END;
-  565 
-  566 END remove_redundant_sums;
-  567 
+  543 
+  544 /******************************************************************************
+  545 * PROCEDURE remove_redundant_sums: Cleans up irredundant nonessential PI      *
+  546 *                                  sum-of-products array                      *
+  547 *******************************************************************************/
+  548 remove_redundant_sums: PROCEDURE;
+  549      DECLARE (i, j) FIXED BINARY, sum_moved BIT ALIGNED;
+  550 
+  551      DO i = 1 TO num_inepi_sums;
+  552           IF inepi_sum(i) = BIT(0,96) THEN DO;
+  553                sum_moved = $false;
+  554                DO j = i + 1 TO num_inepi_sums WHILE (^ sum_moved);
+  555                     IF inepi_sum(j) ^= BIT(0,96) THEN DO;
+  556                          inepi_sum(i) = inepi_sum(j);  inepi_sum(j) = BIT(0, 96);
+  557                          sum_moved = $true;
+  558                          END;
+  559                     END;
+  560                IF ^ sum_moved THEN DO;
+  561                     num_inepi_sums = i - 1;
+  562                     RETURN;
+  563                     END;
+  564                END;
+  565           END;
+  566 
+  567 END remove_redundant_sums;
   568 
-  569 /******************************************************************************
-Jul 27, 2024  01:55                                       /*                                                            
+  569 
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 11    
-  570 * PROCEDURE essential_cost: Returns literal cost of all essential PIs         *
-  571 *******************************************************************************/
-  572 essential_cost: PROCEDURE RETURNS (FIXED BINARY);
-  573      DECLARE (p, e_cost) FIXED BINARY;
-  574      e_cost = 0;
-  575      DO p = 1 TO num_pis;
-  576           IF p_i($status,p) > $non_essential THEN e_cost = e_cost + p_i($cost,p);
-  577           END;
-  578      RETURN (e_cost);
-  579 END essential_cost;
-  580 
+  570 /******************************************************************************
+  571 * PROCEDURE essential_cost: Returns literal cost of all essential PIs         *
+  572 *******************************************************************************/
+  573 essential_cost: PROCEDURE RETURNS (FIXED BINARY);
+  574      DECLARE (p, e_cost) FIXED BINARY;
+  575      e_cost = 0;
+  576      DO p = 1 TO num_pis;
+  577           IF p_i($status,p) > $non_essential THEN e_cost = e_cost + p_i($cost,p);
+  578           END;
+  579      RETURN (e_cost);
+  580 END essential_cost;
   581 
-  582 /******************************************************************************
-  583 * PROCEDURE nonessential_cost: Returns literal cost of all nonessential PIs   *
-  584 *                              in specified sum-of-product sum                *
-  585 *******************************************************************************/
-  586 nonessential_cost: PROCEDURE (s) RETURNS (FIXED BINARY);
-  587      DECLARE (s, p, ne_cost) FIXED BINARY,
-  588               b BIT (96) ALIGNED;
-  589      ne_cost = 0;  b = BIT(0,95) || '1'B;
-  590      DO p = 1 TO num_ne_pis;
-  591           IF (inepi_sum(s) & b) ^= BIT(0,96) THEN ne_cost = ne_cost + p_i($cost,ne_pi(p));
-  592           b = SUBSTR(b, 2);
-  593           END;
-  594      RETURN (ne_cost);
-  595 END nonessential_cost;
-  596 
+  582 
+  583 /******************************************************************************
+  584 * PROCEDURE nonessential_cost: Returns literal cost of all nonessential PIs   *
+  585 *                              in specified sum-of-product sum                *
+  586 *******************************************************************************/
+  587 nonessential_cost: PROCEDURE (s) RETURNS (FIXED BINARY);
+  588      DECLARE (s, p, ne_cost) FIXED BINARY,
+  589               b BIT (96) ALIGNED;
+  590      ne_cost = 0;  b = BIT(0,95) || '1'B;
+  591      DO p = 1 TO num_ne_pis;
+  592           IF (inepi_sum(s) & b) ^= BIT(0,96) THEN ne_cost = ne_cost + p_i($cost,ne_pi(p));
+  593           b = SUBSTR(b, 2);
+  594           END;
+  595      RETURN (ne_cost);
+  596 END nonessential_cost;
   597 
-  598 /******************************************************************************
-  599 * PROCEDURE run_minimisation: Performs minimisation of switching function     *
-  600 *******************************************************************************/
-  601 run_minimisation: PROCEDURE;
-  602      function_order = LOG2(term(num_terms)) + 1;
-  603      PUT SKIP LIST ('(finding prime implicants)');
-  604      CALL prime_implicants; /* generates complete set of prime implicants */
-  605      CALL p_i_chart; /* generates array of pi coverage of minterms */
-  606      CALL p_i_status; /* gives ess/noness/red status to p.i.s & e.p.i. cover status to minterms & de
+  598 
+  599 /******************************************************************************
+  600 * PROCEDURE run_minimisation: Performs minimisation of switching function     *
+  601 *******************************************************************************/
+  602 run_minimisation: PROCEDURE;
+  603      function_order = LOG2(term(num_terms)) + 1;
+  604      PUT SKIP LIST ('(finding prime implicants)');
+  605      CALL prime_implicants; /* generates complete set of prime implicants */
+  606      CALL p_i_chart; /* generates array of pi coverage of minterms */
+  607      CALL p_i_status; /* gives ess/noness/red status to p.i.s & e.p.i. cover status to minterms & de
       cides if unique */
-  607      CALL p_i_cost; /* finds literal costs of p.i.s */
-  608      IF ^ unique_solution THEN DO;
-  609           PUT SKIP LIST ('(finding minimum cost solution)');
-  610           CALL irredundant_nepi_sums; /* generate irredundant n.e.p.i. sums to cover remaining minte
+  608      CALL p_i_cost; /* finds literal costs of p.i.s */
+  609      IF ^ unique_solution THEN DO;
+  610           PUT SKIP LIST ('(finding minimum cost solution)');
+  611           CALL irredundant_nepi_sums; /* generate irredundant n.e.p.i. sums to cover remaining minte
       rms */
-  611           CALL minimum_cost_solution; /* finds lowest literal cost solutions from irredundant n.e.p.
+  612           CALL minimum_cost_solution; /* finds lowest literal cost solutions from irredundant n.e.p.
       i. sums */
-  612           CALL ammend_p_i_status; /* gives min-cost-ess/min-cost-red status to n.e.p.i.s */
-  613           END;
-  614      solution_cost = essential_cost();
-  615      IF ^ unique_solution THEN solution_cost = solution_cost + nonessential_cost(1);
-  616 END run_minimisation;
-  617 
+  613           CALL ammend_p_i_status; /* gives min-cost-ess/min-cost-red status to n.e.p.i.s */
+  614           END;
+  615      solution_cost = essential_cost();
+  616      IF ^ unique_solution THEN solution_cost = solution_cost + nonessential_cost(1);
+  617 END run_minimisation;
   618 
-  619 /*
-  620 ###############################################################################
-  621 #                          OUTPUT PROCEDURES                                  #
-  622 ###############################################################################
-  623 */
-  624 
-Jul 27, 2024  01:55                                       /*                                                            
+  619 
+  620 /*
+  621 ###############################################################################
+  622 #                          OUTPUT PROCEDURES                                  #
+  623 ###############################################################################
+  624 */
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 12    
   625 
-  626 /******************************************************************************
-  627 * PROCEDURE print_header_message: Prints title and version no to screen/file  *
-  628 *******************************************************************************/
-  629 print_header_message: PROCEDURE (f);
-  630      DECLARE f FILE VARIABLE;
-  631      PUT FILE (f) EDIT ('BOOLEAN MINIMISATION  ', version, COPY('=',26))
-  632           (COLUMN(20),A,A,SKIP,COLUMN(20),A);
-  633 END print_header_message;
-  634 
+  626 
+  627 /******************************************************************************
+  628 * PROCEDURE print_header_message: Prints title and version no to screen/file  *
+  629 *******************************************************************************/
+  630 print_header_message: PROCEDURE (f);
+  631      DECLARE f FILE VARIABLE;
+  632      PUT FILE (f) EDIT ('BOOLEAN MINIMISATION  ', version, COPY('=',26))
+  633           (COLUMN(20),A,A,SKIP,COLUMN(20),A);
+  634 END print_header_message;
   635 
-  636 /******************************************************************************
-  637 * PROCEDURE print_menu: Prints programme menu                                 *
-  638 *******************************************************************************/
-  639 print_menu: PROCEDURE;
-  640      CALL print_header_message(SYSPRINT);
-  641      PUT SKIP(3) LIST ('  A utility for the logical minimisation of boolean functions.');
-  642      PUT SKIP(4) EDIT ('Menu',
-  643                        '----',
-  644                    '1. Enter data',
-  645                    '2. Minimise',
-  646                    '3. File results',
-  647                    '4. Information',
-  648                    '5. Quit',
-  649                    'Enter 1-5 --> ')
-  650           (COLUMN(28),A,SKIP,COLUMN(28),A,SKIP(2),5(COLUMN(24),A,SKIP),SKIP,COLUMN(24),A);
-  651 END print_menu;
-  652 
+  636 
+  637 /******************************************************************************
+  638 * PROCEDURE print_menu: Prints programme menu                                 *
+  639 *******************************************************************************/
+  640 print_menu: PROCEDURE;
+  641      CALL print_header_message(SYSPRINT);
+  642      PUT SKIP(3) LIST ('  A utility for the logical minimisation of boolean functions.');
+  643      PUT SKIP(4) EDIT ('Menu',
+  644                        '----',
+  645                    '1. Enter data',
+  646                    '2. Minimise',
+  647                    '3. File results',
+  648                    '4. Information',
+  649                    '5. Quit',
+  650                    'Enter 1-5 --> ')
+  651           (COLUMN(28),A,SKIP,COLUMN(28),A,SKIP(2),5(COLUMN(24),A,SKIP),SKIP,COLUMN(24),A);
+  652 END print_menu;
   653 
-  654 /******************************************************************************
-  655 * PROCEDURE print_input_data: Prints minterms and don't cares to screen/file  *
-  656 *******************************************************************************/
-  657 print_input_data: PROCEDURE (f);
-  658      DECLARE f FILE VARIABLE, t FIXED BINARY;
-  659      /* list the minterms */
-  660      PUT FILE(f) SKIP(3) LIST ('Minterms:');
-  661      IF num_minterms = 0 THEN PUT FILE(f) SKIP LIST ('*** none ***');
-  662      ELSE PUT FILE(f) SKIP EDIT ((trim(minterm(t)) DO t = 1 TO num_minterms)) (A,X(1));
-  663      /* list the dont-cares */
-  664      PUT FILE(f) SKIP(3) LIST ('Don''t cares:');
-  665      IF num_dont_cares = 0 THEN PUT FILE(f) SKIP LIST ('*** none ***');
-  666      ELSE PUT FILE(f) SKIP EDIT ((trim(dont_care(t)) DO t = 1 TO num_dont_cares)) (A, X(1));
-  667 END print_input_data;
-  668 
+  654 
+  655 /******************************************************************************
+  656 * PROCEDURE print_input_data: Prints minterms and don't cares to screen/file  *
+  657 *******************************************************************************/
+  658 print_input_data: PROCEDURE (f);
+  659      DECLARE f FILE VARIABLE, t FIXED BINARY;
+  660      /* list the minterms */
+  661      PUT FILE(f) SKIP(3) LIST ('Minterms:');
+  662      IF num_minterms = 0 THEN PUT FILE(f) SKIP LIST ('*** none ***');
+  663      ELSE PUT FILE(f) SKIP EDIT ((trim(minterm(t)) DO t = 1 TO num_minterms)) (A,X(1));
+  664      /* list the dont-cares */
+  665      PUT FILE(f) SKIP(3) LIST ('Don''t cares:');
+  666      IF num_dont_cares = 0 THEN PUT FILE(f) SKIP LIST ('*** none ***');
+  667      ELSE PUT FILE(f) SKIP EDIT ((trim(dont_care(t)) DO t = 1 TO num_dont_cares)) (A, X(1));
+  668 END print_input_data;
   669 
-  670 /******************************************************************************
-  671 * PROCEDURE output_results: Prints minimisation results to screen/file        *
-  672 *******************************************************************************/
-  673 output_results: PROCEDURE (f);
-  674      DECLARE f FILE VARIABLE;
-  675 
-  676      /* print header message */
-  677      CALL print_header_message(f);
-  678 
-  679      /* list minterms and dont-cares */
-  680      CALL print_input_data(f);
-  681 
-  682      /* print the function order */
-Jul 27, 2024  01:55                                       /*                                                            
+  670 
+  671 /******************************************************************************
+  672 * PROCEDURE output_results: Prints minimisation results to screen/file        *
+  673 *******************************************************************************/
+  674 output_results: PROCEDURE (f);
+  675      DECLARE f FILE VARIABLE;
+  676 
+  677      /* print header message */
+  678      CALL print_header_message(f);
+  679 
+  680      /* list minterms and dont-cares */
+  681      CALL print_input_data(f);
+  682 
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 13    
-  683      PUT FILE(f) SKIP(3) EDIT ('The function order is ',trim(function_order)) (A);
-  684 
-  685      /* list the prime implicants and associated qualities */
-  686      cell: PROCEDURE (p) RETURNS (CHARACTER (10) VARYING);
-  687           DECLARE p FIXED BINARY;
-  688           RETURN (trim(p_i($low,p)) || ',' || trim(p_i($high, p)));
-  689      END cell;
-  690      literals: PROCEDURE (p) RETURNS (CHARACTER (10) VARYING);
-  691           DECLARE (p, l, b) FIXED BINARY, lits CHARACTER (10) VARYING;
-  692           lits = ''; b = 1;
-  693           DO l = 1 TO function_order;
-  694                IF (equivalent(p_i($low,p),p_i($high,p)) & b) ^= 0 THEN
-  695                     IF (p_i($low,p) & b) ^= 0 THEN lits = '1' || lits;
-  696                     ELSE lits = '0' || lits;
-  697                ELSE lits = '-' || lits;
-  698                b = b + b;
-  699                END;
-  700           RETURN (lits);
-  701      END literals;
-  702      BEGIN;
-  703           DECLARE p FIXED BINARY;
-  704           PUT FILE(f) SKIP(3) LIST ('Prime Implicants:');
-  705           PUT FILE(f) SKIP EDIT (' p.i.','cell','literals','cost','status')
-  706                (A,COLUMN(11),A,COLUMN(25),A,COLUMN(40),A,COLUMN(50),A);
-  707           DO p = 1 TO num_pis;
-  708                PUT FILE(f) SKIP EDIT (p,cell(p),literals(p),p_i($cost,p),pi_status(p_i($status,p)))
-  709                     (F(4),COLUMN(11),A,COLUMN(25),A,COLUMN(40),F(3),COLUMN(50),A);
-  710                END;
-  711           END;
-  712 
-  713      /* abort if no minterms */
-  714      IF num_minterms = 0 THEN RETURN;
-  715 
-  716      /* print the prime implicant chart */
-  717      tick: PROCEDURE (b) RETURNS (CHARACTER);
-  718           DECLARE b BIT ALIGNED;
-  719           IF b THEN RETURN ('*');
-  720           RETURN (' ');
-  721      END tick;
-  722      BEGIN;
-  723           DECLARE (m, b, p, num_blocks, mins_per_block) FIXED BINARY;
-  724           PUT FILE(f) SKIP(3) LIST ('Prime Implicant Chart:');
-  725           num_blocks = CEIL(DECIMAL(num_minterms) / 19.0);
-  726           mins_per_block = CEIL(DECIMAL(num_minterms) / DECIMAL(num_blocks));
-  727           DO b = 1 TO num_blocks;
-  728                PUT FILE(f) SKIP LIST ('      minterm -->');
-  729                PUT FILE(f) SKIP EDIT
-  730                     (' p.i.',(minterm(m)
-  731                     DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (A,F(3),18
+  683      /* print the function order */
+  684      PUT FILE(f) SKIP(3) EDIT ('The function order is ',trim(function_order)) (A);
+  685 
+  686      /* list the prime implicants and associated qualities */
+  687      cell: PROCEDURE (p) RETURNS (CHARACTER (10) VARYING);
+  688           DECLARE p FIXED BINARY;
+  689           RETURN (trim(p_i($low,p)) || ',' || trim(p_i($high, p)));
+  690      END cell;
+  691      literals: PROCEDURE (p) RETURNS (CHARACTER (10) VARYING);
+  692           DECLARE (p, l, b) FIXED BINARY, lits CHARACTER (10) VARYING;
+  693           lits = ''; b = 1;
+  694           DO l = 1 TO function_order;
+  695                IF (equivalent(p_i($low,p),p_i($high,p)) & b) ^= 0 THEN
+  696                     IF (p_i($low,p) & b) ^= 0 THEN lits = '1' || lits;
+  697                     ELSE lits = '0' || lits;
+  698                ELSE lits = '-' || lits;
+  699                b = b + b;
+  700                END;
+  701           RETURN (lits);
+  702      END literals;
+  703      BEGIN;
+  704           DECLARE p FIXED BINARY;
+  705           PUT FILE(f) SKIP(3) LIST ('Prime Implicants:');
+  706           PUT FILE(f) SKIP EDIT (' p.i.','cell','literals','cost','status')
+  707                (A,COLUMN(11),A,COLUMN(25),A,COLUMN(40),A,COLUMN(50),A);
+  708           DO p = 1 TO num_pis;
+  709                PUT FILE(f) SKIP EDIT (p,cell(p),literals(p),p_i($cost,p),pi_status(p_i($status,p)))
+  710                     (F(4),COLUMN(11),A,COLUMN(25),A,COLUMN(40),F(3),COLUMN(50),A);
+  711                END;
+  712           END;
+  713 
+  714      /* abort if no minterms */
+  715      IF num_minterms = 0 THEN RETURN;
+  716 
+  717      /* print the prime implicant chart */
+  718      tick: PROCEDURE (b) RETURNS (CHARACTER);
+  719           DECLARE b BIT ALIGNED;
+  720           IF b THEN RETURN ('*');
+  721           RETURN (' ');
+  722      END tick;
+  723      BEGIN;
+  724           DECLARE (m, b, p, num_blocks, mins_per_block) FIXED BINARY;
+  725           PUT FILE(f) SKIP(3) LIST ('Prime Implicant Chart:');
+  726           num_blocks = CEIL(DECIMAL(num_minterms) / 19.0);
+  727           mins_per_block = CEIL(DECIMAL(num_minterms) / DECIMAL(num_blocks));
+  728           DO b = 1 TO num_blocks;
+  729                PUT FILE(f) SKIP LIST ('      minterm -->');
+  730                PUT FILE(f) SKIP EDIT
+  731                     (' p.i.',(minterm(m)
+  732                     DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (A,F(3),18
       (F(4)));
-  732                DO p = 1 TO num_pis;
-  733                     IF p_i($status,p) > $redundant THEN PUT FILE(f) SKIP EDIT
-  734                          (p, (tick(pi_covers_minterm(p,m))
-  735                          DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (F(4)
+  733                DO p = 1 TO num_pis;
+  734                     IF p_i($status,p) > $redundant THEN PUT FILE(f) SKIP EDIT
+  735                          (p, (tick(pi_covers_minterm(p,m))
+  736                          DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (F(4)
       ,19(X(3),A));
-  736                     END;
-  737                END;
-  738           END;
-Jul 27, 2024  01:55                                       /*                                                            
+  737                     END;
+  738                END;
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 14    
-  739      
-  740      /* print the solution */
-  741      BEGIN;
-  742           DECLARE (p, s) FIXED BINARY, or CHARACTER (2) VARYING, all_covered BIT ALIGNED, b BIT (96)
+  739           END;
+  740      
+  741      /* print the solution */
+  742      BEGIN;
+  743           DECLARE (p, s) FIXED BINARY, or CHARACTER (2) VARYING, all_covered BIT ALIGNED, b BIT (96)
        ALIGNED;
-  743           IF unique_solution THEN PUT FILE(f) SKIP(3) LIST ('Unique Solution:');
-  744           ELSE PUT FILE(f) SKIP(3) LIST ('Minimum Cost Solution:');
-  745           PUT FILE(f) SKIP EDIT (' F = ') (A);
-  746           /* essentials first */
-  747           or = '';
-  748           DO p = 1 TO num_pis;
-  749                IF p_i($status,p) > $non_essential THEN DO;
-  750                     PUT FILE(f) EDIT (or, trim(p)) (A);
-  751                     or = '+';
-  752                     END;
-  753                END;
-  754           /* if these do not cover all minterms then ... */
-  755           all_covered = $true;
-  756           IF ^ unique_solution THEN DO s = 1 TO num_minterms WHILE (all_covered);
-  757                all_covered = $false;
-  758                DO p = 1 TO num_pis WHILE (^ all_covered);
-  759                     IF p_i($status,p) > $non_essential THEN
-  760                          all_covered = pi_covers_minterm(p,s);
-  761                     END;
-  762                END;
-  763           /* ... minimum cost nonessentials */
-  764           IF ^ all_covered THEN DO;
-  765                PUT FILE(f) EDIT (or) (A);
-  766                DO s = 1 TO num_inepi_sums;
-  767                     PUT FILE(f) EDIT ('(') (A);
-  768                     or = ''; b = BIT(0,95) || '1'B;
-  769                     DO p = 1 TO num_ne_pis;
-  770                          IF (inepi_sum(s) & b) ^= BIT(0,96) THEN DO;
-  771                               PUT FILE(f) EDIT (or,trim(ne_pi(p))) (A);
-  772                               or = '+';
-  773                               END;
-  774                          b = SUBSTR(b,2);
-  775                          END;
-  776                     PUT FILE(f) EDIT (')') (A);
-  777                     END;
-  778                PUT FILE(f) SKIP LIST ('(parenthesised expressions are alternatives)');
-  779                END;
-  780           END;
-  781 
-  782      /* print the literal cost of the solution */
-  783      PUT FILE(f) SKIP(3) EDIT ('Cost = ',trim(solution_cost),' literals')  (A);
-  784 
-  785 END output_results;
-  786 
+  744           IF unique_solution THEN PUT FILE(f) SKIP(3) LIST ('Unique Solution:');
+  745           ELSE PUT FILE(f) SKIP(3) LIST ('Minimum Cost Solution:');
+  746           PUT FILE(f) SKIP EDIT (' F = ') (A);
+  747           /* essentials first */
+  748           or = '';
+  749           DO p = 1 TO num_pis;
+  750                IF p_i($status,p) > $non_essential THEN DO;
+  751                     PUT FILE(f) EDIT (or, trim(p)) (A);
+  752                     or = '+';
+  753                     END;
+  754                END;
+  755           /* if these do not cover all minterms then ... */
+  756           all_covered = $true;
+  757           IF ^ unique_solution THEN DO s = 1 TO num_minterms WHILE (all_covered);
+  758                all_covered = $false;
+  759                DO p = 1 TO num_pis WHILE (^ all_covered);
+  760                     IF p_i($status,p) > $non_essential THEN
+  761                          all_covered = pi_covers_minterm(p,s);
+  762                     END;
+  763                END;
+  764           /* ... minimum cost nonessentials */
+  765           IF ^ all_covered THEN DO;
+  766                PUT FILE(f) EDIT (or) (A);
+  767                DO s = 1 TO num_inepi_sums;
+  768                     PUT FILE(f) EDIT ('(') (A);
+  769                     or = ''; b = BIT(0,95) || '1'B;
+  770                     DO p = 1 TO num_ne_pis;
+  771                          IF (inepi_sum(s) & b) ^= BIT(0,96) THEN DO;
+  772                               PUT FILE(f) EDIT (or,trim(ne_pi(p))) (A);
+  773                               or = '+';
+  774                               END;
+  775                          b = SUBSTR(b,2);
+  776                          END;
+  777                     PUT FILE(f) EDIT (')') (A);
+  778                     END;
+  779                PUT FILE(f) SKIP LIST ('(parenthesised expressions are alternatives)');
+  780                END;
+  781           END;
+  782 
+  783      /* print the literal cost of the solution */
+  784      PUT FILE(f) SKIP(3) EDIT ('Cost = ',trim(solution_cost),' literals')  (A);
+  785 
+  786 END output_results;
   787 
-  788 /******************************************************************************
-  789 * PROCEDURE print information: Prints information about the pregramme         *
-  790 *******************************************************************************/
-  791 print_information: PROCEDURE;
-  792      PUT SKIP(2) EDIT (
-  793      '  This utility determines the minimal 2-level solution for a Boolean switching',
-  794      'function. This function must be fully specified as minterm and don''t care',
-  795      'arrays. The maximum number of input variables is 8. Data is entered as decimal',
-Jul 27, 2024  01:55                                       /*                                                            
+  788 
+  789 /******************************************************************************
+  790 * PROCEDURE print information: Prints information about the pregramme         *
+  791 *******************************************************************************/
+  792 print_information: PROCEDURE;
+  793      PUT SKIP(2) EDIT (
+  794      '  This utility determines the minimal 2-level solution for a Boolean switching',
+  795      'function. This function must be fully specified as minterm and don''t care',
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 15    
-  796      'values in the range 0 to 255 in any order. Ranges of values may be entered by',
-  797      'using a hyphen. e.g. 10-15. This data is sorted by the programme. If any value',
-  798      'is specified as both a minterm and a don''t care term then it is assumed to be',
-  799      'a minterm. Values which are out of range are ignored.',
-  800      '  Minimisation is done by first finding the prime implicants of the function',
-  801      'and then reducing the PI chart. Prime implicants are found by taking pairs of',
-  802      'terms (minterms or don''t cares) and testing to see if they form a cell. If they',
-  803      'do then a search is made to determine whether all the vertices of the cell are',
-  804      'either minterms or don''t cares. If so the cell is tested for containment by',
-  805      'any PI already found. If it is not contained then this cell is a PI. PI chart',
-  806      'reduction is done using the algebraic method after removing essential PIs and',
-  807      'the minterms they cover') (SKIP,A);
-  808 END print_information;
-  809 
+  796      'arrays. The maximum number of input variables is 8. Data is entered as decimal',
+  797      'values in the range 0 to 255 in any order. Ranges of values may be entered by',
+  798      'using a hyphen. e.g. 10-15. This data is sorted by the programme. If any value',
+  799      'is specified as both a minterm and a don''t care term then it is assumed to be',
+  800      'a minterm. Values which are out of range are ignored.',
+  801      '  Minimisation is done by first finding the prime implicants of the function',
+  802      'and then reducing the PI chart. Prime implicants are found by taking pairs of',
+  803      'terms (minterms or don''t cares) and testing to see if they form a cell. If they',
+  804      'do then a search is made to determine whether all the vertices of the cell are',
+  805      'either minterms or don''t cares. If so the cell is tested for containment by',
+  806      'any PI already found. If it is not contained then this cell is a PI. PI chart',
+  807      'reduction is done using the algebraic method after removing essential PIs and',
+  808      'the minterms they cover') (SKIP,A);
+  809 END print_information;
   810 
-  811 /*
-  812 ###############################################################################
-  813 #                            MAIN PROGRAMME                                   #
-  814 ###############################################################################
-  815 */
-  816 
+  811 
+  812 /*
+  813 ###############################################################################
+  814 #                            MAIN PROGRAMME                                   #
+  815 ###############################################################################
+  816 */
   817 
-  818 /* initialisation */
-  819 num_minterms = 0;  num_dont_cares = 0;  num_terms = 0;
-  820 new_data = $true;
-  821 
-  822 /* main loop */
-  823 DO WHILE ($true);
-  824      /* get menu selection */
-  825      menu:
-  826      PUT SKIP(3);
-  827      CALL print_menu;
-  828      SELECT (menu_selection());
-  829 
-  830      WHEN (1) BEGIN; /* enter data */
-  831           CALL enter_data;
-  832           GO TO menu; END;
-  833 
-  834      WHEN (2) BEGIN; /* minimise */
-  835           IF num_terms < 2 THEN
-  836                PUT SKIP LIST ('Insufficient data - cannot minimise.');
-  837           ELSE DO;
-  838                IF new_data THEN CALL run_minimisation;
-  839                PUT SKIP(2);
-  840                CALL output_results(SYSPRINT);
-  841                new_data = $false;
-  842                CALL continue_prompt;
-  843                END;
-  844           GO TO menu; END;
-  845 
-  846      WHEN (3) BEGIN; /* file results */
-  847           IF ^ new_data THEN DO;
-  848                OPEN FILE(results_file) TITLE ('bool_min.txt') LINESIZE(80) STREAM OUTPUT PRINT;
-  849                CALL output_results(results_file);
-  850                PUT PAGE FILE(results_file);
-  851                CLOSE FILE(results_file);
-  852                PUT SKIP LIST ('Results appended to file BOOL_MIN.');
-  853                END;
-Jul 27, 2024  01:55                                       /*                                                            
+  818 
+  819 /* initialisation */
+  820 num_minterms = 0;  num_dont_cares = 0;  num_terms = 0;
+  821 new_data = $true;
+  822 
+  823 /* main loop */
+  824 DO WHILE ($true);
+  825      /* get menu selection */
+  826      menu:
+  827      PUT SKIP(3);
+  828      CALL print_menu;
+  829      SELECT (menu_selection());
+  830 
+  831      WHEN (1) BEGIN; /* enter data */
+  832           CALL enter_data;
+  833           GO TO menu; END;
+  834 
+  835      WHEN (2) BEGIN; /* minimise */
+  836           IF num_terms < 2 THEN
+  837                PUT SKIP LIST ('Insufficient data - cannot minimise.');
+  838           ELSE DO;
+  839                IF new_data THEN CALL run_minimisation;
+  840                PUT SKIP(2);
+  841                CALL output_results(SYSPRINT);
+  842                new_data = $false;
+  843                CALL continue_prompt;
+  844                END;
+  845           GO TO menu; END;
+  846 
+  847      WHEN (3) BEGIN; /* file results */
+  848           IF ^ new_data THEN DO;
+  849                OPEN FILE(results_file) TITLE ('bool_min.txt') LINESIZE(80) STREAM OUTPUT PRINT;
+  850                CALL output_results(results_file);
+  851                PUT PAGE FILE(results_file);
+  852                CLOSE FILE(results_file);
+  853                PUT SKIP LIST ('Results appended to file BOOL_MIN.');
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Source Listing                                           Page 16    
-  854           ELSE PUT SKIP LIST ('No results to file.');
-  855           GO TO menu; END;
-  856 
-  857      WHEN (4) BEGIN; /* information */
-  858           CALL print_information;
-  859           CALL continue_prompt;
-  860           GO TO menu; END;
-  861 
-  862      WHEN (5) /* quit */
-  863           STOP;
-  864      END;
-  865   END;
-  866 END BSc_project;
-Jul 27, 2024  01:55                                       /*                                                            
+  854                END;
+  855           ELSE PUT SKIP LIST ('No results to file.');
+  856           GO TO menu; END;
+  857 
+  858      WHEN (4) BEGIN; /* information */
+  859           CALL print_information;
+  860           CALL continue_prompt;
+  861           GO TO menu; END;
+  862 
+  863      WHEN (5) /* quit */
+  864           STOP;
+  865      END;
+  866   END;
+  867 END BSc_project;
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Procedure Map                                            Page 17    
   Offset  Line Statement type             Offset  Line Statement type             Offset  Line Statement type           
-      08    10 PROCEDURE                BSC_PROJECT
-      3A    38 DCL                            3A    40 DCL                      
+      08    11 PROCEDURE                BSC_PROJECT
+      3A    39 DCL                            3A    41 DCL                      
 
-      3F    55 PROCEDURE                EQUIVALENT
-      56    57 RETURN                         B4    58 END                      
+      3F    56 PROCEDURE                EQUIVALENT
+      56    58 RETURN                         B4    59 END                      
 
-      C4    64 PROCEDURE                TRIM
-      D5    66 RETURN                       01DA    67 END                      
+      C4    65 PROCEDURE                TRIM
+      D5    67 RETURN                       01DA    68 END                      
 
-    01EA    74 PROCEDURE                SORT_DATA
-    0200    78 DO                           024B    79 Assignment                   026D    80 Assignment               
-    0279    81 END                          0284    82 DO                           02CF    83 Assignment               
-    02FA    84 Assignment                   030F    85 END                          031A    86 Assignment               
-    0331    89 Assignment                   0335    90 DO                           034B    91 Assignment               
-    034F    91 Assignment                   0353    92 DO                           03AC    94 IF                       
-    03EF    94 DO                           03EF    95 Assignment                   0414    96 Assignment               
-    042E    97 Assignment                   043A    98 Assignment                   043E    99 END                      
-    0444   100 Assignment                   0448   101 DO                           049B   102 IF                       
-    04B5   102 Assignment                   04B9   104 IF                           04E4   104 DO                       
-    04E4   105 Assignment                   04F9   105 Assignment                   051C   105 Assignment               
-    0532   106 Assignment                   0541   106 Assignment                   0559   106 Assignment               
-    0569   107 Assignment                   056D   108 END                          056D   110 ELSE                     
-    0572   110 IF                           059D   110 DO                           059D   111 Assignment               
-    05C3   112 Assignment                   05E9   113 Assignment                   0604   114 Assignment               
-    0610   115 Assignment                   0614   116 END                          0614   117 END                      
-    0625   118 END                          0636   119 END                          0641   122 Assignment               
-    064A   122 Assignment                   0653   123 DO                           069E   124 IF                       
-    06B0   124 DO                           06B0   125 Assignment                   06BC   126 Assignment               
-    06E1   127 END                          06E1   128 ELSE                         06E6   128 DO                       
-    06E6   129 Assignment                   06F2   130 Assignment                   0717   131 END                      
-    0717   132 END                          0725   133 END                      
+    01EA    75 PROCEDURE                SORT_DATA
+    0200    79 DO                           024B    80 Assignment                   026D    81 Assignment               
+    0279    82 END                          0284    83 DO                           02CF    84 Assignment               
+    02FA    85 Assignment                   030F    86 END                          031A    87 Assignment               
+    0331    90 Assignment                   0335    91 DO                           034B    92 Assignment               
+    034F    92 Assignment                   0353    93 DO                           03AC    95 IF                       
+    03EF    95 DO                           03EF    96 Assignment                   0414    97 Assignment               
+    042E    98 Assignment                   043A    99 Assignment                   043E   100 END                      
+    0444   101 Assignment                   0448   102 DO                           049B   103 IF                       
+    04B5   103 Assignment                   04B9   105 IF                           04E4   105 DO                       
+    04E4   106 Assignment                   04F9   106 Assignment                   051C   106 Assignment               
+    0532   107 Assignment                   0541   107 Assignment                   0559   107 Assignment               
+    0569   108 Assignment                   056D   109 END                          056D   111 ELSE                     
+    0572   111 IF                           059D   111 DO                           059D   112 Assignment               
+    05C3   113 Assignment                   05E9   114 Assignment                   0604   115 Assignment               
+    0610   116 Assignment                   0614   117 END                          0614   118 END                      
+    0625   119 END                          0636   120 END                          0641   123 Assignment               
+    064A   123 Assignment                   0653   124 DO                           069E   125 IF                       
+    06B0   125 DO                           06B0   126 Assignment                   06BC   127 Assignment               
+    06E1   128 END                          06E1   129 ELSE                         06E6   129 DO                       
+    06E6   130 Assignment                   06F2   131 Assignment                   0717   132 END                      
+    0717   133 END                          0725   134 END                      
 
-    0735   146 PROCEDURE                MENU_SELECTION
-    0750   148 DO                           0766   149 GET                          07E4   150 IF                       
-    0831   150 DO                           0831   151 Assignment                   0878   152 IF                       
-    0898   152 RETURN                       08AA   153 END                          08AA   154 END                      
-    08B2   155 END                      
+    0735   147 PROCEDURE                MENU_SELECTION
+    0750   149 DO                           0766   150 GET                          07E4   151 IF                       
+    0831   151 DO                           0831   152 Assignment                   0878   153 IF                       
+    0898   153 RETURN                       08AA   154 END                          08AA   155 END                      
+    08B2   156 END                      
 
-    08C2   161 PROCEDURE                CONTINUE_PROMPT
-    08DE   162 PUT                          0957   163 GET                          09DB   164 END                      
+    08C2   162 PROCEDURE                CONTINUE_PROMPT
+    08DE   163 PUT                          0957   164 GET                          09DB   165 END                      
 
-    09EB   170 PROCEDURE                ENTER_DATA
+    09EB   171 PROCEDURE                ENTER_DATA
 
 
-    0A07   173 PROCEDURE                GET_INPUT_LIST
-    0A22   178 Assignment                   0A2E   179 Assignment                   0A32   180 PUT                      
-    0B37   184 DO                           0B4D   185 GET                          0BCB   186 IF                       
-    0CAC   186 RETURN                       0CB1   187 ELSE                         0CB6   187 IF                       
-    0D2A   187 DO                           0D2A   188 Assignment                   0D47   189 IF                       
-    0D57   189 DO                           0D57   190 IF                           0D6D   190 DO                       
-    0D6D   191 Assignment                   0D7C   192 Assignment                   0DD9   193 END                      
-    0DD9   194 END                          0DD9   195 ELSE                         0DDE   195 IF                       
-    0E07   195 DO                           0E07   196 Assignment                   0E89   196 IF                       
-    0E99   196 Assignment                   0E9F   197 Assignment                   0F0D   197 IF                       
-    0F1D   197 Assignment                   0F23   198 IF                           0F33   198 DO                       
-    0F33   198 Assignment                   0F3E   198 Assignment                   0F46   198 Assignment               
-Jul 27, 2024  01:55                                       /*                                                            
+    0A07   174 PROCEDURE                GET_INPUT_LIST
+    0A22   179 Assignment                   0A2E   180 Assignment                   0A32   181 PUT                      
+    0B37   185 DO                           0B4D   186 GET                          0BCB   187 IF                       
+    0CAC   187 RETURN                       0CB1   188 ELSE                         0CB6   188 IF                       
+    0D2A   188 DO                           0D2A   189 Assignment                   0D47   190 IF                       
+    0D57   190 DO                           0D57   191 IF                           0D6D   191 DO                       
+    0D6D   192 Assignment                   0D7C   193 Assignment                   0DD9   194 END                      
+    0DD9   195 END                          0DD9   196 ELSE                         0DDE   196 IF                       
+    0E07   196 DO                           0E07   197 Assignment                   0E89   197 IF                       
+    0E99   197 Assignment                   0E9F   198 Assignment                   0F0D   198 IF                       
+    0F1D   198 Assignment                   0F23   199 IF                           0F33   199 DO                       
+    0F33   199 Assignment                   0F3E   199 Assignment                   0F46   199 Assignment               
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Procedure Map                                            Page 18    
-    0F51   198 END                          0F51   199 DO                           0FAE   200 Assignment               
-    0FBD   201 Assignment                   0FDE   202 END                          0FE6   203 END                      
-    0FE9   204 END                          0FE9   205 ELSE                         0FF1   205 Assignment               
-    0FFE   206 END                          1006   207 IF                           1010   207 PUT                      
-    1081   208 END                          108C   210 DO                           10A2   211 PUT                      
-    10FA   212 CALL                         111D   213 CALL                         1168   214 CALL                     
-    11B3   215 PUT                          1344   222 Assignment                   1354   223 DO                       
-    13A7   224 GET                          1425   225 Assignment                   14F0   226 END                      
-    14FB   227 IF                           1539   227 RETURN                       153E   228 IF                       
-    157C   228 DO                           157C   229 Assignment                   1585   229 Assignment               
-    158E   230 END                          158E   231 IF                           168C   231 DO                       
-    168C   232 CALL                         16AE   233 IF                           16EC   233 DO                       
-    16EC   234 DO                           1731   235 Assignment                   175C   236 END                      
-    1764   237 Assignment                   1778   238 END                          1778   239 ELSE                     
-    177D   239 IF                           17BB   239 DO                           17BB   240 DO                       
-    1800   241 Assignment                   1804   242 DO                           1853   243 IF                       
-    187D   243 DO                           187D   244 Assignment                   1890   245 Assignment               
-    1894   246 END                          1894   247 END                          189C   248 END                      
-    18A7   249 END                          18A7   250 ELSE                         18AC   250 IF                       
-    18EA   250 DO                           18EA   251 DO                           192F   252 Assignment               
-    195A   253 END                          1962   254 Assignment                   1976   255 END                      
-    1976   256 ELSE                         197B   256 DO                           197B   257 DO                       
-    19C0   258 Assignment                   19C4   259 DO                           1A13   260 IF                       
-    1A3D   260 DO                           1A3D   261 Assignment                   1A50   262 Assignment               
-    1A54   263 END                          1A54   264 END                          1A5C   265 END                      
-    1A67   266 END                          1A67   267 IF                           1A77   267 Assignment               
-    1A7E   268 END                          1A81   269 END                          1A89   270 END                      
+    0F51   199 END                          0F51   200 DO                           0FAE   201 Assignment               
+    0FBD   202 Assignment                   0FDE   203 END                          0FE6   204 END                      
+    0FE9   205 END                          0FE9   206 ELSE                         0FF1   206 Assignment               
+    0FFE   207 END                          1006   208 IF                           1010   208 PUT                      
+    1081   209 END                          108C   211 DO                           10A2   212 PUT                      
+    10FA   213 CALL                         111D   214 CALL                         1168   215 CALL                     
+    11B3   216 PUT                          1344   223 Assignment                   1354   224 DO                       
+    13A7   225 GET                          1425   226 Assignment                   14F0   227 END                      
+    14FB   228 IF                           1539   228 RETURN                       153E   229 IF                       
+    157C   229 DO                           157C   230 Assignment                   1585   230 Assignment               
+    158E   231 END                          158E   232 IF                           168C   232 DO                       
+    168C   233 CALL                         16AE   234 IF                           16EC   234 DO                       
+    16EC   235 DO                           1731   236 Assignment                   175C   237 END                      
+    1764   238 Assignment                   1778   239 END                          1778   240 ELSE                     
+    177D   240 IF                           17BB   240 DO                           17BB   241 DO                       
+    1800   242 Assignment                   1804   243 DO                           1853   244 IF                       
+    187D   244 DO                           187D   245 Assignment                   1890   246 Assignment               
+    1894   247 END                          1894   248 END                          189C   249 END                      
+    18A7   250 END                          18A7   251 ELSE                         18AC   251 IF                       
+    18EA   251 DO                           18EA   252 DO                           192F   253 Assignment               
+    195A   254 END                          1962   255 Assignment                   1976   256 END                      
+    1976   257 ELSE                         197B   257 DO                           197B   258 DO                       
+    19C0   259 Assignment                   19C4   260 DO                           1A13   261 IF                       
+    1A3D   261 DO                           1A3D   262 Assignment                   1A50   263 Assignment               
+    1A54   264 END                          1A54   265 END                          1A5C   266 END                      
+    1A67   267 END                          1A67   268 IF                           1A77   268 Assignment               
+    1A7E   269 END                          1A81   270 END                          1A89   271 END                      
 
-    1A99   283 PROCEDURE                PRIME_IMPLICANTS
-    1AB6   289 Assignment                   1ABF   290 DO                           1B04   291 DO                       
-    1B4B   293 Assignment                   1B60   293 Assignment                   1B75   295 IF                       
-    1BA4   295 DO                           1BA4   297 Assignment                   1BDD   298 Assignment               
-    1BE1   298 Assignment                   1BEA   299 DO                           1C3A   300 IF                       
-    1C69   300 DO                           1C69   301 DO                           1C8C   301 Assignment               
-    1C95   301 END                          1C9A   302 Assignment                   1CBE   303 Assignment               
-    1CC7   304 END                          1CC7   305 END                          1CD2   306 IF                       
-    1CDC   306 DO                           1CDC   308 Assignment                   1CE0   309 IF                       
-    1CF0   309 DO                           1D3F   310 IF                           1D5C   311 IF                       
-    1DA5   312 Assignment                   1DE8   313 END                          1DF3   314 IF                       
-    1DFD   314 DO                           1DFD   315 Assignment                   1E09   316 Assignment               
-    1E21   317 Assignment                   1E39   318 END                          1E39   319 END                      
-    1E39   320 END                          1E39   321 END                          1E44   322 END                      
-    1E4F   324 END                      
+    1A99   284 PROCEDURE                PRIME_IMPLICANTS
+    1AB6   290 Assignment                   1ABF   291 DO                           1B04   292 DO                       
+    1B4B   294 Assignment                   1B60   294 Assignment                   1B75   296 IF                       
+    1BA4   296 DO                           1BA4   298 Assignment                   1BDD   299 Assignment               
+    1BE1   299 Assignment                   1BEA   300 DO                           1C3A   301 IF                       
+    1C69   301 DO                           1C69   302 DO                           1C8C   302 Assignment               
+    1C95   302 END                          1C9A   303 Assignment                   1CBE   304 Assignment               
+    1CC7   305 END                          1CC7   306 END                          1CD2   307 IF                       
+    1CDC   307 DO                           1CDC   309 Assignment                   1CE0   310 IF                       
+    1CF0   310 DO                           1D3F   311 IF                           1D5C   312 IF                       
+    1DA5   313 Assignment                   1DE8   314 END                          1DF3   315 IF                       
+    1DFD   315 DO                           1DFD   316 Assignment                   1E09   317 Assignment               
+    1E21   318 Assignment                   1E39   319 END                          1E39   320 END                      
+    1E39   321 END                          1E39   322 END                          1E44   323 END                      
+    1E4F   325 END                      
 
-    1E5F   330 PROCEDURE                P_I_CHART
-    1E75   333 DO                           1EBA   334 DO                           1EFF   335 Assignment               
-    200B   337 END                          2016   338 END                          2021   339 END                      
+    1E5F   331 PROCEDURE                P_I_CHART
+    1E75   334 DO                           1EBA   335 DO                           1EFF   336 Assignment               
+    200B   338 END                          2016   339 END                          2021   340 END                      
 
-    2031   345 PROCEDURE                P_I_STATUS
-    2048   349 DO                           208D   349 Assignment                   20A0   349 END                      
-    20A8   351 DO                           20ED   352 Assignment                   20F3   353 DO                       
-    2138   354 IF                           2173   354 DO                           2173   355 Assignment               
-    217B   356 Assignment                   2184   357 END                          2184   358 END                      
-    218C   359 IF                           2199   359 Assignment                   21AC   360 END                      
-    21B7   362 Assignment                   21BD   363 DO                           2202   364 Assignment               
-    2245   365 DO                           22B3   366 IF                           230E   366 DO                       
-    230E   367 Assignment                   2351   368 Assignment                   235A   369 END                      
-    235D   370 END                          2368   371 END                          2373   373 Assignment               
-Jul 27, 2024  01:55                                       /*                                                            
+    2031   346 PROCEDURE                P_I_STATUS
+    2048   350 DO                           208D   350 Assignment                   20A0   350 END                      
+    20A8   352 DO                           20ED   353 Assignment                   20F3   354 DO                       
+    2138   355 IF                           2173   355 DO                           2173   356 Assignment               
+    217B   357 Assignment                   2184   358 END                          2184   359 END                      
+    218C   360 IF                           2199   360 Assignment                   21AC   361 END                      
+    21B7   363 Assignment                   21BD   364 DO                           2202   365 Assignment               
+    2245   366 DO                           22B3   367 IF                           230E   367 DO                       
+    230E   368 Assignment                   2351   369 Assignment                   235A   370 END                      
+    235D   371 END                          2368   372 END                          2373   374 Assignment               
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Procedure Map                                            Page 19    
-    238F   375 IF                           239C   375 DO                           239C   376 DO                       
-    23E1   377 IF                           240A   377 DO                           244F   378 IF                       
-    24AA   378 Assignment                   24C0   379 END                          24CB   380 END                      
-    24D6   382 Assignment                   24DF   383 DO                           2524   384 IF                       
-    253E   384 DO                           253E   385 Assignment                   254A   385 Assignment               
-    2562   386 END                          2562   387 END                          256A   388 END                      
-    256A   390 END                      
+    238F   376 IF                           239C   376 DO                           239C   377 DO                       
+    23E1   378 IF                           240A   378 DO                           244F   379 IF                       
+    24AA   379 Assignment                   24C0   380 END                          24CB   381 END                      
+    24D6   383 Assignment                   24DF   384 DO                           2524   385 IF                       
+    253E   385 DO                           253E   386 Assignment                   254A   386 Assignment               
+    2562   387 END                          2562   388 END                          256A   389 END                      
+    256A   391 END                      
 
-    257A   396 PROCEDURE                P_I_COST
-    258F   398 DO                           25D4   399 Assignment                   25E7   399 Assignment               
-    25ED   400 Assignment                   2640   401 DO                           2688   402 IF                       
-    26B4   402 Assignment                   26D7   403 Assignment                   26E5   404 END                      
-    26F0   405 END                          26FB   406 END                      
+    257A   397 PROCEDURE                P_I_COST
+    258F   399 DO                           25D4   400 Assignment                   25E7   400 Assignment               
+    25ED   401 Assignment                   2640   402 DO                           2688   403 IF                       
+    26B4   403 Assignment                   26D7   404 Assignment                   26E5   405 END                      
+    26F0   406 END                          26FB   407 END                      
 
-    270B   414 PROCEDURE                IRREDUNDANT_NEPI_SUMS
-    272D   420 Assignment                   2733   421 DO                           277E   422 IF                       
-    27A7   422 DO                           27A7   423 Assignment                   27B0   424 Assignment               
-    27CF   425 Assignment                   2867   426 DO                           28B2   427 IF                       
-    28FA   428 Assignment                   297B   429 Assignment                   29AA   430 END                      
-    29B8   431 END                          29B8   432 END                          29C6   435 Assignment               
-    29CF   435 Assignment                   2A67   436 DO                           2AB2   438 IF                       
-    2B3B   438 DO                           2B3B   440 Assignment                   2B47   440 Assignment               
-    2B6F   441 END                          2B75   442 Assignment                   2BA4   443 END                      
-    2BB2   446 DO                           2BFA   448 Assignment                   2C00   448 Assignment               
-    2C98   450 DO                           2CE3   452 IF                           2D74   452 DO                       
-    2D74   454 Assignment                   2D7D   456 DO                           2DD8   458 Assignment               
-    2E0C   460 Assignment                   2E95   461 END                          2EA3   462 END                      
-    2EA9   463 Assignment                   2ED8   464 END                          2EE9   466 Assignment               
-    2EFD   468 Assignment                   2F04   469 DO                           2F4F   470 IF                       
-    2F91   470 DO                           2FDC   471 IF                           30D1   471 DO                       
-    30D1   472 Assignment                   310E   473 Assignment                   3115   474 END                      
-    311B   475 END                          312F   476 END                          3140   478 IF                       
-    314D   478 CALL                         3171   479 END                          317F   481 END                      
+    270B   415 PROCEDURE                IRREDUNDANT_NEPI_SUMS
+    272D   421 Assignment                   2733   422 DO                           277E   423 IF                       
+    27A7   423 DO                           27A7   424 Assignment                   27B0   425 Assignment               
+    27CF   426 Assignment                   2867   427 DO                           28B2   428 IF                       
+    28FA   429 Assignment                   297B   430 Assignment                   29AA   431 END                      
+    29B8   432 END                          29B8   433 END                          29C6   436 Assignment               
+    29CF   436 Assignment                   2A67   437 DO                           2AB2   439 IF                       
+    2B3B   439 DO                           2B3B   441 Assignment                   2B47   441 Assignment               
+    2B6F   442 END                          2B75   443 Assignment                   2BA4   444 END                      
+    2BB2   447 DO                           2BFA   449 Assignment                   2C00   449 Assignment               
+    2C98   451 DO                           2CE3   453 IF                           2D74   453 DO                       
+    2D74   455 Assignment                   2D7D   457 DO                           2DD8   459 Assignment               
+    2E0C   461 Assignment                   2E95   462 END                          2EA3   463 END                      
+    2EA9   464 Assignment                   2ED8   465 END                          2EE9   467 Assignment               
+    2EFD   469 Assignment                   2F04   470 DO                           2F4F   471 IF                       
+    2F91   471 DO                           2FDC   472 IF                           30D1   472 DO                       
+    30D1   473 Assignment                   310E   474 Assignment                   3115   475 END                      
+    311B   476 END                          312F   477 END                          3140   479 IF                       
+    314D   479 CALL                         3171   480 END                          317F   482 END                      
 
-    318F   488 PROCEDURE                MINIMUM_COST_SOLUTION
-    31B1   493 DO                           31FC   494 Assignment                   3239   495 END                      
-    3244   497 Assignment                   324F   498 DO                           329A   499 IF                       
-    32B4   499 Assignment                   32C6   500 END                          32D1   502 DO                       
-    331C   503 IF                           3336   503 DO                           3336   504 Assignment               
-    3373   505 Assignment                   337A   506 END                          337A   507 END                      
-    3388   508 IF                           3395   508 CALL                         33B9   510 END                      
+    318F   489 PROCEDURE                MINIMUM_COST_SOLUTION
+    31B1   494 DO                           31FC   495 Assignment                   3239   496 END                      
+    3244   498 Assignment                   324F   499 DO                           329A   500 IF                       
+    32B4   500 Assignment                   32C6   501 END                          32D1   503 DO                       
+    331C   504 IF                           3336   504 DO                           3336   505 Assignment               
+    3373   506 Assignment                   337A   507 END                          337A   508 END                      
+    3388   509 IF                           3395   509 CALL                         33B9   511 END                      
 
-    33C9   517 PROCEDURE                AMMEND_P_I_STATUS
-    33E7   522 Assignment                   33FC   523 Assignment                   3453   524 DO                       
-    3498   525 Assignment                   350E   526 Assignment                   35CF   527 END                      
-    35DA   529 DO                           361F   530 Assignment                   36FD   531 END                      
-    3708   533 Assignment                   37A0   534 DO                           37E5   535 IF                       
-    386B   535 Assignment                   388B   536 ELSE                         3890   536 IF                       
-    3916   536 Assignment                   3942   537 Assignment                   3971   538 END                      
-    397C   540 END                      
+    33C9   518 PROCEDURE                AMMEND_P_I_STATUS
+    33E7   523 Assignment                   33FC   524 Assignment                   3453   525 DO                       
+    3498   526 Assignment                   350E   527 Assignment                   35CF   528 END                      
+    35DA   530 DO                           361F   531 Assignment                   36FD   532 END                      
+    3708   534 Assignment                   37A0   535 DO                           37E5   536 IF                       
+    386B   536 Assignment                   388B   537 ELSE                         3890   537 IF                       
+    3916   537 Assignment                   3942   538 Assignment                   3971   539 END                      
+    397C   541 END                      
 
-    398C   547 PROCEDURE                REMOVE_REDUNDANT_SUMS
-    39AE   550 DO                           39F3   551 IF                           3A35   551 DO                       
-    3A35   552 Assignment                   3A39   553 DO                           3A8B   554 IF                       
-    3ACD   554 DO                           3ACD   555 Assignment                   3AFA   555 Assignment               
-    3B37   556 Assignment                   3B3B   557 END                          3B41   558 END                      
-    3B4C   559 IF                           3B56   559 DO                           3B56   560 Assignment               
-    3B62   561 RETURN                       3B67   562 END                          3B67   563 END                      
-Jul 27, 2024  01:55                                       /*                                                            
+    398C   548 PROCEDURE                REMOVE_REDUNDANT_SUMS
+    39AE   551 DO                           39F3   552 IF                           3A35   552 DO                       
+    3A35   553 Assignment                   3A39   554 DO                           3A8B   555 IF                       
+    3ACD   555 DO                           3ACD   556 Assignment                   3AFA   556 Assignment               
+    3B37   557 Assignment                   3B3B   558 END                          3B41   559 END                      
+    3B4C   560 IF                           3B56   560 DO                           3B56   561 Assignment               
+    3B62   562 RETURN                       3B67   563 END                          3B67   564 END                      
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Procedure Map                                            Page 20    
-    3B6D   564 END                          3B78   566 END                      
+    3B6D   565 END                          3B78   567 END                      
 
-    3B88   572 PROCEDURE                ESSENTIAL_COST
-    3BA3   574 Assignment                   3BA9   575 DO                           3BEE   576 IF                       
-    3C08   576 Assignment                   3C23   577 END                          3C2B   578 RETURN                   
-    3C3A   579 END                      
+    3B88   573 PROCEDURE                ESSENTIAL_COST
+    3BA3   575 Assignment                   3BA9   576 DO                           3BEE   577 IF                       
+    3C08   577 Assignment                   3C23   578 END                          3C2B   579 RETURN                   
+    3C3A   580 END                      
 
-    3C4A   586 PROCEDURE                NONESSENTIAL_COST
-    3C68   589 Assignment                   3C6E   589 Assignment                   3D06   590 DO                       
-    3D4B   591 IF                           3DE1   591 Assignment                   3E0F   592 Assignment               
-    3E3E   593 END                          3E49   594 RETURN                       3E58   595 END                      
+    3C4A   587 PROCEDURE                NONESSENTIAL_COST
+    3C68   590 Assignment                   3C6E   590 Assignment                   3D06   591 DO                       
+    3D4B   592 IF                           3DE1   592 Assignment                   3E0F   593 Assignment               
+    3E3E   594 END                          3E49   595 RETURN                       3E58   596 END                      
 
-    3E68   601 PROCEDURE                RUN_MINIMISATION
-    3E85   602 Assignment                   3EF7   603 PUT                          3F68   604 CALL                     
-    3F8B   605 CALL                         3FAE   606 CALL                         3FD1   607 CALL                     
-    3FF4   608 IF                           4001   608 DO                           4001   609 PUT                      
-    4072   610 CALL                         4095   611 CALL                         40B8   612 CALL                     
-    40DB   613 END                          40DB   614 Assignment                   410C   615 IF                       
-    4119   615 Assignment                   4164   616 END                      
+    3E68   602 PROCEDURE                RUN_MINIMISATION
+    3E85   603 Assignment                   3EF7   604 PUT                          3F68   605 CALL                     
+    3F8B   606 CALL                         3FAE   607 CALL                         3FD1   608 CALL                     
+    3FF4   609 IF                           4001   609 DO                           4001   610 PUT                      
+    4072   611 CALL                         4095   612 CALL                         40B8   613 CALL                     
+    40DB   614 END                          40DB   615 Assignment                   410C   616 IF                       
+    4119   616 Assignment                   4164   617 END                      
 
-    4174   629 PROCEDURE                PRINT_HEADER_MESSAGE
-    4195   631 PUT                          4281   633 END                      
+    4174   630 PROCEDURE                PRINT_HEADER_MESSAGE
+    4195   632 PUT                          4281   634 END                      
 
-    4291   639 PROCEDURE                PRINT_MENU
-    42A8   640 CALL                         42F2   641 PUT                          436B   642 PUT                      
-    4528   651 END                      
+    4291   640 PROCEDURE                PRINT_MENU
+    42A8   641 CALL                         42F2   642 PUT                          436B   643 PUT                      
+    4528   652 END                      
 
-    4538   657 PROCEDURE                PRINT_INPUT_DATA
-    4555   660 PUT                          45CE   661 IF                           45DE   661 PUT                      
-    464F   662 ELSE                         4654   662 PUT                          476B   664 PUT                      
-    47E4   665 IF                           47F4   665 PUT                          4865   666 ELSE                     
-    486A   666 PUT                          4981   667 END                      
+    4538   658 PROCEDURE                PRINT_INPUT_DATA
+    4555   661 PUT                          45CE   662 IF                           45DE   662 PUT                      
+    464F   663 ELSE                         4654   663 PUT                          476B   665 PUT                      
+    47E4   666 IF                           47F4   666 PUT                          4865   667 ELSE                     
+    486A   667 PUT                          4981   668 END                      
 
-    4991   673 PROCEDURE                OUTPUT_RESULTS
-    49AC   677 CALL                         49D6   680 CALL                         4A00   683 PUT                      
+    4991   674 PROCEDURE                OUTPUT_RESULTS
+    49AC   678 CALL                         49D6   681 CALL                         4A00   684 PUT                      
 
-    4AFC   686 PROCEDURE                CELL
-    4B0D   688 RETURN                       4CA1   689 END                      
+    4AFC   687 PROCEDURE                CELL
+    4B0D   689 RETURN                       4CA1   690 END                      
 
-    4CB1   690 PROCEDURE                LITERALS
-    4CC6   692 Assignment                   4CCC   692 Assignment                   4CD2   693 DO                       
-    4D1D   694 IF                           4D9B   695 IF                           4DD9   695 Assignment               
-    4E45   696 ELSE                         4E4A   696 Assignment                   4EB6   697 ELSE                     
-    4EBB   697 Assignment                   4F2A   698 Assignment                   4F38   699 END                      
-    4F43   700 RETURN                       4F5D   701 END                      
+    4CB1   691 PROCEDURE                LITERALS
+    4CC6   693 Assignment                   4CCC   693 Assignment                   4CD2   694 DO                       
+    4D1D   695 IF                           4D9B   696 IF                           4DD9   696 Assignment               
+    4E45   697 ELSE                         4E4A   697 Assignment                   4EB6   698 ELSE                     
+    4EBB   698 Assignment                   4F2A   699 Assignment                   4F38   700 END                      
+    4F43   701 RETURN                       4F5D   702 END                      
 
-    4F68   702 BEGIN                    
-    4F87   704 PUT                          5003   705 PUT                          5137   707 DO                       
-    517F   708 PUT                          534C   710 END                          5357   711 END                      
-    5361   714 IF                           5371   714 RETURN                   
+    4F68   703 BEGIN                    
+    4F87   705 PUT                          5003   706 PUT                          5137   708 DO                       
+    517F   709 PUT                          534C   711 END                          5357   712 END                      
+    5361   715 IF                           5371   715 RETURN                   
 
-    537B   717 PROCEDURE                TICK
-    538C   719 IF                           539A   719 RETURN                       53AD   720 RETURN                   
-    53C0   721 END                      
+    537B   718 PROCEDURE                TICK
+    538C   720 IF                           539A   720 RETURN                       53AD   721 RETURN                   
+    53C0   722 END                      
 
-    53CB   722 BEGIN                    
-    53EA   724 PUT                          5466   725 Assignment                   54E7   726 Assignment               
-    5572   727 DO                           55B4   728 PUT                          5628   729 PUT                      
-Jul 27, 2024  01:55                                       /*                                                            
+    53CB   723 BEGIN                    
+    53EA   725 PUT                          5466   726 Assignment                   54E7   727 Assignment               
+    5572   728 DO                           55B4   729 PUT                          5628   730 PUT                      
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                               Procedure Map                                            Page 21    
-    574C   732 DO                           5794   733 IF                           57B1   733 PUT                      
-    5976   736 END                          5981   737 END                          598C   738 END                      
+    574C   733 DO                           5794   734 IF                           57B1   734 PUT                      
+    5976   737 END                          5981   738 END                          598C   739 END                      
 
-    5996   741 BEGIN                    
-    59B5   743 IF                           59C2   743 PUT                          5A3E   744 ELSE                     
-    5A43   744 PUT                          5ABF   745 PUT                          5B43   747 Assignment               
-    5B49   748 DO                           5B91   749 IF                           5BAE   749 DO                       
-    5BAE   750 PUT                          5C9A   751 Assignment                   5CAA   752 END                      
-    5CAA   753 END                          5CB5   755 Assignment                   5CB9   756 IF                       
-    5CC6   756 DO                           5D18   757 Assignment                   5D1C   758 DO                       
-    5D6E   759 IF                           5D8B   760 Assignment                   5DE6   761 END                      
-    5DF1   762 END                          5DFC   764 IF                           5E06   764 DO                       
-    5E06   765 PUT                          5E87   766 DO                           5ECF   767 PUT                      
-    5F53   768 Assignment                   5F59   768 Assignment                   5FF1   769 DO                       
-    6039   770 IF                           60D0   770 DO                           60D0   771 PUT                      
-    61CC   772 Assignment                   61DC   773 END                          61E2   774 Assignment               
-    6211   775 END                          621C   776 PUT                          62A0   777 END                      
-    62AB   778 PUT                          631F   779 END                          631F   780 END                      
-    6329   783 PUT                          644C   785 END                      
+    5996   742 BEGIN                    
+    59B5   744 IF                           59C2   744 PUT                          5A3E   745 ELSE                     
+    5A43   745 PUT                          5ABF   746 PUT                          5B43   748 Assignment               
+    5B49   749 DO                           5B91   750 IF                           5BAE   750 DO                       
+    5BAE   751 PUT                          5C9A   752 Assignment                   5CAA   753 END                      
+    5CAA   754 END                          5CB5   756 Assignment                   5CB9   757 IF                       
+    5CC6   757 DO                           5D18   758 Assignment                   5D1C   759 DO                       
+    5D6E   760 IF                           5D8B   761 Assignment                   5DE6   762 END                      
+    5DF1   763 END                          5DFC   765 IF                           5E06   765 DO                       
+    5E06   766 PUT                          5E87   767 DO                           5ECF   768 PUT                      
+    5F53   769 Assignment                   5F59   769 Assignment                   5FF1   770 DO                       
+    6039   771 IF                           60D0   771 DO                           60D0   772 PUT                      
+    61CC   773 Assignment                   61DC   774 END                          61E2   775 Assignment               
+    6211   776 END                          621C   777 PUT                          62A0   778 END                      
+    62AB   779 PUT                          631F   780 END                          631F   781 END                      
+    6329   784 PUT                          644C   786 END                      
 
-    645C   791 PROCEDURE                PRINT_INFORMATION
-    647A   792 PUT                          676B   808 END                          6776   819 Assignment               
-    677C   819 Assignment                   6782   819 Assignment                   6788   820 Assignment               
-    678F   823 DO                           67AB   825 PUT                          6809   827 CALL                     
-    682B   828 SELECT                       685F   830 WHEN                     
+    645C   792 PROCEDURE                PRINT_INFORMATION
+    647A   793 PUT                          676B   809 END                          6776   820 Assignment               
+    677C   820 Assignment                   6782   820 Assignment                   6788   821 Assignment               
+    678F   824 DO                           67AB   826 PUT                          6809   828 CALL                     
+    682B   829 SELECT                       685F   831 WHEN                     
 
-    686C   830 BEGIN                    
-    688B   831 CALL                         68AE   832 GO                           68BC   832 END                      
-    68C6   834 WHEN                     
+    686C   831 BEGIN                    
+    688B   832 CALL                         68AE   833 GO                           68BC   833 END                      
+    68C6   835 WHEN                     
 
-    68DE   834 BEGIN                    
-    68FD   835 IF                           690D   836 PUT                          697E   837 ELSE                     
-    6983   837 DO                           6983   838 IF                           6990   838 CALL                     
-    69B3   839 PUT                          6A0B   840 CALL                         6A55   841 Assignment               
-    6A5C   842 CALL                         6A7F   843 END                          6A7F   844 GO                       
-    6A8D   844 END                          6A97   846 WHEN                     
+    68DE   835 BEGIN                    
+    68FD   836 IF                           690D   837 PUT                          697E   838 ELSE                     
+    6983   838 DO                           6983   839 IF                           6990   839 CALL                     
+    69B3   840 PUT                          6A0B   841 CALL                         6A55   842 Assignment               
+    6A5C   843 CALL                         6A7F   844 END                          6A7F   845 GO                       
+    6A8D   845 END                          6A97   847 WHEN                     
 
-    6AAF   846 BEGIN                    
-    6ACE   847 IF                           6ADB   847 DO                           6ADB   848 OPEN                     
-    6B4F   849 CALL                         6B99   850 PUT                          6BE9   851 CLOSE                    
-    6C39   852 PUT                          6CAA   853 END                          6CAA   854 ELSE                     
-    6CAF   854 PUT                          6D20   855 GO                           6D2E   855 END                      
-    6D38   857 WHEN                     
+    6AAF   847 BEGIN                    
+    6ACE   848 IF                           6ADB   848 DO                           6ADB   849 OPEN                     
+    6B4F   850 CALL                         6B99   851 PUT                          6BE9   852 CLOSE                    
+    6C39   853 PUT                          6CAA   854 END                          6CAA   855 ELSE                     
+    6CAF   855 PUT                          6D20   856 GO                           6D2E   856 END                      
+    6D38   858 WHEN                     
 
-    6D50   857 BEGIN                    
-    6D6F   858 CALL                         6D92   859 CALL                         6DB5   860 GO                       
-    6DC3   860 END                          6DCD   862 WHEN                         6DE5   863 STOP                     
-    6DF2   864 END                          6E11   865 END                          6E1C   866 END                      
-    6E21   866 Initialization           
-Jul 27, 2024  01:55                                       /*                                                            
+    6D50   858 BEGIN                    
+    6D6F   859 CALL                         6D92   860 CALL                         6DB5   861 GO                       
+    6DC3   861 END                          6DCD   863 WHEN                         6DE5   864 STOP                     
+    6DF2   865 END                          6E11   866 END                          6E1C   867 END                      
+    6E21   867 Initialization           
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 22    
-ACTION               171  Char(30) Var                                          [ DSA-'40'x(32) ]
-                            222   223   224   225   227   228   231   233   239   250 
-ALL_COVERED          742  Bit(1) Aligned                                        [ DSA-'29'x(1) ]
-                            755   756   757   758   760   764 
+ACTION               172  Char(30) Var                                          [ DSA-'40'x(32) ]
+                            223   224   225   226   228   229   232   234   240   251 
+ALL_COVERED          743  Bit(1) Aligned                                        [ DSA-'29'x(1) ]
+                            756   757   758   759   761   765 
 ALL_VERTICES_CONTAINED
-                     286  Bit(1) Aligned                                        [ DSA-'31'x(1) ]
-                            298   299   302   306 
-AMMEND_P_I_STATUS    517  Entry                                                 [ Code+'33DB'x ]
-                            612 
-B                     75  Bit(1) Aligned                                        [ DSA-'27'x(1) ]
-                            106 
-B                    397  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
-                            399   402   403 
-B                    416  Bit(96) Aligned                                       [ DSA-'36'x(12) ]
-                            425   428   429   435   438   440   442   448   452   460 
-                            463 
-B                    518  Bit(96) Aligned                                       [ DSA-'44'x(12) ]
-                            533   535   536   537 
-B                    588  Bit(96) Aligned                                       [ DSA-'30'x(12) ]
-                            589   591   592 
-B                    691  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            692   694   695   698 
-B                    718  Bit(1) Aligned Parameter                              [ Loc @DSA+'08'x(1) ]
-                            719 
-B                    723  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            727   729   733 
-B                    742  Bit(96) Aligned                                       [ DSA-'35'x(12) ]
-                            768   770   774 
-BINARY                27  Builtin
-                            151   192   196   197 
-BIT                   27  Builtin
-                            425   435   438   448   452   470   471   472   504   533 
-                            535   536   551   554   555   589   591   768   770 
-BSC_PROJECT           10  Entry External Options(Main )                         [ Code+'15'x ]
-C                    415  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
-                            448   454   456   466   470   471   472 
-CEIL                  27  Builtin
-                            725   726 
-CELL                 686  Entry                                                 [ Code+'4B01'x ]
-                            708 
-CHARACTER             27  Builtin
-                             66 
-CONTINUE              39  Char(30) Var                                          [ DSA-'A5B0'x(32) ]
-                            163 
-CONTINUE_PROMPT      161  Entry                                                 [ Code+'08D2'x ]
-                            842   859 
-COPY                  27  Builtin
-                            631 
-COVERED              286  Bit(1) Aligned                                        [ DSA-'32'x(1) ]
-                            308   309   312   314 
-DECIMAL               27  Builtin
-                            725   726 
-DELETED              171  Bit(1) Aligned                                        [ DSA-'41'x(1) ]
-                            241   242   245   258   259   262 
-DONT_CARE             30  (512) Fixed Bin(15,0) Aligned                         [ DSA-'082C'x(2) ]
-                             83   130   252   260   261   666 
-ENTER_DATA           170  Entry                                                 [ Code+'09F6'x ]
-Jul 27, 2024  01:55                                       /*                                                            
+                     287  Bit(1) Aligned                                        [ DSA-'31'x(1) ]
+                            299   300   303   307 
+AMMEND_P_I_STATUS    518  Entry                                                 [ Code+'33DB'x ]
+                            613 
+B                     76  Bit(1) Aligned                                        [ DSA-'27'x(1) ]
+                            107 
+B                    398  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
+                            400   403   404 
+B                    417  Bit(96) Aligned                                       [ DSA-'36'x(12) ]
+                            426   429   430   436   439   441   443   449   453   461 
+                            464 
+B                    519  Bit(96) Aligned                                       [ DSA-'44'x(12) ]
+                            534   536   537   538 
+B                    589  Bit(96) Aligned                                       [ DSA-'30'x(12) ]
+                            590   592   593 
+B                    692  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            693   695   696   699 
+B                    719  Bit(1) Aligned Parameter                              [ Loc @DSA+'08'x(1) ]
+                            720 
+B                    724  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            728   730   734 
+B                    743  Bit(96) Aligned                                       [ DSA-'35'x(12) ]
+                            769   771   775 
+BINARY                28  Builtin
+                            152   193   197   198 
+BIT                   28  Builtin
+                            426   436   439   449   453   471   472   473   505   534 
+                            536   537   552   555   556   590   592   769   771 
+BSC_PROJECT           11  Entry External Options(Main )                         [ Code+'15'x ]
+C                    416  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
+                            449   455   457   467   471   472   473 
+CEIL                  28  Builtin
+                            726   727 
+CELL                 687  Entry                                                 [ Code+'4B01'x ]
+                            709 
+CHARACTER             28  Builtin
+                             67 
+CONTINUE              40  Char(30) Var                                          [ DSA-'A5B0'x(32) ]
+                            164 
+CONTINUE_PROMPT      162  Entry                                                 [ Code+'08D2'x ]
+                            843   860 
+COPY                  28  Builtin
+                            632 
+COVERED              287  Bit(1) Aligned                                        [ DSA-'32'x(1) ]
+                            309   310   313   315 
+DECIMAL               28  Builtin
+                            726   727 
+DELETED              172  Bit(1) Aligned                                        [ DSA-'41'x(1) ]
+                            242   243   246   259   260   263 
+DONT_CARE             31  (512) Fixed Bin(15,0) Aligned                         [ DSA-'082C'x(2) ]
+                             84   131   253   261   262   667 
+ENTER_DATA           171  Entry                                                 [ Code+'09F6'x ]
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 23    
-                            831 
-EPI                  346  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
-                            355   359 
-EPI_COVERS_MINTERM    34  (256) Bit(1) Static                                   [ BSS+'02'x.0(0.1) ]
-                            364   365   367   377   422 
-EQUIVALENT            55  Entry                                                 [ Code+'4A'x ]
-                            297   400   694 
-ESSENTIAL_COST       572  Entry                                                 [ Code+'3B97'x ]
-                            614 
-ESS_PIS              518  Bit(96) Aligned                                       [ DSA-'2C'x(12) ]
-                            522   523   525   530   535 
-EXCESS_TERMS          75  Bit(1) Aligned                                        [ DSA-'29'x(1) ]
-                             89    90    91    92    98   101   115 
-E_COST               573  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            574   576   578 
-F                    630  File Variable Aligned Parameter                       [ Loc @DSA+'08'x(12) ]
-                            631 
-F                    658  File Variable Aligned Parameter                       [ Loc @DSA+'08'x(12) ]
-                            660   661   662   664   665   666 
-F                    674  File Variable Aligned Parameter                       [ Loc @DSA+'08'x(12) ]
-                            677   680   683   704   705   708   724   728   729   733 
-                            743   744   745   750   765   767   771   776   778   783 
-FUNCTION_ORDER        30  Fixed Bin(15,0) Aligned                               [ DSA-'18EE'x(2) ]
-                            401   602   683   693 
-GET_INPUT_LIST       173  Entry                                                 [ Code+'0A16'x ]
-                            232 
-I                     75  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                             92    94    95    96   101 
-I                    171  Fixed Bin(15,0) Aligned                               [ DSA-'44'x(2) ]
-                            242   243   244   259   260   261 
-I                    285  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            290   291   293   298 
-I                    548  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            550   551   553   555   560 
-ILLEGAL_ENTRY        176  Bit(1) Aligned                                        [ DSA-'45'x(1) ]
-                            179   205   207 
-INDEX                 27  Builtin
-                            187   188 
-INEPI_SUM             36  (3000) Bit(96) Aligned                                [ DSA-'A590'x(12) ]
-                            440   458   460   470   471   472   504   522   525   526 
-                            530   551   554   555   591   770 
-INPUT_ITEM           175  Char(30) Var                                          [ DSA-'44'x(32) ]
-                            185   186   187   188   192   195   196   197 
+                            832 
+EPI                  347  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
+                            356   360 
+EPI_COVERS_MINTERM    35  (256) Bit(1) Static                                   [ BSS+'02'x.0(0.1) ]
+                            365   366   368   378   423 
+EQUIVALENT            56  Entry                                                 [ Code+'4A'x ]
+                            298   401   695 
+ESSENTIAL_COST       573  Entry                                                 [ Code+'3B97'x ]
+                            615 
+ESS_PIS              519  Bit(96) Aligned                                       [ DSA-'2C'x(12) ]
+                            523   524   526   531   536 
+EXCESS_TERMS          76  Bit(1) Aligned                                        [ DSA-'29'x(1) ]
+                             90    91    92    93    99   102   116 
+E_COST               574  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            575   577   579 
+F                    631  File Variable Aligned Parameter                       [ Loc @DSA+'08'x(12) ]
+                            632 
+F                    659  File Variable Aligned Parameter                       [ Loc @DSA+'08'x(12) ]
+                            661   662   663   665   666   667 
+F                    675  File Variable Aligned Parameter                       [ Loc @DSA+'08'x(12) ]
+                            678   681   684   705   706   709   725   729   730   734 
+                            744   745   746   751   766   768   772   777   779   784 
+FUNCTION_ORDER        31  Fixed Bin(15,0) Aligned                               [ DSA-'18EE'x(2) ]
+                            402   603   684   694 
+GET_INPUT_LIST       174  Entry                                                 [ Code+'0A16'x ]
+                            233 
+I                     76  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                             93    95    96    97   102 
+I                    172  Fixed Bin(15,0) Aligned                               [ DSA-'44'x(2) ]
+                            243   244   245   260   261   262 
+I                    286  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            291   292   294   299 
+I                    549  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            551   552   554   556   561 
+ILLEGAL_ENTRY        177  Bit(1) Aligned                                        [ DSA-'45'x(1) ]
+                            180   206   208 
+INDEX                 28  Builtin
+                            188   189 
+INEPI_SUM             37  (3000) Bit(96) Aligned                                [ DSA-'A590'x(12) ]
+                            441   459   461   471   472   473   505   523   526   527 
+                            531   552   555   556   592   771 
+INPUT_ITEM           176  Char(30) Var                                          [ DSA-'44'x(32) ]
+                            186   187   188   189   193   196   197   198 
 IRREDUNDANT_NEPI_SUMS
-                     414  Entry                                                 [ Code+'2721'x ]
-                            610 
-I_EQV_J              285  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
-                            297   300 
-J                     75  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            101   102   104   105   106   110   111   112   113 
-J                    285  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            291   293 
-J                    548  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            553   554   555 
-L                    397  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            401 
-L                    691  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            693 
-Jul 27, 2024  01:55                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 24    
-LENGTH                27  Builtin
-                            195 
-LITERALS             397  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
-                            400   402 
-LITERALS             690  Entry                                                 [ Code+'4CBA'x ]
-                            708 
-LITS                 691  Char(10) Var                                          [ DSA-'30'x(12) ]
-                            692   695   696   697   700 
-LOG2                  27  Builtin
-                            602 
-LOWER                174  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            197   198   199 
-M                    147  Fixed Bin(15,0) Aligned                               [ DSA-'42'x(2) ]
-                            151   152 
-M                    285  Fixed Bin(15,0) Aligned                               [ DSA-'30'x(2) ]
-                            298   301   302   303 
-M                    331  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            333   335 
-M                    346  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            351   354   363   364   365   366   367   376   377   378 
-M                    415  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            421   422   427   446   452 
-M                    723  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            729   733 
-MENU                 825  Label                                                 [ Code+'67AB'x ]
-                            832   844   855   860 
-MENU_ITEM            147  Char(30) Var                                          [ DSA-'40'x(32) ]
-                            149   150   151 
-MENU_SELECTION       146  Entry                                                 [ Code+'0744'x ]
-                            828 
-MIN                   27  Builtin
-                            729   733 
-MINIMUM_COST_SOLUTION
-                     488  Entry                                                 [ Code+'31A5'x ]
+                     415  Entry                                                 [ Code+'2721'x ]
                             611 
-MINS_PER_BLOCK       723  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
-                            726   729   733 
-MINTERM               30  (512) Fixed Bin(15,0) Aligned                         [ DSA-'042C'x(2) ]
-                             79   126   235   243   244   335   662   729 
-MIN_COST             489  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            497   499   503 
-NEW_DATA              34  Bit(1) Static                                         [ BSS+'01'x(1) ]
-                            267   820   838   841   847 
-NE_COST              587  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            589   591   594 
-NE_PI                 30  (96) Fixed Bin(15,0) Aligned                          [ DSA-'18EC'x(2) ]
-                            385   427   535   536   591   771 
-NONESSENTIAL_COST    586  Entry                                                 [ Code+'3C5C'x ]
-                            494   615 
-NUM_BLOCKS           723  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
-                            725   726   727 
-NUM_COVERS           346  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
-                            352   356   359   362   368   373 
-NUM_DONT_CARES        30  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                             82    86   122   129   130   229   252   254   259   665 
-                            666   819 
-NUM_INEPI_SUMS        30  Fixed Bin(15,0) Aligned                               [ DSA-'2C'x(2) ]
-                            435   440   456   458   466   469   470   493   498   502 
-Jul 27, 2024  01:55                                       /*                                                            
+I_EQV_J              286  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
+                            298   301 
+J                     76  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            102   103   105   106   107   111   112   113   114 
+J                    286  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            292   294 
+J                    549  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            554   555   556 
+L                    398  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            402 
+L                    692  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            694 
+Jul 27, 2024  02:54                                       /*                                                            
+1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 24    
+LENGTH                28  Builtin
+                            196 
+LITERALS             398  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
+                            401   403 
+LITERALS             691  Entry                                                 [ Code+'4CBA'x ]
+                            709 
+LITS                 692  Char(10) Var                                          [ DSA-'30'x(12) ]
+                            693   696   697   698   701 
+LOG2                  28  Builtin
+                            603 
+LOWER                175  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            198   199   200 
+M                    148  Fixed Bin(15,0) Aligned                               [ DSA-'42'x(2) ]
+                            152   153 
+M                    286  Fixed Bin(15,0) Aligned                               [ DSA-'30'x(2) ]
+                            299   302   303   304 
+M                    332  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            334   336 
+M                    347  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            352   355   364   365   366   367   368   377   378   379 
+M                    416  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            422   423   428   447   453 
+M                    724  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            730   734 
+MENU                 826  Label                                                 [ Code+'67AB'x ]
+                            833   845   856   861 
+MENU_ITEM            148  Char(30) Var                                          [ DSA-'40'x(32) ]
+                            150   151   152 
+MENU_SELECTION       147  Entry                                                 [ Code+'0744'x ]
+                            829 
+MIN                   28  Builtin
+                            730   734 
+MINIMUM_COST_SOLUTION
+                     489  Entry                                                 [ Code+'31A5'x ]
+                            612 
+MINS_PER_BLOCK       724  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
+                            727   730   734 
+MINTERM               31  (512) Fixed Bin(15,0) Aligned                         [ DSA-'042C'x(2) ]
+                             80   127   236   244   245   336   663   730 
+MIN_COST             490  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            498   500   504 
+NEW_DATA              35  Bit(1) Static                                         [ BSS+'01'x(1) ]
+                            268   821   839   842   848 
+NE_COST              588  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            590   592   595 
+NE_PI                 31  (96) Fixed Bin(15,0) Aligned                          [ DSA-'18EC'x(2) ]
+                            386   428   536   537   592   772 
+NONESSENTIAL_COST    587  Entry                                                 [ Code+'3C5C'x ]
+                            495   616 
+NUM_BLOCKS           724  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
+                            726   727   728 
+NUM_COVERS           347  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
+                            353   357   360   363   369   374 
+NUM_DONT_CARES        31  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                             83    87   123   130   131   230   253   255   260   666 
+                            667   820 
+NUM_INEPI_SUMS        31  Fixed Bin(15,0) Aligned                               [ DSA-'2C'x(2) ]
+                            436   441   457   459   467   470   471   494   499   503 
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 25    
-                            524   529   550   553   560   766 
-NUM_MINTERMS          30  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                             78    83    84    86   122   125   126   229   235   237 
-                            242   333   351   363   373   376   421   661   662   714 
-                            725   726   729   733   756   819 
-NUM_NE_PIS            30  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
-                            382   385   426   436   450   534   590   769 
-NUM_PIS               30  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
-                            289   309   315   316   317   334   349   353   365   377 
-                            383   398   575   707   732   748   758 
-NUM_TERMS             30  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
-                             86    92    95    96    97   112   113   114   123   178 
-                            190   191   192   199   200   201   234   237   240   251 
-                            254   257   267   290   291   602   819   835 
-NUM_UMIN_NEPIS       415  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
-                            420   423   424   428   446 
-OR                   742  Char(2) Var                                           [ DSA-'28'x(4) ]
-                            747   750   751   765   768   771   772 
-OUTPUT_RESULTS       673  Entry                                                 [ Code+'49A0'x ]
-                            840   849 
-P                    285  Fixed Bin(15,0) Aligned                               [ DSA-'2E'x(2) ]
-                            309   310   311   312 
-P                    331  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            334   335 
-P                    346  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            349   353   354   355   365   366   377   378   383   384 
-                            385 
-P                    397  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            398   399   400   402 
-P                    415  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            426   427   436   450 
-P                    573  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            575   576 
-P                    587  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            590   591 
-P                    687  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
-                            688 
-P                    691  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
-                            694   695 
-P                    703  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            707   708 
-P                    723  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
-                            732   733 
-P                    742  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            748   749   750   758   759   760   769   771 
-PI_COVERS_MINTERM     34  (256,256) Bit(1) Static                               [ BSS+'22'x.0(0.1) ]
-                            335   354   366   378   427   733   760 
-PI_STATUS             40  (5) Char(30) Var Static Init()                        [ Static+'76'x(32) ]
-                            708 
-PRIME_IMPLICANTS     283  Entry                                                 [ Code+'1AAA'x ]
-                            604 
-PRINT_HEADER_MESSAGE
-                     629  Entry                                                 [ Code+'4189'x ]
-                            213   640   677 
-PRINT_INFORMATION    791  Entry                                                 [ Code+'646E'x ]
-                            858 
-PRINT_INPUT_DATA     657  Entry                                                 [ Code+'4549'x ]
-                            214   680 
-Jul 27, 2024  01:55                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 26    
-PRINT_MENU           639  Entry                                                 [ Code+'429C'x ]
-                            827 
-P_I                   30  (4,256) Fixed Bin(15,0) Aligned                       [ DSA-'182C'x(2) ]
-                            310   311   312   316   317   335   349   359   366   378 
-                            384   399   400   402   535   536   576   591   688   694 
-                            695   708   733   749   759 
-P_I_CHART            330  Entry                                                 [ Code+'1E69'x ]
+                            525   530   551   554   561   767 
+NUM_MINTERMS          31  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                             79    84    85    87   123   126   127   230   236   238 
+                            243   334   352   364   374   377   422   662   663   715 
+                            726   727   730   734   757   820 
+NUM_NE_PIS            31  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
+                            383   386   427   437   451   535   591   770 
+NUM_PIS               31  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
+                            290   310   316   317   318   335   350   354   366   378 
+                            384   399   576   708   733   749   759 
+NUM_TERMS             31  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
+                             87    93    96    97    98   113   114   115   124   179 
+                            191   192   193   200   201   202   235   238   241   252 
+                            255   258   268   291   292   603   820   836 
+NUM_UMIN_NEPIS       416  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
+                            421   424   425   429   447 
+OR                   743  Char(2) Var                                           [ DSA-'28'x(4) ]
+                            748   751   752   766   769   772   773 
+OUTPUT_RESULTS       674  Entry                                                 [ Code+'49A0'x ]
+                            841   850 
+P                    286  Fixed Bin(15,0) Aligned                               [ DSA-'2E'x(2) ]
+                            310   311   312   313 
+P                    332  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            335   336 
+P                    347  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            350   354   355   356   366   367   378   379   384   385 
+                            386 
+P                    398  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            399   400   401   403 
+P                    416  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            427   428   437   451 
+P                    574  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            576   577 
+P                    588  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            591   592 
+P                    688  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
+                            689 
+P                    692  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
+                            695   696 
+P                    704  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            708   709 
+P                    724  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
+                            733   734 
+P                    743  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            749   750   751   759   760   761   770   772 
+PI_COVERS_MINTERM     35  (256,256) Bit(1) Static                               [ BSS+'22'x.0(0.1) ]
+                            336   355   367   379   428   734   761 
+PI_STATUS             41  (5) Char(30) Var Static Init()                        [ Static+'76'x(32) ]
+                            709 
+PRIME_IMPLICANTS     284  Entry                                                 [ Code+'1AAA'x ]
                             605 
-P_I_COST             396  Entry                                                 [ Code+'2583'x ]
-                            607 
-P_I_STATUS           345  Entry                                                 [ Code+'203C'x ]
+PRINT_HEADER_MESSAGE
+                     630  Entry                                                 [ Code+'4189'x ]
+                            214   641   678 
+PRINT_INFORMATION    792  Entry                                                 [ Code+'646E'x ]
+                            859 
+PRINT_INPUT_DATA     658  Entry                                                 [ Code+'4549'x ]
+                            215   681 
+Jul 27, 2024  02:54                                       /*                                                            
+1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 26    
+PRINT_MENU           640  Entry                                                 [ Code+'429C'x ]
+                            828 
+P_I                   31  (4,256) Fixed Bin(15,0) Aligned                       [ DSA-'182C'x(2) ]
+                            311   312   313   317   318   336   350   360   367   379 
+                            385   400   401   403   536   537   577   592   689   695 
+                            696   709   734   750   760 
+P_I_CHART            331  Entry                                                 [ Code+'1E69'x ]
                             606 
-REDUNDANT_SUMS       417  Bit(1) Aligned                                        [ DSA-'0C37'x(1) ]
-                            468   473   478 
-REDUNDANT_SUMS       490  Bit(1) Aligned                                        [ DSA-'07F5'x(1) ]
-                            505   508 
-RED_PIS              518  Bit(96) Aligned                                       [ DSA-'38'x(12) ]
-                            523   526   536 
+P_I_COST             397  Entry                                                 [ Code+'2583'x ]
+                            608 
+P_I_STATUS           346  Entry                                                 [ Code+'203C'x ]
+                            607 
+REDUNDANT_SUMS       418  Bit(1) Aligned                                        [ DSA-'0C37'x(1) ]
+                            469   474   479 
+REDUNDANT_SUMS       491  Bit(1) Aligned                                        [ DSA-'07F5'x(1) ]
+                            506   509 
+RED_PIS              519  Bit(96) Aligned                                       [ DSA-'38'x(12) ]
+                            524   527   537 
 REMOVE_REDUNDANT_SUMS
-                     547  Entry                                                 [ Code+'39A2'x ]
-                            478   508 
-RESULTS_FILE          42  File Aligned External                                 [ Ext+'00'x(12) ]
-                            848   849   850   851 
-RUN_MINIMISATION     601  Entry                                                 [ Code+'3E79'x ]
-                            838 
-S                    415  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
-                            456   458   460   469   470   471 
-S                    489  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            493   494   498   499   502   503   504 
-S                    519  Fixed Bin(15,0) Aligned                               [ DSA-'46'x(2) ]
-                            524   525   526   529   530   534   535   536 
-S                    587  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
-                            591 
-S                    742  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
-                            756   760   766   770 
-SOLUTION_COST         30  Fixed Bin(15,0) Aligned                               [ DSA-'18F0'x(2) ]
-                            614   615   783 
-SORTED                75  Bit(1) Aligned                                        [ DSA-'28'x(1) ]
-                             91    92   100   102   107 
-SORT_DATA             74  Entry                                                 [ Code+'01F4'x ]
-                            212 
-SUBSTR                27  Builtin
-                             66   196   197   429   442   463   537   592   774 
-SUM_COST             489  (1000) Fixed Bin(15,0) Aligned                        [ DSA-'07F4'x(2) ]
-                            494   497   499   503 
-SUM_MOVED            548  Bit(1) Aligned                                        [ DSA-'25'x(1) ]
-                            552   553   556   559 
-SYSIN                 24  File Aligned External                                 [ Ext+'00'x(12) ]
-                            149   163   185   224 
-SYSPRINT              25  File Aligned External Print                           [ Ext+'00'x(12) ]
-                            162   180   207   211   213   214   215   603   609   640 
-                            641   642   792   825   836   839   840   852   854 
-T                     75  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
-                             78    79    80    82    83    84   105   123   124   126 
-                            130 
-T                    171  Fixed Bin(15,0) Aligned                               [ DSA-'46'x(2) ]
-                            188   189   195   196   197   198   199   201   234   235 
-                            240   243   251   252   257   260 
-Jul 27, 2024  01:55                                       /*                                                            
+                     548  Entry                                                 [ Code+'39A2'x ]
+                            479   509 
+RESULTS_FILE          43  File Aligned External                                 [ Ext+'00'x(12) ]
+                            849   850   851   852 
+RUN_MINIMISATION     602  Entry                                                 [ Code+'3E79'x ]
+                            839 
+S                    416  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
+                            457   459   461   470   471   472 
+S                    490  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            494   495   499   500   503   504   505 
+S                    520  Fixed Bin(15,0) Aligned                               [ DSA-'46'x(2) ]
+                            525   526   527   530   531   535   536   537 
+S                    588  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
+                            592 
+S                    743  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
+                            757   761   767   771 
+SOLUTION_COST         31  Fixed Bin(15,0) Aligned                               [ DSA-'18F0'x(2) ]
+                            615   616   784 
+SORTED                76  Bit(1) Aligned                                        [ DSA-'28'x(1) ]
+                             92    93   101   103   108 
+SORT_DATA             75  Entry                                                 [ Code+'01F4'x ]
+                            213 
+SUBSTR                28  Builtin
+                             67   197   198   430   443   464   538   593   775 
+SUM_COST             490  (1000) Fixed Bin(15,0) Aligned                        [ DSA-'07F4'x(2) ]
+                            495   498   500   504 
+SUM_MOVED            549  Bit(1) Aligned                                        [ DSA-'25'x(1) ]
+                            553   554   557   560 
+SYSIN                 25  File Aligned External                                 [ Ext+'00'x(12) ]
+                            150   164   186   225 
+SYSPRINT              26  File Aligned External Print                           [ Ext+'00'x(12) ]
+                            163   181   208   212   214   215   216   604   610   641 
+                            642   643   793   826   837   840   841   853   855 
+T                     76  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
+                             79    80    81    83    84    85   106   124   125   127 
+                            131 
+T                    172  Fixed Bin(15,0) Aligned                               [ DSA-'46'x(2) ]
+                            189   190   196   197   198   199   200   202   235   236 
+                            241   244   252   253   258   261 
+Jul 27, 2024  02:54                                       /*                                                            
 1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 27    
-T                    658  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            662   666 
-TERM                  30  (1024) Fixed Bin(15,0) Aligned                        [ DSA-'102C'x(2) ]
-                             79    83    94    95   102   104   105   110   112   126 
-                            130   192   201   235   243   252   260   293   301   302 
-                            602 
-TERM_I               285  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
-                            293   295   297   299   300   311   316 
-TERM_J               285  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
-                            293   295   297   299   310   312   317 
-TICK                 717  Entry                                                 [ Code+'5380'x ]
-                            733 
-TRANSLATE             27  Builtin
-                            186   225 
-TRIM                  64  Entry                                                 [ Code+'C9'x ]
-                            662   666   683   688   750   771   783 
-TYPE                  75  (512) Bit(1) Aligned                                  [ DSA-'0229'x(1) ]
-                             80    84    96   106   111   113   124 
-UMIN_NEPIS           416  (256) Bit(96) Aligned                                 [ DSA-'0C36'x(12) ]
-                            424   428   438   452 
-UNIQUE_SOLUTION       34  Bit(1) Static                                         [ BSS+'00'x(1) ]
-                            373   375   608   615   743   756 
-UPPER                174  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
-                            196   198   199 
-VALUE                 65  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
-                             66 
-VERIFY                27  Builtin
-                             66   150   187   223 
-VERSION               38  Char(4) Static Init()                                 [ Static+'72'x(4) ]
-                            631 
-VERTEX               285  Fixed Bin(15,0) Aligned                               [ DSA-'2C'x(2) ]
-                            299   300   301   302 
-X                     56  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
-                             57 
-Y                     56  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'0C'x(2) ]
-                             57 
+T                    659  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            663   667 
+TERM                  31  (1024) Fixed Bin(15,0) Aligned                        [ DSA-'102C'x(2) ]
+                             80    84    95    96   103   105   106   111   113   127 
+                            131   193   202   236   244   253   261   294   302   303 
+                            603 
+TERM_I               286  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
+                            294   296   298   300   301   312   317 
+TERM_J               286  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
+                            294   296   298   300   311   313   318 
+TICK                 718  Entry                                                 [ Code+'5380'x ]
+                            734 
+TRANSLATE             28  Builtin
+                            187   226 
+TRIM                  65  Entry                                                 [ Code+'C9'x ]
+                            663   667   684   689   751   772   784 
+TYPE                  76  (512) Bit(1) Aligned                                  [ DSA-'0229'x(1) ]
+                             81    85    97   107   112   114   125 
+UMIN_NEPIS           417  (256) Bit(96) Aligned                                 [ DSA-'0C36'x(12) ]
+                            425   429   439   453 
+UNIQUE_SOLUTION       35  Bit(1) Static                                         [ BSS+'00'x(1) ]
+                            374   376   609   616   744   757 
+UPPER                175  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
+                            197   199   200 
+VALUE                 66  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
+                             67 
+VERIFY                28  Builtin
+                             67   151   188   224 
+VERSION               39  Char(4) Static Init()                                 [ Static+'72'x(4) ]
+                            632 
+VERTEX               286  Fixed Bin(15,0) Aligned                               [ DSA-'2C'x(2) ]
+                            300   301   302   303 
+X                     57  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'08'x(2) ]
+                             58 
+Y                     57  Fixed Bin(15,0) Aligned Parameter                     [ Loc @DSA+'0C'x(2) ]
+                             58 
 
 End of compilation. 
