@@ -1,0 +1,907 @@
+Archive member included to satisfy reference by file (symbol)
+
+/usr/lib/libprf.a(bool.o)     bool_min.o (_pli_Bool)
+/usr/lib/libprf.a(cac.o)      bool_min.o (_pli_CAC)
+/usr/lib/libprf.a(cba.o)      /usr/lib/libprf.a(bool.o) (_pli_CBA)
+/usr/lib/libprf.a(cbs.o)      /usr/lib/libprf.a(cba.o) (_pli_CBS)
+/usr/lib/libprf.a(cca.o)      bool_min.o (_pli_CCA)
+/usr/lib/libprf.a(cf.o)       bool_min.o (_pli_CF)
+/usr/lib/libprf.a(cnvt.o)     /usr/lib/libprf.a(cca.o) (_pli_Cnvt)
+/usr/lib/libprf.a(cvfy.o)     bool_min.o (_pli_CVfy)
+/usr/lib/libprf.a(exp.o)      /usr/lib/libprf.a(cnvt.o) (_pli_EXP)
+/usr/lib/libprf.a(f2i.o)      /usr/lib/libprf.a(cnvt.o) (_pli_F2I)
+/usr/lib/libprf.a(get.o)      bool_min.o (_pli_Get)
+/usr/lib/libprf.a(getdsa.o)   /usr/lib/libprf.a(cac.o) (_pli_GetFlags)
+/usr/lib/libprf.a(getx.o)     /usr/lib/libprf.a(get.o) (_pli_GetX)
+/usr/lib/libprf.a(ibmdec.o)   /usr/lib/libprf.a(cnvt.o) (_pli_FrIBMDec)
+/usr/lib/libprf.a(kbs.o)      bool_min.o (_pli_KBS)
+/usr/lib/libprf.a(math.o)     bool_min.o (_pli_Math)
+/usr/lib/libprf.a(mbs.o)      bool_min.o (_pli_MBS)
+/usr/lib/libprf.a(mod.o)      /usr/lib/libprf.a(cba.o) (_pli_Mod)
+/usr/lib/libprf.a(npi.o)      /usr/lib/libprf.a(getx.o) (_pli_NPI)
+/usr/lib/libprf.a(numval.o)   /usr/lib/libprf.a(cca.o) (_pli_NumVal)
+/usr/lib/libprf.a(plistart.o)
+                              bool_min.o (_pli_Start)
+/usr/lib/libprf.a(plitabs.o)  /usr/lib/libprf.a(plistart.o) (_pli_Tabs)
+/usr/lib/libprf.a(pow.o)      /usr/lib/libprf.a(exp.o) (_pli_POW)
+/usr/lib/libprf.a(put.o)      bool_min.o (_pli_Put)
+/usr/lib/libprf.a(putx.o)     /usr/lib/libprf.a(put.o) (_pli_PutX)
+/usr/lib/libprf.a(xlat.o)     bool_min.o (_pli_Xlat)
+/usr/lib/libprf.a(aggio.o)    /usr/lib/libprf.a(getx.o) (_pli_AggIO)
+/usr/lib/libprf.a(bufi.o)     /usr/lib/libprf.a(get.o) (_pli_BufI)
+/usr/lib/libprf.a(bufo.o)     /usr/lib/libprf.a(put.o) (_pli_BufO)
+/usr/lib/libprf.a(cbd.o)      /usr/lib/libprf.a(putx.o) (_pli_CBD)
+/usr/lib/libprf.a(ccb.o)      /usr/lib/libprf.a(getx.o) (_pli_CCB)
+/usr/lib/libprf.a(cindex.o)   /usr/lib/libprf.a(getx.o) (_pli_CIndex)
+/usr/lib/libprf.a(clc.o)      /usr/lib/libprf.a(putx.o) (_pli_CLC)
+/usr/lib/libprf.a(conv.o)     /usr/lib/libprf.a(getx.o) (_pli_Conv)
+/usr/lib/libprf.a(dyndesc.o)  /usr/lib/libprf.a(getx.o) (_pli_DynDesc1)
+/usr/lib/libprf.a(fmt.o)      /usr/lib/libprf.a(getx.o) (_pli_Fmt)
+/usr/lib/libprf.a(fmtsub.o)   /usr/lib/libprf.a(aggio.o) (_pli_FmtSub)
+/usr/lib/libprf.a(getd.o)     /usr/lib/libprf.a(getx.o) (_pli_GetD)
+/usr/lib/libprf.a(iic.o)      /usr/lib/libprf.a(plistart.o) (_pli_IIC)
+/usr/lib/libprf.a(init.o)     /usr/lib/libprf.a(plistart.o) (_pli_Init)
+/usr/lib/libprf.a(ior.o)      /usr/lib/libprf.a(init.o) (_pli_IOR)
+/usr/lib/libprf.a(npo.o)      /usr/lib/libprf.a(clc.o) (_pli_NPO)
+/usr/lib/libprf.a(onrev.o)    /usr/lib/libprf.a(init.o) (_pli_OnRev)
+/usr/lib/libprf.a(open.o)     /usr/lib/libprf.a(ior.o) (_pli_Open)
+/usr/lib/libprf.a(osgcl.o)    /usr/lib/libprf.a(init.o) (_pli_GCL)
+/usr/lib/libprf.a(osgetenv.o)
+                              /usr/lib/libprf.a(open.o) (_pli_OSGetEnv)
+/usr/lib/libprf.a(osgetprocinfo.o)
+                              /usr/lib/libprf.a(ior.o) (_pli_OSGetProcInfo)
+/usr/lib/libprf.a(osopen.o)   /usr/lib/libprf.a(open.o) (_pli_OSOpen)
+/usr/lib/libprf.a(osread.o)   /usr/lib/libprf.a(bufi.o) (_pli_OSRead)
+/usr/lib/libprf.a(osseek.o)   /usr/lib/libprf.a(open.o) (_pli_OSSeek)
+/usr/lib/libprf.a(oth.o)      /usr/lib/libprf.a(init.o) (_pli_OTH)
+/usr/lib/libprf.a(pute.o)     /usr/lib/libprf.a(putx.o) (_pli_PutE)
+/usr/lib/libprf.a(read.o)     /usr/lib/libprf.a(ior.o) (_pli_Read)
+/usr/lib/libprf.a(rnd.o)      /usr/lib/libprf.a(clc.o) (_pli_RND)
+/usr/lib/libprf.a(sig.o)      /usr/lib/libprf.a(init.o) (_pli_Sig)
+/usr/lib/libprf.a(siginit.o)  /usr/lib/libprf.a(init.o) (_pli_SigInit)
+/usr/lib/libprf.a(syscall.o)  /usr/lib/libprf.a(osgetprocinfo.o) (_pli_Syscall)
+/usr/lib/libprf.a(sysid.o)    /usr/lib/libprf.a(open.o) (_pli_Sysid)
+/usr/lib/libprf.a(trace.o)    /usr/lib/libprf.a(sig.o) (_pli_Trace)
+/usr/lib/libprf.a(trap.o)     /usr/lib/libprf.a(siginit.o) (_pli_Trap)
+/usr/lib/libprf.a(write.o)    /usr/lib/libprf.a(ior.o) (_pli_Write)
+/usr/lib/libprf.a(beginthread.o)
+                              /usr/lib/libprf.a(sig.o) (_pli_EndThread)
+/usr/lib/libprf.a(buff.o)     /usr/lib/libprf.a(bufo.o) (_pli_BufF)
+/usr/lib/libprf.a(cab.o)      /usr/lib/libprf.a(pute.o) (_pli_CAB)
+/usr/lib/libprf.a(ccs.o)      /usr/lib/libprf.a(init.o) (_pli_CCS)
+/usr/lib/libprf.a(close.o)    /usr/lib/libprf.a(ior.o) (_pli_Close)
+/usr/lib/libprf.a(disp.o)     /usr/lib/libprf.a(getd.o) (_pli_Disp)
+/usr/lib/libprf.a(endpage.o)  /usr/lib/libprf.a(sig.o) (_pli_Endpage)
+/usr/lib/libprf.a(event.o)    /usr/lib/libprf.a(ior.o) (_pli_Cmpl)
+/usr/lib/libprf.a(fhs.o)      /usr/lib/libprf.a(init.o) (_pli_FHS)
+/usr/lib/libprf.a(fpo.o)      /usr/lib/libprf.a(pute.o) (_pli_FPO)
+/usr/lib/libprf.a(fromalien.o)
+                              /usr/lib/libprf.a(beginthread.o) (_pli_FromA)
+/usr/lib/libprf.a(futex.o)    /usr/lib/libprf.a(ior.o) (_pli_mutex_init)
+/usr/lib/libprf.a(gettcb.o)   /usr/lib/libprf.a(sig.o) (_pli_GetTCB)
+/usr/lib/libprf.a(ghs.o)      /usr/lib/libprf.a(init.o) (_pli_GHS)
+/usr/lib/libprf.a(gss.o)      /usr/lib/libprf.a(init.o) (_pli_GSS)
+/usr/lib/libprf.a(heap.o)     /usr/lib/libprf.a(fhs.o) (_pli_free)
+/usr/lib/libprf.a(hexi.o)     /usr/lib/libprf.a(sig.o) (_pli_HexI)
+/usr/lib/libprf.a(iostat.o)   /usr/lib/libprf.a(sig.o) (_pli_IOStat)
+/usr/lib/libprf.a(osclose.o)  /usr/lib/libprf.a(close.o) (_pli_OSClose)
+/usr/lib/libprf.a(oscreatethread.o)
+                              /usr/lib/libprf.a(beginthread.o) (_pli_OSCreateThread)
+/usr/lib/libprf.a(osexit.o)   /usr/lib/libprf.a(sig.o) (_pli_Exit)
+/usr/lib/libprf.a(oswrite.o)  /usr/lib/libprf.a(buff.o) (_pli_OSWrite)
+/usr/lib/libprf.a(plidump.o)  /usr/lib/libprf.a(sig.o) (_pli_Dump)
+/usr/lib/libprf.a(xcptdump.o)
+                              /usr/lib/libprf.a(plidump.o) (_pli_XDump)
+
+Allocating common symbols
+Common symbol       size              file
+
+UNIMPLEMENTED       0x0               /usr/lib/libprf.a(exp.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD bool_min.o
+START GROUP
+LOAD /usr/lib/libprf.a
+END GROUP
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x8048000))
+                0x0000000008048094                . = (SEGMENT_START ("text-segment", 0x8048000) + SIZEOF_HEADERS)
+
+.interp
+ *(.interp)
+
+.note.gnu.build-id
+ *(.note.gnu.build-id)
+
+.hash
+ *(.hash)
+
+.gnu.hash
+ *(.gnu.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.dyn        0x0000000008048094        0x0
+ *(.rel.init)
+ *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
+ *(.rel.fini)
+ *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
+ *(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
+ *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
+ .rel.data      0x0000000008048094        0x0 bool_min.o
+ *(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
+ *(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
+ *(.rel.ctors)
+ *(.rel.dtors)
+ *(.rel.got)
+ .rel.got       0x0000000008048094        0x0 bool_min.o
+ *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
+ *(.rel.ifunc)
+
+.rel.plt        0x0000000008048094        0x0
+ *(.rel.plt)
+                [!provide]                        PROVIDE (__rel_iplt_start = .)
+ *(.rel.iplt)
+ .rel.iplt      0x0000000008048094        0x0 bool_min.o
+                [!provide]                        PROVIDE (__rel_iplt_end = .)
+                0x0000000008049000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+
+.init
+ *(SORT_NONE(.init))
+
+.plt            0x0000000008049000        0x0
+ *(.plt)
+ *(.iplt)
+ .iplt          0x0000000008049000        0x0 bool_min.o
+
+.plt.got
+ *(.plt.got)
+
+.plt.sec
+ *(.plt.sec)
+
+.text           0x0000000008049000    0x35388
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0000000008049000     0x6e68 bool_min.o
+                0x0000000008049015                BSC_PROJECT
+                0x0000000008049015                _pli_Main
+ .text          0x000000000804fe68      0x6e0 /usr/lib/libprf.a(bool.o)
+                0x000000000804fe7a                _pli_Bool
+ .text          0x0000000008050548      0x768 /usr/lib/libprf.a(cac.o)
+                0x0000000008050559                _pli_CAC
+ .text          0x0000000008050cb0      0x2d8 /usr/lib/libprf.a(cba.o)
+                0x0000000008050cc1                _pli_CBA
+ .text          0x0000000008050f88      0x760 /usr/lib/libprf.a(cbs.o)
+                0x0000000008050f99                _pli_CBS
+ .text          0x00000000080516e8      0x410 /usr/lib/libprf.a(cca.o)
+                0x00000000080516f9                _pli_CCA
+ .text          0x0000000008051af8      0x950 /usr/lib/libprf.a(cf.o)
+                0x0000000008051b08                _pli_CF
+ .text          0x0000000008052448     0x1d30 /usr/lib/libprf.a(cnvt.o)
+                0x000000000805245a                _pli_Cnvt
+ .text          0x0000000008054178      0x1d8 /usr/lib/libprf.a(cvfy.o)
+                0x000000000805418a                _pli_CVfy
+ .text          0x0000000008054350     0x1088 /usr/lib/libprf.a(exp.o)
+                0x0000000008054361                _pli_EXP
+ .text          0x00000000080553d8      0xbb8 /usr/lib/libprf.a(f2i.o)
+                0x00000000080553e9                _pli_F2I
+ .text          0x0000000008055f90      0x648 /usr/lib/libprf.a(get.o)
+                0x0000000008055fa1                _pli_Get
+ *fill*         0x00000000080565d8        0x8 
+ .text          0x00000000080565e0       0x7e /usr/lib/libprf.a(getdsa.o)
+                0x00000000080565ec                _pli_GetDSA
+                0x00000000080565fd                _pli_GetFlags
+                0x0000000008056615                _pli_SetFlags
+                0x000000000805662b                _pli_GetGbl
+                0x0000000008056643                _pli_GetX87
+                0x0000000008056657                _pli_PutX87
+ *fill*         0x000000000805665e        0x2 
+ .text          0x0000000008056660     0x3738 /usr/lib/libprf.a(getx.o)
+                0x0000000008056672                _pli_GetX
+ .text          0x0000000008059d98      0x5f0 /usr/lib/libprf.a(ibmdec.o)
+                0x0000000008059dae                _pli_ToIBMDec
+                0x000000000805a0e6                _pli_FrIBMDec
+ .text          0x000000000805a388      0x1b8 /usr/lib/libprf.a(kbs.o)
+                0x000000000805a399                _pli_KBS
+ .text          0x000000000805a540      0x13f /usr/lib/libprf.a(math.o)
+                0x000000000805a552                _pli_Math
+ *fill*         0x000000000805a67f        0x1 
+ .text          0x000000000805a680      0x620 /usr/lib/libprf.a(mbs.o)
+                0x000000000805a691                _pli_MBS
+ .text          0x000000000805aca0      0x908 /usr/lib/libprf.a(mod.o)
+                0x000000000805acb1                _pli_Mod
+ .text          0x000000000805b5a8      0x8a8 /usr/lib/libprf.a(npi.o)
+                0x000000000805b5b9                _pli_NPI
+ .text          0x000000000805be50     0x17c0 /usr/lib/libprf.a(numval.o)
+                0x000000000805be64                _pli_NumVal
+ .text          0x000000000805d610       0x4f /usr/lib/libprf.a(plistart.o)
+                0x000000000805d61b                _pli_Start
+                0x000000000805d61b                main
+ *fill*         0x000000000805d65f        0x1 
+ .text          0x000000000805d660       0x40 /usr/lib/libprf.a(plitabs.o)
+                0x000000000805d672                _pli_Tabs
+ .text          0x000000000805d6a0       0x55 /usr/lib/libprf.a(pow.o)
+                0x000000000805d6b1                _pli_POW
+ *fill*         0x000000000805d6f5        0x3 
+ .text          0x000000000805d6f8      0xb08 /usr/lib/libprf.a(put.o)
+                0x000000000805d709                _pli_Put
+ .text          0x000000000805e200     0x2130 /usr/lib/libprf.a(putx.o)
+                0x000000000805e212                _pli_PutX
+ .text          0x0000000008060330      0x2e0 /usr/lib/libprf.a(xlat.o)
+                0x0000000008060342                _pli_Xlat
+ .text          0x0000000008060610     0x1210 /usr/lib/libprf.a(aggio.o)
+                0x0000000008060623                _pli_AggIO
+ .text          0x0000000008061820      0xb80 /usr/lib/libprf.a(bufi.o)
+                0x0000000008061832                _pli_BufI
+ .text          0x00000000080623a0      0x548 /usr/lib/libprf.a(bufo.o)
+                0x00000000080623b2                _pli_BufO
+ .text          0x00000000080628e8      0x8c8 /usr/lib/libprf.a(cbd.o)
+                0x00000000080628f9                _pli_CBD
+ .text          0x00000000080631b0      0x2c0 /usr/lib/libprf.a(ccb.o)
+                0x00000000080631c1                _pli_CCB
+ .text          0x0000000008063470      0x230 /usr/lib/libprf.a(cindex.o)
+                0x0000000008063484                _pli_CIndex
+ .text          0x00000000080636a0      0x5c8 /usr/lib/libprf.a(clc.o)
+                0x00000000080636b1                _pli_CLC
+ .text          0x0000000008063c68       0x90 /usr/lib/libprf.a(conv.o)
+                0x0000000008063c7a                _pli_Conv
+ .text          0x0000000008063cf8     0x14a8 /usr/lib/libprf.a(dyndesc.o)
+                0x0000000008063d0d                _pli_DynDesc
+                0x0000000008063ded                _pli_DynDesc1
+                0x0000000008063ecc                _pli_Analyze
+ .text          0x00000000080651a0      0xd80 /usr/lib/libprf.a(fmt.o)
+                0x00000000080651b1                _pli_Fmt
+ .text          0x0000000008065f20      0x400 /usr/lib/libprf.a(fmtsub.o)
+                0x0000000008065f34                _pli_FmtSub
+ .text          0x0000000008066320      0x3a8 /usr/lib/libprf.a(getd.o)
+                0x0000000008066332                _pli_GetD
+ .text          0x00000000080666c8       0x78 /usr/lib/libprf.a(iic.o)
+                0x00000000080666d9                _pli_IIC
+ .text          0x0000000008066740      0x25d /usr/lib/libprf.a(init.o)
+                0x000000000806674a                _pli_Init
+ *fill*         0x000000000806699d        0x3 
+ .text          0x00000000080669a0     0x1078 /usr/lib/libprf.a(ior.o)
+                0x00000000080669b1                _pli_IOR
+ .text          0x0000000008067a18      0xc78 /usr/lib/libprf.a(npo.o)
+                0x0000000008067a29                _pli_NPO
+ .text          0x0000000008068690      0x4d0 /usr/lib/libprf.a(onrev.o)
+                0x00000000080686a3                _pli_OnRev
+ .text          0x0000000008068b60     0x14c0 /usr/lib/libprf.a(open.o)
+                0x0000000008068b72                _pli_Open
+ .text          0x000000000806a020      0x148 /usr/lib/libprf.a(osgcl.o)
+                0x000000000806a031                _pli_GCL
+ .text          0x000000000806a168      0x168 /usr/lib/libprf.a(osgetenv.o)
+                0x000000000806a17e                _pli_OSGetEnv
+ .text          0x000000000806a2d0      0x110 /usr/lib/libprf.a(osgetprocinfo.o)
+                0x000000000806a2eb                _pli_OSGetProcInfo
+ .text          0x000000000806a3e0      0x3f0 /usr/lib/libprf.a(osopen.o)
+                0x000000000806a3f4                _pli_OSOpen
+ .text          0x000000000806a7d0       0x70 /usr/lib/libprf.a(osread.o)
+                0x000000000806a7e4                _pli_OSRead
+ .text          0x000000000806a840       0x90 /usr/lib/libprf.a(osseek.o)
+                0x000000000806a854                _pli_OSSeek
+ .text          0x000000000806a8d0       0xb0 /usr/lib/libprf.a(oth.o)
+                0x000000000806a8e1                _pli_OTH
+ .text          0x000000000806a980     0x3588 /usr/lib/libprf.a(pute.o)
+                0x000000000806a992                _pli_PutE
+ .text          0x000000000806df08      0x528 /usr/lib/libprf.a(read.o)
+                0x000000000806df1a                _pli_Read
+ .text          0x000000000806e430      0x1f8 /usr/lib/libprf.a(rnd.o)
+                0x000000000806e441                _pli_RND
+ .text          0x000000000806e628     0x1d30 /usr/lib/libprf.a(sig.o)
+                0x000000000806e639                _pli_Sig
+ .text          0x0000000008070358      0x308 /usr/lib/libprf.a(siginit.o)
+                0x000000000807036d                _pli_SigInit
+ .text          0x0000000008070660       0x68 /usr/lib/libprf.a(syscall.o)
+                0x000000000807066d                _pli_Syscall
+ .text          0x00000000080706c8       0x50 /usr/lib/libprf.a(sysid.o)
+                0x00000000080706db                _pli_Sysid
+ .text          0x0000000008070718      0x5c8 /usr/lib/libprf.a(trace.o)
+                0x000000000807072b                _pli_Trace
+ .text          0x0000000008070ce0       0xcd /usr/lib/libprf.a(trap.o)
+                0x0000000008070cf0                _pli_Trap
+ *fill*         0x0000000008070dad        0x3 
+ .text          0x0000000008070db0      0x5e0 /usr/lib/libprf.a(write.o)
+                0x0000000008070dc3                _pli_Write
+ .text          0x0000000008071390      0x710 /usr/lib/libprf.a(beginthread.o)
+                0x00000000080713a9                _pli_BeginThread
+                0x00000000080715cb                _pli_EndThread
+ .text          0x0000000008071aa0      0x108 /usr/lib/libprf.a(buff.o)
+                0x0000000008071ab2                _pli_BufF
+ .text          0x0000000008071ba8      0x830 /usr/lib/libprf.a(cab.o)
+                0x0000000008071bb9                _pli_CAB
+ *fill*         0x00000000080723d8        0x8 
+ .text          0x00000000080723e0       0x90 /usr/lib/libprf.a(ccs.o)
+                0x00000000080723f1                _pli_CCS
+ .text          0x0000000008072470      0x298 /usr/lib/libprf.a(close.o)
+                0x0000000008072483                _pli_Close
+ .text          0x0000000008072708      0x288 /usr/lib/libprf.a(disp.o)
+                0x000000000807271a                _pli_Disp
+ .text          0x0000000008072990       0xa0 /usr/lib/libprf.a(endpage.o)
+                0x00000000080729a5                _pli_Endpage
+ .text          0x0000000008072a30      0x280 /usr/lib/libprf.a(event.o)
+                0x0000000008072a42                _pli_Wait
+                0x0000000008072ba9                _pli_Cmpl
+ .text          0x0000000008072cb0       0x60 /usr/lib/libprf.a(fhs.o)
+                0x0000000008072cc1                _pli_FHS
+ .text          0x0000000008072d10      0x688 /usr/lib/libprf.a(fpo.o)
+                0x0000000008072d21                _pli_FPO
+ *fill*         0x0000000008073398        0x8 
+ .text          0x00000000080733a0       0x7a /usr/lib/libprf.a(fromalien.o)
+                0x00000000080733ab                _pli_FromA
+ *fill*         0x000000000807341a        0x6 
+ .text          0x0000000008073420      0x18b /usr/lib/libprf.a(futex.o)
+                0x0000000008073438                _pli_mutex_init
+                0x0000000008073469                _pli_mutex_destroy
+                0x000000000807349d                _pli_mutex_timedwait
+                0x00000000080734c1                _pli_mutex_wait
+                0x0000000008073557                _pli_mutex_post
+ *fill*         0x00000000080735ab        0x5 
+ .text          0x00000000080735b0      0x108 /usr/lib/libprf.a(gettcb.o)
+                0x00000000080735c4                _pli_GetTCB
+ .text          0x00000000080736b8       0x68 /usr/lib/libprf.a(ghs.o)
+                0x00000000080736c9                _pli_GHS
+ .text          0x0000000008073720       0x22 /usr/lib/libprf.a(gss.o)
+                0x0000000008073729                _pli_GSS
+ *fill*         0x0000000008073742        0x6 
+ .text          0x0000000008073748     0x7610 /usr/lib/libprf.a(heap.o)
+                0x000000000807375d                _pli_HeapMgr
+                0x000000000807379b                _pli_alloc
+                0x0000000008073832                _pli_free
+ .text          0x000000000807ad58      0x248 /usr/lib/libprf.a(hexi.o)
+                0x000000000807ad6a                _pli_HexI
+ .text          0x000000000807afa0       0xa8 /usr/lib/libprf.a(iostat.o)
+                0x000000000807afb4                _pli_IOStat
+ .text          0x000000000807b048       0x90 /usr/lib/libprf.a(osclose.o)
+                0x000000000807b05d                _pli_OSClose
+ *fill*         0x000000000807b0d8        0x8 
+ .text          0x000000000807b0e0       0x54 /usr/lib/libprf.a(oscreatethread.o)
+                0x000000000807b0fc                _pli_OSCreateThread
+ *fill*         0x000000000807b134        0x4 
+ .text          0x000000000807b138       0x68 /usr/lib/libprf.a(osexit.o)
+                0x000000000807b14a                _pli_Exit
+ .text          0x000000000807b1a0       0x70 /usr/lib/libprf.a(oswrite.o)
+                0x000000000807b1b5                _pli_OSWrite
+ .text          0x000000000807b210     0x1420 /usr/lib/libprf.a(plidump.o)
+                0x000000000807b222                _pli_Dump
+ .text          0x000000000807c630     0x1d58 /usr/lib/libprf.a(xcptdump.o)
+                0x000000000807c643                _pli_XDump
+ *(.gnu.warning)
+
+.fini
+ *(SORT_NONE(.fini))
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+                0x000000000807f000                . = ALIGN (CONSTANT (MAXPAGESIZE))
+                0x000000000807f000                . = SEGMENT_START ("rodata-segment", (ALIGN (CONSTANT (MAXPAGESIZE)) + (. & (CONSTANT (MAXPAGESIZE) - 0x1))))
+
+.rodata
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+
+.rodata1
+ *(.rodata1)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+                0x000000000807f000                . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE))
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x000000000807f000        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+
+.preinit_array  0x000000000807f000        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x000000000807f000        0x0
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x000000000807f000        0x0
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+
+.dynamic
+ *(.dynamic)
+
+.got            0x000000000807f000        0x0
+ *(.got)
+ .got           0x000000000807f000        0x0 bool_min.o
+ *(.igot)
+                0x000000000807f000                . = DATA_SEGMENT_RELRO_END (., (SIZEOF (.got.plt) >= 0xc)?0xc:0x0)
+
+.got.plt        0x000000000807f000        0x0
+ *(.got.plt)
+ .got.plt       0x000000000807f000        0x0 bool_min.o
+ *(.igot.plt)
+ .igot.plt      0x000000000807f000        0x0 bool_min.o
+
+.data           0x000000000807f000     0x4538
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x000000000807f000      0xd60 bool_min.o
+ .data          0x000000000807fd60       0x20 /usr/lib/libprf.a(bool.o)
+ .data          0x000000000807fd80       0x40 /usr/lib/libprf.a(cac.o)
+ .data          0x000000000807fdc0       0x30 /usr/lib/libprf.a(cba.o)
+ .data          0x000000000807fdf0       0x20 /usr/lib/libprf.a(cbs.o)
+ .data          0x000000000807fe10      0x2d0 /usr/lib/libprf.a(cca.o)
+ .data          0x00000000080800e0      0x2d0 /usr/lib/libprf.a(cf.o)
+ .data          0x00000000080803b0      0x300 /usr/lib/libprf.a(cnvt.o)
+ .data          0x00000000080806b0       0x10 /usr/lib/libprf.a(cvfy.o)
+ .data          0x00000000080806c0       0x30 /usr/lib/libprf.a(exp.o)
+ .data          0x00000000080806f0      0x150 /usr/lib/libprf.a(f2i.o)
+ .data          0x0000000008080840       0x30 /usr/lib/libprf.a(get.o)
+ .data          0x0000000008080870        0x0 /usr/lib/libprf.a(getdsa.o)
+ .data          0x0000000008080870      0x1b0 /usr/lib/libprf.a(getx.o)
+ .data          0x0000000008080a20       0x30 /usr/lib/libprf.a(ibmdec.o)
+ .data          0x0000000008080a50       0x10 /usr/lib/libprf.a(kbs.o)
+ .data          0x0000000008080a60       0x20 /usr/lib/libprf.a(math.o)
+ .data          0x0000000008080a80       0x60 /usr/lib/libprf.a(mbs.o)
+ .data          0x0000000008080ae0      0x300 /usr/lib/libprf.a(mod.o)
+ .data          0x0000000008080de0       0x70 /usr/lib/libprf.a(npi.o)
+ .data          0x0000000008080e50      0x190 /usr/lib/libprf.a(numval.o)
+ .data          0x0000000008080fe0       0xc0 /usr/lib/libprf.a(plistart.o)
+ .data          0x00000000080810a0        0x0 /usr/lib/libprf.a(plitabs.o)
+ .data          0x00000000080810a0        0x2 /usr/lib/libprf.a(pow.o)
+ *fill*         0x00000000080810a2        0x6 
+ .data          0x00000000080810a8       0x60 /usr/lib/libprf.a(put.o)
+ .data          0x0000000008081108       0xa0 /usr/lib/libprf.a(putx.o)
+ .data          0x00000000080811a8      0x110 /usr/lib/libprf.a(xlat.o)
+ .data          0x00000000080812b8       0x20 /usr/lib/libprf.a(aggio.o)
+ .data          0x00000000080812d8       0x30 /usr/lib/libprf.a(bufi.o)
+ .data          0x0000000008081308       0x20 /usr/lib/libprf.a(bufo.o)
+ .data          0x0000000008081328      0x2c0 /usr/lib/libprf.a(cbd.o)
+ .data          0x00000000080815e8       0x30 /usr/lib/libprf.a(ccb.o)
+ .data          0x0000000008081618        0x0 /usr/lib/libprf.a(cindex.o)
+ .data          0x0000000008081618       0x70 /usr/lib/libprf.a(clc.o)
+ .data          0x0000000008081688        0x0 /usr/lib/libprf.a(conv.o)
+ .data          0x0000000008081688       0x30 /usr/lib/libprf.a(dyndesc.o)
+ .data          0x00000000080816b8       0x10 /usr/lib/libprf.a(fmt.o)
+ .data          0x00000000080816c8       0x40 /usr/lib/libprf.a(fmtsub.o)
+ .data          0x0000000008081708      0x3d0 /usr/lib/libprf.a(getd.o)
+ .data          0x0000000008081ad8       0x30 /usr/lib/libprf.a(iic.o)
+ *fill*         0x0000000008081b08        0x8 
+ .data          0x0000000008081b10      0x390 /usr/lib/libprf.a(init.o)
+                0x0000000008081b20                _pli_Ttbl
+                0x0000000008081c00                _pli_PGT
+                0x0000000008081e92                _pli_Def_Cond
+                0x0000000008081e94                _pli_argc
+ .data          0x0000000008081ea0      0x2c0 /usr/lib/libprf.a(ior.o)
+ .data          0x0000000008082160       0x70 /usr/lib/libprf.a(npo.o)
+ .data          0x00000000080821d0      0x130 /usr/lib/libprf.a(onrev.o)
+ .data          0x0000000008082300      0x140 /usr/lib/libprf.a(open.o)
+ .data          0x0000000008082440       0x10 /usr/lib/libprf.a(osgcl.o)
+ .data          0x0000000008082450        0x0 /usr/lib/libprf.a(osgetenv.o)
+ .data          0x0000000008082450       0x30 /usr/lib/libprf.a(osgetprocinfo.o)
+ .data          0x0000000008082480       0x70 /usr/lib/libprf.a(osopen.o)
+ .data          0x00000000080824f0       0x10 /usr/lib/libprf.a(osread.o)
+ .data          0x0000000008082500       0x10 /usr/lib/libprf.a(osseek.o)
+ .data          0x0000000008082510       0x60 /usr/lib/libprf.a(oth.o)
+ .data          0x0000000008082570      0x130 /usr/lib/libprf.a(pute.o)
+ .data          0x00000000080826a0       0x20 /usr/lib/libprf.a(read.o)
+ .data          0x00000000080826c0       0x80 /usr/lib/libprf.a(rnd.o)
+ .data          0x0000000008082740      0x400 /usr/lib/libprf.a(sig.o)
+ .data          0x0000000008082b40       0xc0 /usr/lib/libprf.a(siginit.o)
+ .data          0x0000000008082c00        0x0 /usr/lib/libprf.a(syscall.o)
+ .data          0x0000000008082c00        0x0 /usr/lib/libprf.a(sysid.o)
+ .data          0x0000000008082c00       0xd0 /usr/lib/libprf.a(trace.o)
+ .data          0x0000000008082cd0        0x6 /usr/lib/libprf.a(trap.o)
+ *fill*         0x0000000008082cd6        0x2 
+ .data          0x0000000008082cd8       0x20 /usr/lib/libprf.a(write.o)
+ .data          0x0000000008082cf8      0x150 /usr/lib/libprf.a(beginthread.o)
+ .data          0x0000000008082e48       0x10 /usr/lib/libprf.a(buff.o)
+ .data          0x0000000008082e58      0x150 /usr/lib/libprf.a(cab.o)
+ *fill*         0x0000000008082fa8        0x8 
+ .data          0x0000000008082fb0        0x0 /usr/lib/libprf.a(ccs.o)
+ .data          0x0000000008082fb0       0x10 /usr/lib/libprf.a(close.o)
+ .data          0x0000000008082fc0       0x10 /usr/lib/libprf.a(disp.o)
+ .data          0x0000000008082fd0       0x40 /usr/lib/libprf.a(endpage.o)
+ .data          0x0000000008083010       0x10 /usr/lib/libprf.a(event.o)
+ .data          0x0000000008083020        0x0 /usr/lib/libprf.a(fhs.o)
+ .data          0x0000000008083020       0x40 /usr/lib/libprf.a(fpo.o)
+ .data          0x0000000008083060        0x2 /usr/lib/libprf.a(fromalien.o)
+ *fill*         0x0000000008083062        0xe 
+ .data          0x0000000008083070        0x0 /usr/lib/libprf.a(futex.o)
+ .data          0x0000000008083070        0x0 /usr/lib/libprf.a(gettcb.o)
+ .data          0x0000000008083070        0x0 /usr/lib/libprf.a(ghs.o)
+ .data          0x0000000008083070        0x0 /usr/lib/libprf.a(gss.o)
+ .data          0x0000000008083070      0x150 /usr/lib/libprf.a(heap.o)
+ .data          0x00000000080831c0       0x40 /usr/lib/libprf.a(hexi.o)
+ .data          0x0000000008083200        0x0 /usr/lib/libprf.a(iostat.o)
+ .data          0x0000000008083200       0x10 /usr/lib/libprf.a(osclose.o)
+ .data          0x0000000008083210        0x4 /usr/lib/libprf.a(oscreatethread.o)
+ *fill*         0x0000000008083214        0x4 
+ .data          0x0000000008083218       0x10 /usr/lib/libprf.a(osexit.o)
+ .data          0x0000000008083228       0x10 /usr/lib/libprf.a(oswrite.o)
+ .data          0x0000000008083238      0x200 /usr/lib/libprf.a(plidump.o)
+ .data          0x0000000008083438      0x100 /usr/lib/libprf.a(xcptdump.o)
+
+SYSIN           0x0000000008083538       0x18
+ SYSIN          0x0000000008083538       0x18 bool_min.o
+                0x0000000008083538                SYSIN
+
+SYSPRINT        0x0000000008083550       0x18
+ SYSPRINT       0x0000000008083550       0x18 bool_min.o
+                0x0000000008083550                SYSPRINT
+
+RESULTS_FILE    0x0000000008083568       0x20
+ RESULTS_FILE   0x0000000008083568       0x20 bool_min.o
+                0x0000000008083568                RESULTS_FILE
+
+STACK           0x0000000008083590    0x186a0
+ STACK          0x0000000008083590    0x186a0 /usr/lib/libprf.a(plistart.o)
+
+PLITABS         0x000000000809bc30      0x210
+ PLITABS        0x000000000809bc30      0x210 /usr/lib/libprf.a(plitabs.o)
+                0x000000000809bc30                PLITABS
+
+SIG_DESC_TBL    0x000000000809be40      0x2f0
+ SIG_DESC_TBL   0x000000000809be40      0x178 /usr/lib/libprf.a(sig.o)
+                0x000000000809be40                SIG_DESC_TBL
+ SIG_DESC_TBL   0x000000000809bfb8      0x178 /usr/lib/libprf.a(xcptdump.o)
+
+_pli_thread_mutex
+                0x000000000809c130       0x10
+ _pli_thread_mutex
+                0x000000000809c130        0x8 /usr/lib/libprf.a(beginthread.o)
+                0x000000000809c130                _pli_thread_mutex
+ _pli_thread_mutex
+                0x000000000809c138        0x8 /usr/lib/libprf.a(gettcb.o)
+
+.data1
+ *(.data1)
+                0x000000000809c140                _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x000000000809c140                . = .
+                0x000000000809c140                __bss_start = .
+
+.bss            0x000000000809c140     0x2240
+ *(.dynbss)
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x000000000809c140     0x2030 bool_min.o
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(bool.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cac.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cba.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cbs.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cca.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cf.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cnvt.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cvfy.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(exp.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(f2i.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(get.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(getx.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(ibmdec.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(kbs.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(mbs.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(mod.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(npi.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(numval.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(plitabs.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(put.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(putx.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(xlat.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(aggio.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(bufi.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(bufo.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cbd.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(ccb.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(cindex.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(clc.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(conv.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(dyndesc.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(fmt.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(fmtsub.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(getd.o)
+ .bss           0x000000000809e170        0x0 /usr/lib/libprf.a(iic.o)
+ .bss           0x000000000809e170       0x10 /usr/lib/libprf.a(ior.o)
+ .bss           0x000000000809e180        0x0 /usr/lib/libprf.a(npo.o)
+ .bss           0x000000000809e180        0x0 /usr/lib/libprf.a(onrev.o)
+ .bss           0x000000000809e180       0x10 /usr/lib/libprf.a(open.o)
+ .bss           0x000000000809e190        0x0 /usr/lib/libprf.a(osgcl.o)
+ .bss           0x000000000809e190        0x0 /usr/lib/libprf.a(osgetenv.o)
+ .bss           0x000000000809e190        0x0 /usr/lib/libprf.a(osgetprocinfo.o)
+ .bss           0x000000000809e190       0x10 /usr/lib/libprf.a(osopen.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(osread.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(osseek.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(oth.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(pute.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(read.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(rnd.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(sig.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(siginit.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(sysid.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(trace.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(write.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(beginthread.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(buff.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(cab.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(close.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(disp.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(endpage.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(event.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(fhs.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(fpo.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(gettcb.o)
+ .bss           0x000000000809e1a0        0x0 /usr/lib/libprf.a(ghs.o)
+ .bss           0x000000000809e1a0      0x1e0 /usr/lib/libprf.a(heap.o)
+ .bss           0x000000000809e380        0x0 /usr/lib/libprf.a(hexi.o)
+ .bss           0x000000000809e380        0x0 /usr/lib/libprf.a(iostat.o)
+ .bss           0x000000000809e380        0x0 /usr/lib/libprf.a(osclose.o)
+ .bss           0x000000000809e380        0x0 /usr/lib/libprf.a(osexit.o)
+ .bss           0x000000000809e380        0x0 /usr/lib/libprf.a(oswrite.o)
+ .bss           0x000000000809e380        0x0 /usr/lib/libprf.a(plidump.o)
+ .bss           0x000000000809e380        0x0 /usr/lib/libprf.a(xcptdump.o)
+ *(COMMON)
+ COMMON         0x000000000809e380        0x0 /usr/lib/libprf.a(exp.o)
+                0x000000000809e380                UNIMPLEMENTED
+                0x000000000809e380                . = ALIGN ((. != 0x0)?0x4:0x1)
+
+UNIMPLEMENTED   0x000000000809e380        0x0
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(exp.o)
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(getx.o)
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(put.o)
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(putx.o)
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(getd.o)
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(ior.o)
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(pute.o)
+ UNIMPLEMENTED  0x000000000809e380        0x0 /usr/lib/libprf.a(cab.o)
+
+PLITABS         0x000000000809e380      0x210
+ PLITABS        0x000000000809e380      0x210 /usr/lib/libprf.a(putx.o)
+                0x000000000809e590                . = ALIGN (0x4)
+                0x000000000809e590                . = SEGMENT_START ("ldata-segment", .)
+                0x000000000809e590                . = ALIGN (0x4)
+                0x000000000809e590                _end = .
+                [!provide]                        PROVIDE (end = .)
+                0x000000000809e590                . = DATA_SEGMENT_END (.)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000      0xf9c
+ *(.comment)
+ .comment       0x0000000000000000       0x36 bool_min.o
+ .comment       0x0000000000000036       0x36 /usr/lib/libprf.a(bool.o)
+ .comment       0x000000000000006c       0x36 /usr/lib/libprf.a(cac.o)
+ .comment       0x00000000000000a2       0x36 /usr/lib/libprf.a(cba.o)
+ .comment       0x00000000000000d8       0x36 /usr/lib/libprf.a(cbs.o)
+ .comment       0x000000000000010e       0x36 /usr/lib/libprf.a(cca.o)
+ .comment       0x0000000000000144       0x36 /usr/lib/libprf.a(cf.o)
+ .comment       0x000000000000017a       0x36 /usr/lib/libprf.a(cnvt.o)
+ .comment       0x00000000000001b0       0x36 /usr/lib/libprf.a(cvfy.o)
+ .comment       0x00000000000001e6       0x36 /usr/lib/libprf.a(exp.o)
+ .comment       0x000000000000021c       0x36 /usr/lib/libprf.a(f2i.o)
+ .comment       0x0000000000000252       0x36 /usr/lib/libprf.a(get.o)
+ .comment       0x0000000000000288       0x36 /usr/lib/libprf.a(getx.o)
+ .comment       0x00000000000002be       0x36 /usr/lib/libprf.a(ibmdec.o)
+ .comment       0x00000000000002f4       0x36 /usr/lib/libprf.a(kbs.o)
+ .comment       0x000000000000032a       0x36 /usr/lib/libprf.a(mbs.o)
+ .comment       0x0000000000000360       0x36 /usr/lib/libprf.a(mod.o)
+ .comment       0x0000000000000396       0x36 /usr/lib/libprf.a(npi.o)
+ .comment       0x00000000000003cc       0x36 /usr/lib/libprf.a(numval.o)
+ .comment       0x0000000000000402       0x36 /usr/lib/libprf.a(plitabs.o)
+ .comment       0x0000000000000438       0x36 /usr/lib/libprf.a(put.o)
+ .comment       0x000000000000046e       0x36 /usr/lib/libprf.a(putx.o)
+ .comment       0x00000000000004a4       0x36 /usr/lib/libprf.a(xlat.o)
+ .comment       0x00000000000004da       0x36 /usr/lib/libprf.a(aggio.o)
+ .comment       0x0000000000000510       0x36 /usr/lib/libprf.a(bufi.o)
+ .comment       0x0000000000000546       0x36 /usr/lib/libprf.a(bufo.o)
+ .comment       0x000000000000057c       0x36 /usr/lib/libprf.a(cbd.o)
+ .comment       0x00000000000005b2       0x36 /usr/lib/libprf.a(ccb.o)
+ .comment       0x00000000000005e8       0x36 /usr/lib/libprf.a(cindex.o)
+ .comment       0x000000000000061e       0x36 /usr/lib/libprf.a(clc.o)
+ .comment       0x0000000000000654       0x36 /usr/lib/libprf.a(conv.o)
+ .comment       0x000000000000068a       0x36 /usr/lib/libprf.a(dyndesc.o)
+ .comment       0x00000000000006c0       0x36 /usr/lib/libprf.a(fmt.o)
+ .comment       0x00000000000006f6       0x36 /usr/lib/libprf.a(fmtsub.o)
+ .comment       0x000000000000072c       0x36 /usr/lib/libprf.a(getd.o)
+ .comment       0x0000000000000762       0x36 /usr/lib/libprf.a(iic.o)
+ .comment       0x0000000000000798       0x36 /usr/lib/libprf.a(ior.o)
+ .comment       0x00000000000007ce       0x36 /usr/lib/libprf.a(npo.o)
+ .comment       0x0000000000000804       0x36 /usr/lib/libprf.a(onrev.o)
+ .comment       0x000000000000083a       0x36 /usr/lib/libprf.a(open.o)
+ .comment       0x0000000000000870       0x36 /usr/lib/libprf.a(osgcl.o)
+ .comment       0x00000000000008a6       0x36 /usr/lib/libprf.a(osgetenv.o)
+ .comment       0x00000000000008dc       0x36 /usr/lib/libprf.a(osgetprocinfo.o)
+ .comment       0x0000000000000912       0x36 /usr/lib/libprf.a(osopen.o)
+ .comment       0x0000000000000948       0x36 /usr/lib/libprf.a(osread.o)
+ .comment       0x000000000000097e       0x36 /usr/lib/libprf.a(osseek.o)
+ .comment       0x00000000000009b4       0x36 /usr/lib/libprf.a(oth.o)
+ .comment       0x00000000000009ea       0x36 /usr/lib/libprf.a(pute.o)
+ .comment       0x0000000000000a20       0x36 /usr/lib/libprf.a(read.o)
+ .comment       0x0000000000000a56       0x36 /usr/lib/libprf.a(rnd.o)
+ .comment       0x0000000000000a8c       0x36 /usr/lib/libprf.a(sig.o)
+ .comment       0x0000000000000ac2       0x36 /usr/lib/libprf.a(siginit.o)
+ .comment       0x0000000000000af8       0x36 /usr/lib/libprf.a(sysid.o)
+ .comment       0x0000000000000b2e       0x36 /usr/lib/libprf.a(trace.o)
+ .comment       0x0000000000000b64       0x36 /usr/lib/libprf.a(write.o)
+ .comment       0x0000000000000b9a       0x36 /usr/lib/libprf.a(beginthread.o)
+ .comment       0x0000000000000bd0       0x36 /usr/lib/libprf.a(buff.o)
+ .comment       0x0000000000000c06       0x36 /usr/lib/libprf.a(cab.o)
+ .comment       0x0000000000000c3c       0x36 /usr/lib/libprf.a(close.o)
+ .comment       0x0000000000000c72       0x36 /usr/lib/libprf.a(disp.o)
+ .comment       0x0000000000000ca8       0x36 /usr/lib/libprf.a(endpage.o)
+ .comment       0x0000000000000cde       0x36 /usr/lib/libprf.a(event.o)
+ .comment       0x0000000000000d14       0x36 /usr/lib/libprf.a(fhs.o)
+ .comment       0x0000000000000d4a       0x36 /usr/lib/libprf.a(fpo.o)
+ .comment       0x0000000000000d80       0x36 /usr/lib/libprf.a(gettcb.o)
+ .comment       0x0000000000000db6       0x36 /usr/lib/libprf.a(ghs.o)
+ .comment       0x0000000000000dec       0x36 /usr/lib/libprf.a(heap.o)
+ .comment       0x0000000000000e22       0x36 /usr/lib/libprf.a(hexi.o)
+ .comment       0x0000000000000e58       0x36 /usr/lib/libprf.a(iostat.o)
+ .comment       0x0000000000000e8e       0x36 /usr/lib/libprf.a(osclose.o)
+ .comment       0x0000000000000ec4       0x36 /usr/lib/libprf.a(osexit.o)
+ .comment       0x0000000000000efa       0x36 /usr/lib/libprf.a(oswrite.o)
+ .comment       0x0000000000000f30       0x36 /usr/lib/libprf.a(plidump.o)
+ .comment       0x0000000000000f66       0x36 /usr/lib/libprf.a(xcptdump.o)
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info .gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line .debug_line.* .debug_line_end)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_addr
+ *(.debug_addr)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(bool_min elf32-i386)
