@@ -30,9 +30,9 @@ running the [PRIMOS](https://en.wikipedia.org/wiki/PRIMOS) operating system
 and accessed from dumb terminals.
 The photo shows a similar system at Chilten ACL.
 
-PL/I was chosen because it can perform bitwise logical operations on varying-length bit strings,
-rather than deploying arrays of fixed-length integers.
-In its day it was the language of choice for scientific, engineering and system programming.
+PL/I was chosen because it can perform bitwise logical operations on arbitrary length bit strings,
+rather than deploying arrays of fixed length integers.
+In its day PL/I was the language of choice for scientific, engineering and system programming.
 
 <img src="assets/list.gif" alt="PL/I Listing" align="left">
 
