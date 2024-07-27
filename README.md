@@ -29,7 +29,7 @@ It ran on a 1979 PRIME 550 System [minicomputer](https://en.wikipedia.org/wiki/M
 by [Prime Computer, Inc.](https://en.wikipedia.org/wiki/Prime_Computer)
 running the [PRIMOS](https://en.wikipedia.org/wiki/PRIMOS) operating system
 and accessed from dumb terminals.
-The photo shows a similar system at [Chilten ACL](https://www.chilton-computing.org.uk/acd/icf/mums/p014.htm).
+The photo shows a similar system at [Chilten Atlas Computer Laboratory](https://www.chilton-computing.org.uk/acd/icf/mums/p014.htm).
 
 PL/I was chosen because it can perform bitwise logical operations on arbitrary length bit strings,
 rather than deploying arrays of fixed length integers.
@@ -37,7 +37,7 @@ In its day PL/I was the language of choice for scientific, engineering and syste
 
 <img src="assets/list.gif" alt="PL/I Listing" align="left">
 
-The program [source code](1986/1986-bool_min.pli)
+The 1986 [source code](1986/1986-bool_min.pli)
 derives from the original line printer [listing](https://scriptit.uk/download/1986-list-lineprint.pdf)
 via scanning, optical character recognition and extensive correction
 (OCR does not handle dot-matrix print well).
