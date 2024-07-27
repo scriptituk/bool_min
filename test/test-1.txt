@@ -1,0 +1,47 @@
+                   BOOLEAN MINIMISATION  V1.0
+                   ==========================
+
+
+Minterms: 
+0 1 5 7 8 10 14 15
+
+
+Don't cares: 
+*** none *** 
+
+
+The function order is 4
+
+
+Prime Implicants: 
+ p.i.     cell          literals       cost      status
+   1      0,8           -000             3       non-essential
+   2      0,1           000-             3       non-essential
+   3      1,5           0-01             3       non-essential
+   4      5,7           01-1             3       non-essential
+   5      7,15          -111             3       non-essential
+   6      8,10          10-0             3       non-essential
+   7      10,14         1-10             3       non-essential
+   8      14,15         111-             3       non-essential
+
+
+Prime Implicant Chart: 
+      minterm --> 
+ p.i.  0   1   5   7   8  10  14  15
+   1   *               *            
+   2   *   *                        
+   3       *   *                    
+   4           *   *                
+   5               *               *
+   6                   *   *        
+   7                       *   *    
+   8                           *   *
+
+
+Minimum Cost Solution: 
+ F = (1+3+5+7)(2+4+6+8)
+(parenthesised expressions are alternatives) 
+
+
+Cost = 12 literals
+
