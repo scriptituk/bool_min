@@ -1,0 +1,951 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for Mac OS X (vers 31 October 2006 - Apple Inc. build 15.18.4), see www.w3.org">
+
+  <title>bool_min.pli diff</title>
+  <style type="text/css">
+<!--
+  BODY { font-family: Versana,Arial,Helvetica }
+  TH { font-family : Verdana, Arial, Helvetica;font-size : 8pt;color : White; }
+  TD { font-family : Verdana, Arial, Helvetica;font-size : 7pt;color : Black; }
+  -->
+  </style>
+  <style type="text/css">
+body {
+  background-color: #EEEEEE;
+  }
+  p.c4 {text-align: center}
+  span.c3 {font-size: 80%}
+  span.c2 {color: #FFFFFF}
+  div.c1 {text-align: center}
+  </style>
+</head>
+
+<body>
+  <div class="c1">
+    <h2>bool_min.pli diff</h2>
+  </div>
+
+  <p>Note: all %REPLACE preprocessor identifiers now have a $ prefix (not shown here) to avoid PL/I
+  keyword conflict</p>
+
+  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+    <tr bgcolor="#000000">
+      <th width="50%" valign="top"><span class="c2">Original 1986 source</span></th>
+
+      <th width="50%" valign="top"><span class="c2">Amended 2024 source</span></th>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCFF">&nbsp;&nbsp;1:&nbsp;</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCFF">&nbsp;&nbsp;2:&nbsp;</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;&nbsp;3:&nbsp;/*</td>
+
+      <td>&nbsp;&nbsp;1:&nbsp;/*</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;&nbsp;4:&nbsp;===============================================================================</td>
+
+      <td>
+      &nbsp;&nbsp;2:&nbsp;===============================================================================</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;&nbsp;5:&nbsp;=&nbsp;UTILITY&nbsp;PROGRAMME&nbsp;FOR&nbsp;THE&nbsp;MINIMISATION&nbsp;OF&nbsp;BOOLEAN&nbsp;FUNCTIONS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</td>
+
+      <td>
+      &nbsp;&nbsp;3:&nbsp;=&nbsp;UTILITY&nbsp;PROGRAMME&nbsp;FOR&nbsp;THE&nbsp;MINIMISATION&nbsp;OF&nbsp;BOOLEAN&nbsp;FUNCTIONS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;&nbsp;6:&nbsp;=&nbsp;Written&nbsp;by&nbsp;R.C.LUCKHURST,&nbsp;September&nbsp;1986&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</td>
+
+      <td>
+      &nbsp;&nbsp;4:&nbsp;=&nbsp;Written&nbsp;by&nbsp;R.C.LUCKHURST,&nbsp;September&nbsp;1986&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;&nbsp;7:&nbsp;=&nbsp;for&nbsp;final&nbsp;year&nbsp;BSc&nbsp;Electrical&nbsp;Engineering&nbsp;project,&nbsp;Bristol&nbsp;Polytechnic&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</td>
+
+      <td>
+      &nbsp;&nbsp;5:&nbsp;=&nbsp;for&nbsp;final&nbsp;year&nbsp;BSc&nbsp;Electrical&nbsp;Engineering&nbsp;project,&nbsp;Bristol&nbsp;Polytechnic&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">
+      &nbsp;&nbsp;6:&nbsp;=&nbsp;Amended&nbsp;July&nbsp;2024,&nbsp;see&nbsp;https://github.com/scriptituk/bool_min&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;&nbsp;8:&nbsp;===============================================================================</td>
+
+      <td>
+      &nbsp;&nbsp;7:&nbsp;===============================================================================</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;&nbsp;9:&nbsp;*/</td>
+
+      <td>&nbsp;&nbsp;8:&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;10:&nbsp;</td>
+
+      <td>&nbsp;&nbsp;9:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;11:&nbsp;</td>
+
+      <td>&nbsp;10:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCFF">
+      &nbsp;12:&nbsp;%REPLACE&nbsp;true&nbsp;BY&nbsp;'1'B,&nbsp;false&nbsp;BY&nbsp;'0'B;</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCFF">
+      &nbsp;13:&nbsp;%REPLACE&nbsp;low&nbsp;BY&nbsp;1,&nbsp;high&nbsp;BY&nbsp;2,&nbsp;cost&nbsp;BY&nbsp;3,&nbsp;status&nbsp;BY&nbsp;4;</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCFF">
+      &nbsp;14:&nbsp;%REPLACE&nbsp;redundant&nbsp;BY&nbsp;1,&nbsp;min_cost_redundant&nbsp;BY&nbsp;2,&nbsp;non_essential&nbsp;BY&nbsp;3,&nbsp;min_cost_essential&nbsp;BY&nbsp;4,&nbsp;essential&nbsp;BY&nbsp;5;</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCFF">&nbsp;15:&nbsp;</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;16:&nbsp;BSc_project:&nbsp;PROCEDURE&nbsp;OPTIONS&nbsp;(MAIN);</td>
+
+      <td>&nbsp;11:&nbsp;BSc_project:&nbsp;PROCEDURE&nbsp;OPTIONS&nbsp;(MAIN);</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;17:&nbsp;</td>
+
+      <td>&nbsp;12:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;13:&nbsp;%REPLACE&nbsp;true&nbsp;BY&nbsp;'1'B;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;14:&nbsp;%REPLACE&nbsp;false&nbsp;BY&nbsp;'0'B;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;15:&nbsp;%REPLACE&nbsp;low&nbsp;BY&nbsp;1;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;16:&nbsp;%REPLACE&nbsp;high&nbsp;BY&nbsp;2;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;17:&nbsp;%REPLACE&nbsp;cost&nbsp;BY&nbsp;3;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;18:&nbsp;%REPLACE&nbsp;status&nbsp;BY&nbsp;4;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;19:&nbsp;%REPLACE&nbsp;redundant&nbsp;BY&nbsp;1;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;20:&nbsp;%REPLACE&nbsp;min_cost_redundant&nbsp;BY&nbsp;2;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;21:&nbsp;%REPLACE&nbsp;non_essential&nbsp;BY&nbsp;3;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;22:&nbsp;%REPLACE&nbsp;min_cost_essential&nbsp;BY&nbsp;4;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;23:&nbsp;%REPLACE&nbsp;essential&nbsp;BY&nbsp;5;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;24:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">
+      &nbsp;25:&nbsp;DECLARE&nbsp;SYSIN&nbsp;FILE&nbsp;STREAM&nbsp;INPUT&nbsp;ENVIRONMENT(INTERACTIVE);</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">
+      &nbsp;26:&nbsp;DECLARE&nbsp;SYSPRINT&nbsp;FILE&nbsp;STREAM&nbsp;OUTPUT&nbsp;PRINT&nbsp;ENVIRONMENT(INTERACTIVE);</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td bgcolor="#FF9999">&nbsp;27:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;18:&nbsp;DECLARE&nbsp;(BINARY,&nbsp;BIT,&nbsp;CEIL,&nbsp;CHARACTER,&nbsp;COPY,&nbsp;DECIMAL,&nbsp;INDEX,</td>
+
+      <td>
+      &nbsp;28:&nbsp;DECLARE&nbsp;(BINARY,&nbsp;BIT,&nbsp;CEIL,&nbsp;CHARACTER,&nbsp;COPY,&nbsp;DECIMAL,&nbsp;INDEX,</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;19:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LENGTH,&nbsp;LOG2,&nbsp;MIN,&nbsp;SUBSTR,&nbsp;TRANSLATE,&nbsp;VERIFY)&nbsp;BUILTIN,</td>
+
+      <td>
+      &nbsp;29:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LENGTH,&nbsp;LOG2,&nbsp;MIN,&nbsp;SUBSTR,&nbsp;TRANSLATE,&nbsp;VERIFY)&nbsp;BUILTIN,</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;20:&nbsp;</td>
+
+      <td>&nbsp;30:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;33:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results_file&nbsp;FILE;</td>
+
+      <td>
+      &nbsp;43:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;results_file&nbsp;FILE;</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;34:&nbsp;</td>
+
+      <td>&nbsp;44:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;35:&nbsp;</td>
+
+      <td>&nbsp;45:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCFF">&nbsp;36:&nbsp;</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;37:&nbsp;/*</td>
+
+      <td>&nbsp;46:&nbsp;/*</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;38:&nbsp;###############################################################################</td>
+
+      <td>
+      &nbsp;47:&nbsp;###############################################################################</td>
+    </tr>
+
+    <tr>
+      <td>
+      &nbsp;39:&nbsp;#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UTILITY&nbsp;PROCEDURES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#</td>
+
+      <td>
+      &nbsp;48:&nbsp;#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UTILITY&nbsp;PROCEDURES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#</td>
+    </tr>
+
+    <tr>
+      <td>138:&nbsp;menu_selection:&nbsp;PROCEDURE&nbsp;RETURNS&nbsp;(FIXED&nbsp;BINARY);</td>
+
+      <td>147:&nbsp;menu_selection:&nbsp;PROCEDURE&nbsp;RETURNS&nbsp;(FIXED&nbsp;BINARY);</td>
+    </tr>
+
+    <tr>
+      <td>
+      139:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DECLARE&nbsp;menu_item&nbsp;CHARACTER&nbsp;(30)&nbsp;VARYING,&nbsp;m&nbsp;FIXED&nbsp;BINARY;</td>
+
+      <td>
+      148:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DECLARE&nbsp;menu_item&nbsp;CHARACTER&nbsp;(30)&nbsp;VARYING,&nbsp;m&nbsp;FIXED&nbsp;BINARY;</td>
+    </tr>
+
+    <tr>
+      <td>140:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO&nbsp;WHILE&nbsp;(true);</td>
+
+      <td>149:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO&nbsp;WHILE&nbsp;(true);</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      141:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;LIST&nbsp;(menu_item);</td>
+
+      <td bgcolor="#99FF99">
+      150:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;EDIT&nbsp;(menu_item)&nbsp;(A);</td>
+    </tr>
+
+    <tr>
+      <td>
+      142:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;VERIFY(menu_item,&nbsp;'12345')&nbsp;=&nbsp;0&nbsp;THEN&nbsp;DO;</td>
+
+      <td>
+      151:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;VERIFY(menu_item,&nbsp;'12345')&nbsp;=&nbsp;0&nbsp;THEN&nbsp;DO;</td>
+    </tr>
+
+    <tr>
+      <td>
+      143:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m&nbsp;=&nbsp;BINARY(menu_item);</td>
+
+      <td>
+      152:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m&nbsp;=&nbsp;BINARY(menu_item);</td>
+    </tr>
+
+    <tr>
+      <td>
+      144:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;m&nbsp;&gt;=&nbsp;1&nbsp;&amp;&nbsp;m&nbsp;&lt;=&nbsp;5&nbsp;THEN&nbsp;RETURN&nbsp;(m);</td>
+
+      <td>
+      153:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;m&nbsp;&gt;=&nbsp;1&nbsp;&amp;&nbsp;m&nbsp;&lt;=&nbsp;5&nbsp;THEN&nbsp;RETURN&nbsp;(m);</td>
+    </tr>
+
+    <tr>
+      <td>
+      152:&nbsp;*******************************************************************************/</td>
+
+      <td>
+      161:&nbsp;*******************************************************************************/</td>
+    </tr>
+
+    <tr>
+      <td>153:&nbsp;continue_prompt:&nbsp;PROCEDURE;</td>
+
+      <td>162:&nbsp;continue_prompt:&nbsp;PROCEDURE;</td>
+    </tr>
+
+    <tr>
+      <td>
+      154:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP(2)&nbsp;LIST&nbsp;('Press&nbsp;RETURN&nbsp;to&nbsp;continue&nbsp;--&gt;');</td>
+
+      <td>
+      163:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP(2)&nbsp;LIST&nbsp;('Press&nbsp;RETURN&nbsp;to&nbsp;continue&nbsp;--&gt;');</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      155:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;LIST&nbsp;(continue);</td>
+
+      <td bgcolor="#99FF99">
+      164:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;EDIT&nbsp;(continue)&nbsp;(A);</td>
+    </tr>
+
+    <tr>
+      <td>156:&nbsp;END&nbsp;continue_prompt;</td>
+
+      <td>165:&nbsp;END&nbsp;continue_prompt;</td>
+    </tr>
+
+    <tr>
+      <td>157:&nbsp;</td>
+
+      <td>166:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>158:&nbsp;</td>
+
+      <td>167:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>
+      174:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Type&nbsp;E&nbsp;after&nbsp;the&nbsp;last&nbsp;entry.&nbsp;',</td>
+
+      <td>
+      183:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Type&nbsp;E&nbsp;after&nbsp;the&nbsp;last&nbsp;entry.&nbsp;',</td>
+    </tr>
+
+    <tr>
+      <td>
+      175:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'--&gt;&nbsp;')&nbsp;(SKIP,&nbsp;A);</td>
+
+      <td>
+      184:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'--&gt;&nbsp;')&nbsp;(SKIP,&nbsp;A);</td>
+    </tr>
+
+    <tr>
+      <td>
+      176:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO&nbsp;WHILE&nbsp;(true);</td>
+
+      <td>
+      185:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO&nbsp;WHILE&nbsp;(true);</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      177:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;LIST&nbsp;(input_item);</td>
+
+      <td bgcolor="#99FF99">
+      186:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;EDIT&nbsp;(input_item)&nbsp;(A);</td>
+    </tr>
+
+    <tr>
+      <td>
+      178:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;TRANSLATE(input_item,&nbsp;'E',&nbsp;'e')&nbsp;=&nbsp;'E'&nbsp;THEN&nbsp;RETURN;</td>
+
+      <td>
+      187:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;TRANSLATE(input_item,&nbsp;'E',&nbsp;'e')&nbsp;=&nbsp;'E'&nbsp;THEN&nbsp;RETURN;</td>
+    </tr>
+
+    <tr>
+      <td>
+      179:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE&nbsp;IF&nbsp;VERIFY(input_item,&nbsp;'-0123456789')&nbsp;=&nbsp;0&nbsp;&amp;&nbsp;INDEX(input_item,&nbsp;'-')&nbsp;^=&nbsp;1&nbsp;THEN&nbsp;DO;</td>
+
+      <td>
+      188:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE&nbsp;IF&nbsp;VERIFY(input_item,&nbsp;'-0123456789')&nbsp;=&nbsp;0&nbsp;&amp;&nbsp;INDEX(input_item,&nbsp;'-')&nbsp;^=&nbsp;1&nbsp;THEN&nbsp;DO;</td>
+    </tr>
+
+    <tr>
+      <td>
+      180:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&nbsp;INDEX(input_item,&nbsp;'-');</td>
+
+      <td>
+      189:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t&nbsp;=&nbsp;INDEX(input_item,&nbsp;'-');</td>
+    </tr>
+
+    <tr>
+      <td>
+      213:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Enter&nbsp;C/AM/DM/AD/DD/E&nbsp;--&gt;&nbsp;')&nbsp;(6(COLUMN(24),A,SKIP),SKIP,COLUMN(24),A);</td>
+
+      <td>
+      222:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Enter&nbsp;C/AM/DM/AD/DD/E&nbsp;--&gt;&nbsp;')&nbsp;(6(COLUMN(24),A,SKIP),SKIP,COLUMN(24),A);</td>
+    </tr>
+
+    <tr>
+      <td>
+      214:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;action&nbsp;=&nbsp;'&nbsp;';</td>
+
+      <td>
+      223:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;action&nbsp;=&nbsp;'&nbsp;';</td>
+    </tr>
+
+    <tr>
+      <td>
+      215:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO&nbsp;WHILE&nbsp;(VERIFY(action,'ACDEM')&nbsp;^=&nbsp;0);</td>
+
+      <td>
+      224:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO&nbsp;WHILE&nbsp;(VERIFY(action,'ACDEM')&nbsp;^=&nbsp;0);</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      216:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;LIST&nbsp;(action);</td>
+
+      <td bgcolor="#99FF99">
+      225:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GET&nbsp;EDIT&nbsp;(action)&nbsp;(A);</td>
+    </tr>
+
+    <tr>
+      <td>
+      217:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;action&nbsp;=&nbsp;TRANSLATE(action,&nbsp;'ACDEM',&nbsp;'acdem');</td>
+
+      <td>
+      226:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;action&nbsp;=&nbsp;TRANSLATE(action,&nbsp;'ACDEM',&nbsp;'acdem');</td>
+    </tr>
+
+    <tr>
+      <td>
+      218:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+
+      <td>
+      227:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>
+      219:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;action&nbsp;=&nbsp;'E'&nbsp;THEN&nbsp;RETURN;</td>
+
+      <td>
+      228:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;action&nbsp;=&nbsp;'E'&nbsp;THEN&nbsp;RETURN;</td>
+    </tr>
+
+    <tr>
+      <td>707:&nbsp;</td>
+
+      <td>716:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>
+      708:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/*&nbsp;print&nbsp;the&nbsp;prime&nbsp;implicant&nbsp;chart&nbsp;*/</td>
+
+      <td>
+      717:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/*&nbsp;print&nbsp;the&nbsp;prime&nbsp;implicant&nbsp;chart&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>
+      709:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tick:&nbsp;PROCEDURE&nbsp;(b)&nbsp;RETURNS&nbsp;(CHARACTER);</td>
+
+      <td>
+      718:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tick:&nbsp;PROCEDURE&nbsp;(b)&nbsp;RETURNS&nbsp;(CHARACTER);</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      710:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DECLARE&nbsp;b&nbsp;BIT;</td>
+
+      <td bgcolor="#99FF99">
+      719:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DECLARE&nbsp;b&nbsp;BIT&nbsp;ALIGNED;</td>
+    </tr>
+
+    <tr>
+      <td>
+      711:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;b&nbsp;THEN&nbsp;RETURN&nbsp;('*');</td>
+
+      <td>
+      720:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;b&nbsp;THEN&nbsp;RETURN&nbsp;('*');</td>
+    </tr>
+
+    <tr>
+      <td>
+      712:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RETURN&nbsp;('&nbsp;');</td>
+
+      <td>
+      721:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RETURN&nbsp;('&nbsp;');</td>
+    </tr>
+
+    <tr>
+      <td>713:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END&nbsp;tick;</td>
+
+      <td>722:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END&nbsp;tick;</td>
+    </tr>
+
+    <tr>
+      <td>
+      728:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+
+      <td>
+      737:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>
+      729:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+
+      <td>
+      738:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>730:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+
+      <td>739:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">731:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+      <td bgcolor="#99FF99">740:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td>732:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/*&nbsp;print&nbsp;the&nbsp;solution&nbsp;*/</td>
+
+      <td>741:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/*&nbsp;print&nbsp;the&nbsp;solution&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>733:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEGIN;</td>
+
+      <td>742:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEGIN;</td>
+    </tr>
+
+    <tr>
+      <td>
+      734:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DECLARE&nbsp;(p,&nbsp;s)&nbsp;FIXED&nbsp;BINARY,&nbsp;or&nbsp;CHARACTER&nbsp;(2)&nbsp;VARYING,&nbsp;all_covered&nbsp;BIT&nbsp;ALIGNED,&nbsp;b&nbsp;BIT&nbsp;(96)&nbsp;ALIGNED;</td>
+
+      <td>
+      743:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DECLARE&nbsp;(p,&nbsp;s)&nbsp;FIXED&nbsp;BINARY,&nbsp;or&nbsp;CHARACTER&nbsp;(2)&nbsp;VARYING,&nbsp;all_covered&nbsp;BIT&nbsp;ALIGNED,&nbsp;b&nbsp;BIT&nbsp;(96)&nbsp;ALIGNED;</td>
+    </tr>
+
+    <tr>
+      <td>817:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu:</td>
+
+      <td>826:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu:</td>
+    </tr>
+
+    <tr>
+      <td>818:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP(3);</td>
+
+      <td>827:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP(3);</td>
+    </tr>
+
+    <tr>
+      <td>819:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;print_menu;</td>
+
+      <td>828:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;print_menu;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      820:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu_option(menu_selection());</td>
+
+      <td bgcolor="#99FF99">
+      829:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;(menu_selection());</td>
+    </tr>
+
+    <tr>
+      <td>821:&nbsp;</td>
+
+      <td>830:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      822:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu_option(1):&nbsp;/*&nbsp;enter&nbsp;data&nbsp;*/</td>
+
+      <td bgcolor="#99FF99">
+      831:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;(1)&nbsp;BEGIN;&nbsp;/*&nbsp;enter&nbsp;data&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>
+      823:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;enter_data;</td>
+
+      <td>
+      832:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;enter_data;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      824:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;</td>
+
+      <td bgcolor="#99FF99">
+      833:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>825:&nbsp;</td>
+
+      <td>834:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      826:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu_option(2):&nbsp;/*&nbsp;minimise&nbsp;*/</td>
+
+      <td bgcolor="#99FF99">
+      835:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;(2)&nbsp;BEGIN;&nbsp;/*&nbsp;minimise&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>
+      827:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;num_terms&nbsp;&lt;&nbsp;2&nbsp;THEN</td>
+
+      <td>
+      836:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;num_terms&nbsp;&lt;&nbsp;2&nbsp;THEN</td>
+    </tr>
+
+    <tr>
+      <td>
+      828:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP&nbsp;LIST&nbsp;('Insufficient&nbsp;data&nbsp;-&nbsp;cannot&nbsp;minimise.');</td>
+
+      <td>
+      837:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP&nbsp;LIST&nbsp;('Insufficient&nbsp;data&nbsp;-&nbsp;cannot&nbsp;minimise.');</td>
+    </tr>
+
+    <tr>
+      <td>829:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE&nbsp;DO;</td>
+
+      <td>838:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE&nbsp;DO;</td>
+    </tr>
+
+    <tr>
+      <td>
+      833:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_data&nbsp;=&nbsp;false;</td>
+
+      <td>
+      842:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_data&nbsp;=&nbsp;false;</td>
+    </tr>
+
+    <tr>
+      <td>
+      834:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;continue_prompt;</td>
+
+      <td>
+      843:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;continue_prompt;</td>
+    </tr>
+
+    <tr>
+      <td>
+      835:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+
+      <td>
+      844:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      836:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;</td>
+
+      <td bgcolor="#99FF99">
+      845:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>837:&nbsp;</td>
+
+      <td>846:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      838:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu_option(3):&nbsp;/*&nbsp;file&nbsp;results&nbsp;*/</td>
+
+      <td bgcolor="#99FF99">
+      847:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;(3)&nbsp;BEGIN;&nbsp;/*&nbsp;file&nbsp;results&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>
+      839:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;^&nbsp;new_data&nbsp;THEN&nbsp;DO;</td>
+
+      <td>
+      848:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;^&nbsp;new_data&nbsp;THEN&nbsp;DO;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      840:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OPEN&nbsp;FILE(results_file)&nbsp;TITLE&nbsp;('BOOL_MIN&nbsp;-APPEND')&nbsp;LINESIZE(80)&nbsp;STREAM&nbsp;OUTPUT&nbsp;PRINT;</td>
+
+      <td bgcolor="#99FF99">
+      849:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OPEN&nbsp;FILE(results_file)&nbsp;TITLE&nbsp;('bool_min.txt')&nbsp;LINESIZE(80)&nbsp;STREAM&nbsp;OUTPUT&nbsp;PRINT;</td>
+    </tr>
+
+    <tr>
+      <td>
+      841:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;output_results(results_file);</td>
+
+      <td>
+      850:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;output_results(results_file);</td>
+    </tr>
+
+    <tr>
+      <td>
+      842:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;PAGE&nbsp;FILE(results_file);</td>
+
+      <td>
+      851:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;PAGE&nbsp;FILE(results_file);</td>
+    </tr>
+
+    <tr>
+      <td>
+      843:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLOSE&nbsp;FILE(results_file);</td>
+
+      <td>
+      852:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLOSE&nbsp;FILE(results_file);</td>
+    </tr>
+
+    <tr>
+      <td>
+      844:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP&nbsp;LIST&nbsp;('Results&nbsp;appended&nbsp;to&nbsp;file&nbsp;BOOL_MIN.');</td>
+
+      <td>
+      853:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PUT&nbsp;SKIP&nbsp;LIST&nbsp;('Results&nbsp;appended&nbsp;to&nbsp;file&nbsp;BOOL_MIN.');</td>
+    </tr>
+
+    <tr>
+      <td>
+      845:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+
+      <td>
+      854:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>
+      846:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE&nbsp;PUT&nbsp;SKIP&nbsp;LIST&nbsp;('No&nbsp;results&nbsp;to&nbsp;file.');</td>
+
+      <td>
+      855:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE&nbsp;PUT&nbsp;SKIP&nbsp;LIST&nbsp;('No&nbsp;results&nbsp;to&nbsp;file.');</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      847:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;</td>
+
+      <td bgcolor="#99FF99">
+      856:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>848:&nbsp;</td>
+
+      <td>857:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      849:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu_option(4):&nbsp;/*&nbsp;information&nbsp;*/</td>
+
+      <td bgcolor="#99FF99">
+      858:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;(4)&nbsp;BEGIN;&nbsp;/*&nbsp;information&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>
+      850:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;print_information;</td>
+
+      <td>
+      859:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;print_information;</td>
+    </tr>
+
+    <tr>
+      <td>
+      851:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;continue_prompt;</td>
+
+      <td>
+      860:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CALL&nbsp;continue_prompt;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      852:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;</td>
+
+      <td bgcolor="#99FF99">
+      861:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GO&nbsp;TO&nbsp;menu;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>853:&nbsp;</td>
+
+      <td>862:&nbsp;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">
+      854:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;menu_option(5):&nbsp;/*&nbsp;quit&nbsp;*/</td>
+
+      <td bgcolor="#99FF99">
+      863:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;(5)&nbsp;/*&nbsp;quit&nbsp;*/</td>
+    </tr>
+
+    <tr>
+      <td>855:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STOP;</td>
+
+      <td>864:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STOP;</td>
+    </tr>
+
+    <tr>
+      <td>856:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+
+      <td>865:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#99FF99">857:&nbsp;</td>
+
+      <td bgcolor="#99FF99">866:&nbsp;&nbsp;&nbsp;END;</td>
+    </tr>
+
+    <tr>
+      <td>858:&nbsp;END&nbsp;BSc_project;</td>
+
+      <td>867:&nbsp;END&nbsp;BSc_project;</td>
+    </tr>
+  </table><br>
+  <br>
+
+  <table border="0" cellspacing="0" cellpadding="1">
+    <tr>
+      <th align="center" bgcolor="#000000" colspan="2"><span class="c2">legend</span></th>
+    </tr>
+
+    <tr>
+      <td align="center" bgcolor="#CCCCFF">Lines Added</td>
+
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+    </tr>
+
+    <tr bgcolor="#99FF99">
+      <td align="center" colspan="2">Lines changed</td>
+    </tr>
+
+    <tr>
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+
+      <td align="center" bgcolor="#FF9999">Lines Removed</td>
+    </tr>
+  </table>
+
+  <p class="c4"><a href="http://www.ginini.com/software/hdiff/"><span class="c3">hdiff - version:
+  2.1.0</span></a></p>
+</body>
+</html>
