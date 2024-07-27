@@ -728,7 +728,7 @@ output_results: PROCEDURE (f);
                     END;
                END;
           END;
-     
+
      /* print the solution */
      BEGIN;
           DECLARE (p, s) FIXED BINARY, or CHARACTER (2) VARYING, all_covered BIT ALIGNED, b BIT (96) ALIGNED;
