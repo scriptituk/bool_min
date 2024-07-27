@@ -112,7 +112,7 @@ sort_data: PROCEDURE;
 
      /* now extract sorted terms back into ordered minterm & dont-care arrays */
      num_minterms = 0; num_dont_cares = 0;
-     DO t = i TO num_terms;
+     DO t = 1 TO num_terms;
           IF type(t) THEN DO;
                num_minterms = num_minterms + 1;
                minterm(num_minterms) = term(t);
@@ -335,7 +335,7 @@ END p_i_chart;
 * PROCEDURE p_i_status: Categorises PIs as essential/nonessential/redundant   *
 *******************************************************************************/
 p_i_status: PROCEDURE;
-    DECLARE (m, p, epi, num_covers) FIXED BINARY;
+     DECLARE (m, p, epi, num_covers) FIXED BINARY;
 
      /* initialise all p.i. status to redundant */
      DO p = 1 TO num_pis; p_i(status,p) = redundant; END;
@@ -343,41 +343,41 @@ p_i_status: PROCEDURE;
      DO m = 1 TO num_minterms;
           num_covers = 0;
           DO p = 1 TO num_pis;
-          IF pi_covers_minterm(p,m) THEN DO;
-               epi = p;
-               num_covers = num_covers + 1;
+               IF pi_covers_minterm(p,m) THEN DO;
+                    epi = p;
+                    num_covers = num_covers + 1;
+                    END;
                END;
+          IF num_covers = 1 THEN p_i(status, epi) = essential;
           END;
-     IF num_covers = 1 THEN p_i(status, epi) = essential;
-     END;
-/* find minterms covered by essential p.i.s */
-num_covers = 0;
-DO m = 1 TO num_minterms;
-epi_covers_minterm(m) = false;
-     DO p = 1 TO num_pis WHILE (^ epi_covers_minterm(m));
-          IF p_i(status,p) = essential & pi_covers_minterm(p,m) THEN DO;
-               epi_covers_minterm(m) = true;
-               num_covers = num_covers + 1;
-               END;
-          END;
-     END;
-/* determine whether 1 solution or more */
-unique_solution = (num_covers = num_minterms);
-/* find non-essential p.i.s */
-IF ^ unique_solution THEN DO;
+     /* find minterms covered by essential p.i.s */
+     num_covers = 0;
      DO m = 1 TO num_minterms;
-          IF ^ epi_covers_minterm(m) THEN DO p = 1 TO num_pis;
-               IF p_i(status,p) = redundant & pi_covers_minterm(p,m) THEN p_i(status,p) = non_essential;
+          epi_covers_minterm(m) = false;
+          DO p = 1 TO num_pis WHILE (^ epi_covers_minterm(m));
+               IF p_i(status,p) = essential & pi_covers_minterm(p,m) THEN DO;
+                    epi_covers_minterm(m) = true;
+                    num_covers = num_covers + 1;
+                    END;
                END;
           END;
-     /* make a table of n.e.p.i. pointers */
-     num_ne_pis = 0;
-     DO p = 1 TO num_pis;
-          IF p_i(status,p) = non_essential THEN DO;
-               num_ne_pis = num_ne_pis + 1;   ne_pi(num_ne_pis) = p;
+     /* determine whether 1 solution or more */
+     unique_solution = (num_covers = num_minterms);
+     /* find non-essential p.i.s */
+     IF ^ unique_solution THEN DO;
+          DO m = 1 TO num_minterms;
+               IF ^ epi_covers_minterm(m) THEN DO p = 1 TO num_pis;
+                    IF p_i(status,p) = redundant & pi_covers_minterm(p,m) THEN p_i(status,p) = non_essential;
+                    END;
+               END;
+          /* make a table of n.e.p.i. pointers */
+          num_ne_pis = 0;
+          DO p = 1 TO num_pis;
+               IF p_i(status,p) = non_essential THEN DO;
+                    num_ne_pis = num_ne_pis + 1;   ne_pi(num_ne_pis) = p;
+                    END;
                END;
           END;
-     END;
 
 END p_i_status;
 
@@ -388,11 +388,11 @@ END p_i_status;
 p_i_cost: PROCEDURE;
      DECLARE (p, l, b, literals) FIXED BINARY;
      DO p = 1 TO num_pis;
-          p_i(cost,p) = 0; b= 1;
+          p_i(cost,p) = 0;  b = 1;
           literals = equivalent(p_i(low,p),p_i(high,p));
           DO l = 1 TO function_order;
                IF (b & literals) ^= 0 THEN p_i(cost,p) = p_i(cost,p) + 1;
-               b= b + b;
+               b = b + b;
                END;
           END;
 END p_i_cost;
@@ -423,7 +423,7 @@ irredundant_nepi_sums: PROCEDURE;
               END;
           END;
 
-     /* first pass - i.n.e.p.i. sums ate those covering 1st uncovered minterm */
+     /* first pass - i.n.e.p.i. sums are those covering 1st uncovered minterm */
      num_inepi_sums = 0;  b = BIT(0,95) || '1'B;
      DO p = 1 TO num_ne_pis;
           /* if 1st uncovered minterm is covered by this n.e.p.i. then ... */
@@ -434,10 +434,10 @@ irredundant_nepi_sums: PROCEDURE;
           b = SUBSTR(b, 2);
           END;
 
-     /* continue by repeatediy combining with n.e.p.i.  terms of succeeding minterms algebraically */
+     /* continue by repeatediy combining with n.e.p.i. terms of succeeding minterms algebraically */
      DO m = 2 TO num_umin_nepis;
           /* initialise cover counter and n.e.p.i. pointer */
-          c= -1;  b = BIT(0,95) || '1'B;
+          c = -1;  b = BIT(0,95) || '1'B;
           /* add each n.e.p.i. covering this minterm successively to each sum */
           DO p = 1 TO num_ne_pis;
               /* if this n.e.p.i. covers this minterm then ... */
@@ -490,7 +490,7 @@ minimum_cost_solution: PROCEDURE;
      DO s = 2 TO num_inepi_sums;
           IF sum_cost(s) < min_cost THEN min_cost = sum_cost(s);
           END;
-     /* remove a11 but minimum cost sums */
+     /* remove all but minimum cost sums */
      DO s = 1 TO num_inepi_sums;
           IF sum_cost(s) > min_cost THEN DO;
                inepi_sum(s) = BIT(0, 96);
@@ -549,7 +549,7 @@ remove_redundant_sums: PROCEDURE;
                          END;
                     END;
                IF ^ sum_moved THEN DO;
-                    num_inepi_sums = i - i;
+                    num_inepi_sums = i - 1;
                     RETURN;
                     END;
                END;
@@ -599,7 +599,7 @@ run_minimisation: PROCEDURE;
      CALL p_i_cost; /* finds literal costs of p.i.s */
      IF ^ unique_solution THEN DO;
           PUT SKIP LIST ('(finding minimum cost solution)');
-          CALL irredundant_nepi_sums; /* generate irredundant n.e.p.i. sums to caver Temaining minterms */
+          CALL irredundant_nepi_sums; /* generate irredundant n.e.p.i. sums to cover remaining minterms */
           CALL minimum_cost_solution; /* finds lowest literal cost solutions from irredundant n.e.p.i. sums */
           CALL ammend_p_i_status; /* gives min-cost-ess/min-cost-red status to n.e.p.i.s */
           END;
@@ -694,10 +694,10 @@ output_results: PROCEDURE (f);
      BEGIN;
           DECLARE p FIXED BINARY;
           PUT FILE(f) SKIP(3) LIST ('Prime Implicants:');
-          PUT FILE(f) SKIP EDIT (' p.i.','cell', 'literals', 'cost', 'status')
-               (A,COLUMN(11),A, COLUMN(25),A,COLUMN(40),A,COLUMN(50),A);
+          PUT FILE(f) SKIP EDIT (' p.i.','cell','literals','cost','status')
+               (A,COLUMN(11),A,COLUMN(25),A,COLUMN(40),A,COLUMN(50),A);
           DO p = 1 TO num_pis;
-               PUT FILE(f) SKIP EDIT (p,cell(p),literals(p),p_i(cost,p),pi_status(p_i(status, p)))
+               PUT FILE(f) SKIP EDIT (p,cell(p),literals(p),p_i(cost,p),pi_status(p_i(status,p)))
                     (F(4),COLUMN(11),A,COLUMN(25),A,COLUMN(40),F(3),COLUMN(50),A);
                END;
           END;
@@ -720,11 +720,11 @@ output_results: PROCEDURE (f);
                PUT FILE(f) SKIP LIST ('      minterm -->');
                PUT FILE(f) SKIP EDIT
                     (' p.i.',(minterm(m)
-                    DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (A,F(3),18(F(4))); /*?*/
+                    DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (A,F(3),18(F(4)));
                DO p = 1 TO num_pis;
                     IF p_i(status,p) > redundant THEN PUT FILE(f) SKIP EDIT
                          (p, (tick(pi_covers_minterm(p,m))
-                         DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (F(4),19(X(1))); /*?*/
+                         DO m = (b-1)*mins_per_block+1 TO MIN(num_minterms,b*mins_per_block))) (F(4),19(X(3),A));
                     END;
                END;
           END;
