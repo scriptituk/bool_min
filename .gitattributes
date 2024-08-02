@@ -1,0 +1,3 @@
+src/*.html linguist-vendored
+src/*.pli linguist-language=PLI
+1998/*.pli linguist-language=PLI
