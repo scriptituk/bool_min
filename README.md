@@ -4,10 +4,13 @@
 
 ### Purpose
 
-This project is not intended as a solution for modern applications.
-It is presented for historic interest and to demonstrate the algebraic method of prime implicant production.
+This project is not a solution for modern applications.
+It is just presented for historic interest and to demonstrate the algebraic method of prime implicant production.
 
 ### Background
+
+<img src="assets/minimisaton-boolean-gate.png" alt="Boolean gate minimisation" align="right">
+
 This was my final-year BSc project at Bristol Polytechnic, now [UWE Bristol](https://www.uwe.ac.uk/) (University of the West of England).
 My course was Electrical Engineering
 but they allowed me do a 100% software project because it related to electronics –
@@ -21,7 +24,7 @@ that also incorporates algebraic methods proposed by Nagle *et al.* for improved
 
 ### Implementation
 
-<img src="assets/prime-550.png" alt="PR1ME 550" align="right">
+<img src="assets/list.gif" alt="PL/I Listing" align="left">
 
 The program was coded in [PL/I](https://en.wikipedia.org/wiki/PL/I) General Purpose Subset (Subset G),
 a subset of ANSI Standard PL/I, initially developed by IBM.
@@ -35,7 +38,7 @@ PL/I was chosen because it can perform bitwise logical operations on arbitrary l
 rather than deploying arrays of fixed length integers.
 In its day PL/I was the language of choice for scientific, engineering and system programming.
 
-<img src="assets/list.gif" alt="PL/I Listing" align="left">
+<img src="assets/prime-550.png" alt="PR1ME 550" align="right">
 
 The 1986 [source code](1986/1986-bool_min.pli)
 derives from the original line printer [listing](https://scriptit.uk/download/1986-list-lineprint.pdf)
