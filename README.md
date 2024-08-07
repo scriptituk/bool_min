@@ -2,9 +2,8 @@
 
 ## A vintage PL/I implementation from 1986 brought back to life!
 
-### Purpose
-
-This is not a solution for modern applications.
+> [!NOTE]
+> This is not a solution for modern applications.
 It is just presented for historic interest and to demonstrate the algebraic method of prime implicant production.
 
 ### Background
