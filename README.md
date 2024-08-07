@@ -57,5 +57,5 @@ After fixing minor [compatibility issues](https://htmlpreview.github.io/?https:/
 
 The amended source code is [bool_min.pli](src/bool_min.pli),
 and that [src/](src/) directory also contains everything needed to build it on Linux.
-
 The [test/](test/) directory replicates the original [test runs](https://scriptit.uk/download/1986-runs-lineprint.pdf).
+I shall scan and uplaod the accompanying dissertation sometime.
