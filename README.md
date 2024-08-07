@@ -16,8 +16,8 @@ but they let me do a 100% software project because it related to electronics –
 
 ### Concept
 
-This is a version of the [Quine–McCluskey](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm) algorithm
-that also incorporates algebraic methods proposed by Nagle *et al.* for improved efficiency
+This is a variant of the [Quine–McCluskey](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm) algorithm
+incorporating algebraic methods proposed by Nagle *et al.* for improved efficiency
 (ref. *An Introduction to Computer Logic; H.T.Nagle, B.D.Carroll & J.D.Irwin; Prentice-Hall, 1975*).
 
 ### Implementation
@@ -29,7 +29,7 @@ It ran on a 1979 PRIME 550 System [minicomputer](https://en.wikipedia.org/wiki/M
 by [Prime Computer, Inc.](https://en.wikipedia.org/wiki/Prime_Computer)
 running the [PRIMOS](https://en.wikipedia.org/wiki/PRIMOS) operating system
 and accessed from dumb terminals.
-The photo shows a similar system at [Chilten Atlas Computer Laboratory](https://www.chilton-computing.org.uk/acd/icf/mums/p014.htm).
+The photo shows a similar system at [Chilton Atlas Computer Laboratory](https://www.chilton-computing.org.uk/acd/icf/mums/p014.htm).
 
 I chose PL/I because it can perform bitwise logical operations on arbitrary length bit strings which even today is quite rare –
 few modern languages natively support packed bit arrays with bitwise and shift operators.
@@ -39,7 +39,7 @@ I hoped the novel approach would impress the examiners!
 <img src="assets/prime-550.png" alt="PR1ME 550" align="right">
 
 The 1986 [source code](1986/1986-bool_min.pli)
-derives from the original line printer [listing](https://scriptit.uk/download/1986-list-lineprint.pdf)
+derives from the original [line printer listing](https://scriptit.uk/download/1986-list-lineprint.pdf)
 via scanning, optical character recognition and extensive correction
 (OCR does not handle old dot-matrix print well).
 The [test runs](https://scriptit.uk/download/1986-runs-lineprint.pdf) were also scanned
