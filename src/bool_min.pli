@@ -826,13 +826,13 @@ DO WHILE ($true);
      menu:
      PUT SKIP(3);
      CALL print_menu;
-     SELECT (menu_selection());
+     GO TO menu_option(menu_selection());
 
-     WHEN (1) BEGIN; /* enter data */
+     menu_option(1): /* enter data */
           CALL enter_data;
-          GO TO menu; END;
+          GO TO menu;
 
-     WHEN (2) BEGIN; /* minimise */
+     menu_option(2): /* minimise */
           IF num_terms < 2 THEN
                PUT SKIP LIST ('Insufficient data - cannot minimise.');
           ELSE DO;
@@ -842,9 +842,9 @@ DO WHILE ($true);
                new_data = $false;
                CALL continue_prompt;
                END;
-          GO TO menu; END;
+          GO TO menu;
 
-     WHEN (3) BEGIN; /* file results */
+     menu_option(3): /* file results */
           IF ^ new_data THEN DO;
                OPEN FILE(results_file) TITLE ('bool_min.txt') LINESIZE(80) STREAM OUTPUT PRINT;
                CALL output_results(results_file);
@@ -853,15 +853,15 @@ DO WHILE ($true);
                PUT SKIP LIST ('Results appended to file BOOL_MIN.');
                END;
           ELSE PUT SKIP LIST ('No results to file.');
-          GO TO menu; END;
+          GO TO menu;
 
-     WHEN (4) BEGIN; /* information */
+     menu_option(4): /* information */
           CALL print_information;
           CALL continue_prompt;
-          GO TO menu; END;
+          GO TO menu;
 
-     WHEN (5) /* quit */
+     menu_option(5): /* quit */
           STOP;
      END;
-  END;
+
 END BSc_project;

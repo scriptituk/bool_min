@@ -1,5 +1,5 @@
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 1     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 1     
     1 /*
     2 ===============================================================================
     3 = UTILITY PROGRAMME FOR THE MINIMISATION OF BOOLEAN FUNCTIONS                 =
@@ -58,8 +58,8 @@ Jul 27, 2024  02:54                                       /*
    55 *******************************************************************************/
    56 equivalent: PROCEDURE (x,y) RETURNS (FIXED BINARY);
    57      DECLARE (x,y) FIXED BINARY;
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 2     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 2     
    58      RETURN (x & y  |  ^ x & ^ y);
    59 END equivalent;
    60 
@@ -118,8 +118,8 @@ Jul 27, 2024  02:54                                       /*
   113                          term(j + 1) = term(num_terms);
   114                          type(j + 1) = type(num_terms);
   115                          num_terms = num_terms - 1;
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 3     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 3     
   116                          excess_terms = $true;
   117                          END;
   118                     END;
@@ -178,8 +178,8 @@ Jul 27, 2024  02:54                                       /*
   171 enter_data: PROCEDURE;
   172      DECLARE action CHARACTER (30) VARYING, deleted BIT ALIGNED, (i, t) FIXED BINARY;
   173 
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 4     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 4     
   174      get_input_list: PROCEDURE;
   175           DECLARE (upper, lower) FIXED BINARY,
   176                   input_item CHARACTER (30) VARYING,
@@ -238,8 +238,8 @@ Jul 27, 2024  02:54                                       /*
   224                DO WHILE (VERIFY(action,'ACDEM') ^= 0);
   225                     GET EDIT (action) (A);
   226                     action = TRANSLATE(action, 'ACDEM', 'acdem');
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 5     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 5     
   227                     END;
   228                IF action = 'E' THEN RETURN;
   229                IF action = 'C' THEN DO;
@@ -298,8 +298,8 @@ Jul 27, 2024  02:54                                       /*
   280 
   281 /******************************************************************************
   282 * PROCEDURE prime_implicants: Generates complete list of PIs                  *
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 6     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 6     
   283 *******************************************************************************/
   284 prime_implicants: PROCEDURE;
   285 
@@ -358,8 +358,8 @@ Jul 27, 2024  02:54                                       /*
   338                END;
   339           END;
   340 END p_i_chart;
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 7     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 7     
   341 
   342 
   343 /******************************************************************************
@@ -418,8 +418,8 @@ Jul 27, 2024  02:54                                       /*
   395 * PROCEDURE p_i_cost: Calculates literal costs of PIs                         *
   396 *******************************************************************************/
   397 p_i_cost: PROCEDURE;
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 8     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 8     
   398      DECLARE (p, l, b, literals) FIXED BINARY;
   399      DO p = 1 TO num_pis;
   400           p_i($cost,p) = 0;  b = 1;
@@ -478,8 +478,8 @@ Jul 27, 2024  02:54                                       /*
   452               /* if this n.e.p.i. covers this minterm then ... */
   453               IF (umin_nepis(m) & b) ^= BIT(0, 96) THEN DO;
   454                   /* ... increment cover counter for this minterm ... */
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 9     
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 9     
   455                   c = c + 1;
   456                   /* ... step through the sums for this cover ... */
   457                   DO s = c * num_inepi_sums + 1 TO (c + 1) * num_inepi_sums;
@@ -538,8 +538,8 @@ Jul 27, 2024  02:54                                       /*
   509      IF redundant_sums THEN CALL remove_redundant_sums;
   510 
   511 END minimum_cost_solution;
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 10    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 10    
   512 
   513 
   514 /******************************************************************************
@@ -598,8 +598,8 @@ Jul 27, 2024  02:54                                       /*
   567 END remove_redundant_sums;
   568 
   569 
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 11    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 11    
   570 /******************************************************************************
   571 * PROCEDURE essential_cost: Returns literal cost of all essential PIs         *
   572 *******************************************************************************/
@@ -658,8 +658,8 @@ Jul 27, 2024  02:54                                       /*
   622 #                          OUTPUT PROCEDURES                                  #
   623 ###############################################################################
   624 */
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 12    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 12    
   625 
   626 
   627 /******************************************************************************
@@ -718,8 +718,8 @@ Jul 27, 2024  02:54                                       /*
   680      /* list minterms and dont-cares */
   681      CALL print_input_data(f);
   682 
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 13    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 13    
   683      /* print the function order */
   684      PUT FILE(f) SKIP(3) EDIT ('The function order is ',trim(function_order)) (A);
   685 
@@ -778,10 +778,10 @@ Jul 27, 2024  02:54                                       /*
       ,19(X(3),A));
   737                     END;
   738                END;
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 14    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 14    
   739           END;
-  740      
+  740 
   741      /* print the solution */
   742      BEGIN;
   743           DECLARE (p, s) FIXED BINARY, or CHARACTER (2) VARYING, all_covered BIT ALIGNED, b BIT (96)
@@ -838,8 +838,8 @@ Jul 27, 2024  02:54                                       /*
   793      PUT SKIP(2) EDIT (
   794      '  This utility determines the minimal 2-level solution for a Boolean switching',
   795      'function. This function must be fully specified as minterm and don''t care',
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 15    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 15    
   796      'arrays. The maximum number of input variables is 8. Data is entered as decimal',
   797      'values in the range 0 to 255 in any order. Ranges of values may be entered by',
   798      'using a hyphen. e.g. 10-15. This data is sorted by the programme. If any value',
@@ -873,13 +873,13 @@ Jul 27, 2024  02:54                                       /*
   826      menu:
   827      PUT SKIP(3);
   828      CALL print_menu;
-  829      SELECT (menu_selection());
+  829      GO TO menu_option(menu_selection());
   830 
-  831      WHEN (1) BEGIN; /* enter data */
+  831      menu_option(1): /* enter data */
   832           CALL enter_data;
-  833           GO TO menu; END;
+  833           GO TO menu;
   834 
-  835      WHEN (2) BEGIN; /* minimise */
+  835      menu_option(2): /* minimise */
   836           IF num_terms < 2 THEN
   837                PUT SKIP LIST ('Insufficient data - cannot minimise.');
   838           ELSE DO;
@@ -889,33 +889,33 @@ Jul 27, 2024  02:54                                       /*
   842                new_data = $false;
   843                CALL continue_prompt;
   844                END;
-  845           GO TO menu; END;
+  845           GO TO menu;
   846 
-  847      WHEN (3) BEGIN; /* file results */
+  847      menu_option(3): /* file results */
   848           IF ^ new_data THEN DO;
   849                OPEN FILE(results_file) TITLE ('bool_min.txt') LINESIZE(80) STREAM OUTPUT PRINT;
   850                CALL output_results(results_file);
   851                PUT PAGE FILE(results_file);
   852                CLOSE FILE(results_file);
   853                PUT SKIP LIST ('Results appended to file BOOL_MIN.');
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Source Listing                                           Page 16    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Source Listing                                           Page 16    
   854                END;
   855           ELSE PUT SKIP LIST ('No results to file.');
-  856           GO TO menu; END;
+  856           GO TO menu;
   857 
-  858      WHEN (4) BEGIN; /* information */
+  858      menu_option(4): /* information */
   859           CALL print_information;
   860           CALL continue_prompt;
-  861           GO TO menu; END;
+  861           GO TO menu;
   862 
-  863      WHEN (5) /* quit */
+  863      menu_option(5): /* quit */
   864           STOP;
   865      END;
-  866   END;
+  866 
   867 END BSc_project;
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Procedure Map                                            Page 17    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Procedure Map                                            Page 17    
   Offset  Line Statement type             Offset  Line Statement type             Offset  Line Statement type           
       08    11 PROCEDURE                BSC_PROJECT
       3A    39 DCL                            3A    41 DCL                      
@@ -973,8 +973,8 @@ Jul 27, 2024  02:54                                       /*
     0E99   197 Assignment                   0E9F   198 Assignment                   0F0D   198 IF                       
     0F1D   198 Assignment                   0F23   199 IF                           0F33   199 DO                       
     0F33   199 Assignment                   0F3E   199 Assignment                   0F46   199 Assignment               
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Procedure Map                                            Page 18    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Procedure Map                                            Page 18    
     0F51   199 END                          0F51   200 DO                           0FAE   201 Assignment               
     0FBD   202 Assignment                   0FDE   203 END                          0FE6   204 END                      
     0FE9   205 END                          0FE9   206 ELSE                         0FF1   206 Assignment               
@@ -1009,203 +1009,189 @@ Jul 27, 2024  02:54                                       /*
     1BA4   296 DO                           1BA4   298 Assignment                   1BDD   299 Assignment               
     1BE1   299 Assignment                   1BEA   300 DO                           1C3A   301 IF                       
     1C69   301 DO                           1C69   302 DO                           1C8C   302 Assignment               
-    1C95   302 END                          1C9A   303 Assignment                   1CBE   304 Assignment               
-    1CC7   305 END                          1CC7   306 END                          1CD2   307 IF                       
-    1CDC   307 DO                           1CDC   309 Assignment                   1CE0   310 IF                       
-    1CF0   310 DO                           1D3F   311 IF                           1D5C   312 IF                       
-    1DA5   313 Assignment                   1DE8   314 END                          1DF3   315 IF                       
-    1DFD   315 DO                           1DFD   316 Assignment                   1E09   317 Assignment               
-    1E21   318 Assignment                   1E39   319 END                          1E39   320 END                      
-    1E39   321 END                          1E39   322 END                          1E44   323 END                      
-    1E4F   325 END                      
+    1C95   302 END                          1C9A   303 Assignment                   1CC1   304 Assignment               
+    1CCA   305 END                          1CCA   306 END                          1CD5   307 IF                       
+    1CDF   307 DO                           1CDF   309 Assignment                   1CE3   310 IF                       
+    1CF3   310 DO                           1D42   311 IF                           1D5F   312 IF                       
+    1DA8   313 Assignment                   1DEE   314 END                          1DF9   315 IF                       
+    1E03   315 DO                           1E03   316 Assignment                   1E0F   317 Assignment               
+    1E27   318 Assignment                   1E3F   319 END                          1E3F   320 END                      
+    1E3F   321 END                          1E3F   322 END                          1E4A   323 END                      
+    1E55   325 END                      
 
-    1E5F   331 PROCEDURE                P_I_CHART
-    1E75   334 DO                           1EBA   335 DO                           1EFF   336 Assignment               
-    200B   338 END                          2016   339 END                          2021   340 END                      
+    1E65   331 PROCEDURE                P_I_CHART
+    1E7B   334 DO                           1EC0   335 DO                           1F05   336 Assignment               
+    2017   338 END                          2022   339 END                          202D   340 END                      
 
-    2031   346 PROCEDURE                P_I_STATUS
-    2048   350 DO                           208D   350 Assignment                   20A0   350 END                      
-    20A8   352 DO                           20ED   353 Assignment                   20F3   354 DO                       
-    2138   355 IF                           2173   355 DO                           2173   356 Assignment               
-    217B   357 Assignment                   2184   358 END                          2184   359 END                      
-    218C   360 IF                           2199   360 Assignment                   21AC   361 END                      
-    21B7   363 Assignment                   21BD   364 DO                           2202   365 Assignment               
-    2245   366 DO                           22B3   367 IF                           230E   367 DO                       
-    230E   368 Assignment                   2351   369 Assignment                   235A   370 END                      
-    235D   371 END                          2368   372 END                          2373   374 Assignment               
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Procedure Map                                            Page 19    
-    238F   376 IF                           239C   376 DO                           239C   377 DO                       
-    23E1   378 IF                           240A   378 DO                           244F   379 IF                       
-    24AA   379 Assignment                   24C0   380 END                          24CB   381 END                      
-    24D6   383 Assignment                   24DF   384 DO                           2524   385 IF                       
-    253E   385 DO                           253E   386 Assignment                   254A   386 Assignment               
-    2562   387 END                          2562   388 END                          256A   389 END                      
-    256A   391 END                      
+    203D   346 PROCEDURE                P_I_STATUS
+    2054   350 DO                           2099   350 Assignment                   20AC   350 END                      
+    20B4   352 DO                           20F9   353 Assignment                   20FF   354 DO                       
+    2144   355 IF                           217F   355 DO                           217F   356 Assignment               
+    2187   357 Assignment                   2190   358 END                          2190   359 END                      
+    2198   360 IF                           21A5   360 Assignment                   21B8   361 END                      
+    21C3   363 Assignment                   21C9   364 DO                           220E   365 Assignment               
+    2251   366 DO                           22BF   367 IF                           231A   367 DO                       
+    231A   368 Assignment                   235D   369 Assignment                   2366   370 END                      
+    2369   371 END                          2374   372 END                          237F   374 Assignment               
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Procedure Map                                            Page 19    
+    239E   376 IF                           23AB   376 DO                           23AB   377 DO                       
+    23F0   378 IF                           2419   378 DO                           245E   379 IF                       
+    24B9   379 Assignment                   24CF   380 END                          24DA   381 END                      
+    24E5   383 Assignment                   24EE   384 DO                           2533   385 IF                       
+    254D   385 DO                           254D   386 Assignment                   2559   386 Assignment               
+    2571   387 END                          2571   388 END                          2579   389 END                      
+    2579   391 END                      
 
-    257A   397 PROCEDURE                P_I_COST
-    258F   399 DO                           25D4   400 Assignment                   25E7   400 Assignment               
-    25ED   401 Assignment                   2640   402 DO                           2688   403 IF                       
-    26B4   403 Assignment                   26D7   404 Assignment                   26E5   405 END                      
-    26F0   406 END                          26FB   407 END                      
+    2589   397 PROCEDURE                P_I_COST
+    259E   399 DO                           25E3   400 Assignment                   25F6   400 Assignment               
+    25FC   401 Assignment                   264F   402 DO                           2697   403 IF                       
+    26C3   403 Assignment                   26E6   404 Assignment                   26F4   405 END                      
+    26FF   406 END                          270A   407 END                      
 
-    270B   415 PROCEDURE                IRREDUNDANT_NEPI_SUMS
-    272D   421 Assignment                   2733   422 DO                           277E   423 IF                       
-    27A7   423 DO                           27A7   424 Assignment                   27B0   425 Assignment               
-    27CF   426 Assignment                   2867   427 DO                           28B2   428 IF                       
-    28FA   429 Assignment                   297B   430 Assignment                   29AA   431 END                      
-    29B8   432 END                          29B8   433 END                          29C6   436 Assignment               
-    29CF   436 Assignment                   2A67   437 DO                           2AB2   439 IF                       
-    2B3B   439 DO                           2B3B   441 Assignment                   2B47   441 Assignment               
-    2B6F   442 END                          2B75   443 Assignment                   2BA4   444 END                      
-    2BB2   447 DO                           2BFA   449 Assignment                   2C00   449 Assignment               
-    2C98   451 DO                           2CE3   453 IF                           2D74   453 DO                       
-    2D74   455 Assignment                   2D7D   457 DO                           2DD8   459 Assignment               
-    2E0C   461 Assignment                   2E95   462 END                          2EA3   463 END                      
-    2EA9   464 Assignment                   2ED8   465 END                          2EE9   467 Assignment               
-    2EFD   469 Assignment                   2F04   470 DO                           2F4F   471 IF                       
-    2F91   471 DO                           2FDC   472 IF                           30D1   472 DO                       
-    30D1   473 Assignment                   310E   474 Assignment                   3115   475 END                      
-    311B   476 END                          312F   477 END                          3140   479 IF                       
-    314D   479 CALL                         3171   480 END                          317F   482 END                      
+    271A   415 PROCEDURE                IRREDUNDANT_NEPI_SUMS
+    273C   421 Assignment                   2742   422 DO                           278D   423 IF                       
+    27B6   423 DO                           27B6   424 Assignment                   27BF   425 Assignment               
+    27DE   426 Assignment                   2876   427 DO                           28C1   428 IF                       
+    2909   429 Assignment                   298A   430 Assignment                   29B9   431 END                      
+    29C7   432 END                          29C7   433 END                          29D5   436 Assignment               
+    29DE   436 Assignment                   2A76   437 DO                           2AC1   439 IF                       
+    2B4A   439 DO                           2B4A   441 Assignment                   2B56   441 Assignment               
+    2B7E   442 END                          2B84   443 Assignment                   2BB3   444 END                      
+    2BC1   447 DO                           2C09   449 Assignment                   2C0F   449 Assignment               
+    2CA7   451 DO                           2CF2   453 IF                           2D83   453 DO                       
+    2D83   455 Assignment                   2D8C   457 DO                           2DE7   459 Assignment               
+    2E1B   461 Assignment                   2EA4   462 END                          2EB2   463 END                      
+    2EB8   464 Assignment                   2EE7   465 END                          2EF8   467 Assignment               
+    2F0C   469 Assignment                   2F13   470 DO                           2F5E   471 IF                       
+    2FA0   471 DO                           2FEB   472 IF                           30E0   472 DO                       
+    30E0   473 Assignment                   311D   474 Assignment                   3124   475 END                      
+    312A   476 END                          313E   477 END                          314F   479 IF                       
+    315C   479 CALL                         3180   480 END                          318E   482 END                      
 
-    318F   489 PROCEDURE                MINIMUM_COST_SOLUTION
-    31B1   494 DO                           31FC   495 Assignment                   3239   496 END                      
-    3244   498 Assignment                   324F   499 DO                           329A   500 IF                       
-    32B4   500 Assignment                   32C6   501 END                          32D1   503 DO                       
-    331C   504 IF                           3336   504 DO                           3336   505 Assignment               
-    3373   506 Assignment                   337A   507 END                          337A   508 END                      
-    3388   509 IF                           3395   509 CALL                         33B9   511 END                      
+    319E   489 PROCEDURE                MINIMUM_COST_SOLUTION
+    31C0   494 DO                           320B   495 Assignment                   3248   496 END                      
+    3253   498 Assignment                   325E   499 DO                           32A9   500 IF                       
+    32C3   500 Assignment                   32D5   501 END                          32E0   503 DO                       
+    332B   504 IF                           3345   504 DO                           3345   505 Assignment               
+    3382   506 Assignment                   3389   507 END                          3389   508 END                      
+    3397   509 IF                           33A4   509 CALL                         33C8   511 END                      
 
-    33C9   518 PROCEDURE                AMMEND_P_I_STATUS
-    33E7   523 Assignment                   33FC   524 Assignment                   3453   525 DO                       
-    3498   526 Assignment                   350E   527 Assignment                   35CF   528 END                      
-    35DA   530 DO                           361F   531 Assignment                   36FD   532 END                      
-    3708   534 Assignment                   37A0   535 DO                           37E5   536 IF                       
-    386B   536 Assignment                   388B   537 ELSE                         3890   537 IF                       
-    3916   537 Assignment                   3942   538 Assignment                   3971   539 END                      
-    397C   541 END                      
+    33D8   518 PROCEDURE                AMMEND_P_I_STATUS
+    33F6   523 Assignment                   340B   524 Assignment                   3462   525 DO                       
+    34A7   526 Assignment                   351D   527 Assignment                   35DE   528 END                      
+    35E9   530 DO                           362E   531 Assignment                   370C   532 END                      
+    3717   534 Assignment                   37AF   535 DO                           37F4   536 IF                       
+    387A   536 Assignment                   389A   537 ELSE                         389F   537 IF                       
+    3925   537 Assignment                   3951   538 Assignment                   3980   539 END                      
+    398B   541 END                      
 
-    398C   548 PROCEDURE                REMOVE_REDUNDANT_SUMS
-    39AE   551 DO                           39F3   552 IF                           3A35   552 DO                       
-    3A35   553 Assignment                   3A39   554 DO                           3A8B   555 IF                       
-    3ACD   555 DO                           3ACD   556 Assignment                   3AFA   556 Assignment               
-    3B37   557 Assignment                   3B3B   558 END                          3B41   559 END                      
-    3B4C   560 IF                           3B56   560 DO                           3B56   561 Assignment               
-    3B62   562 RETURN                       3B67   563 END                          3B67   564 END                      
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Procedure Map                                            Page 20    
-    3B6D   565 END                          3B78   567 END                      
+    399B   548 PROCEDURE                REMOVE_REDUNDANT_SUMS
+    39BD   551 DO                           3A02   552 IF                           3A44   552 DO                       
+    3A44   553 Assignment                   3A48   554 DO                           3A9A   555 IF                       
+    3ADC   555 DO                           3ADC   556 Assignment                   3B09   556 Assignment               
+    3B46   557 Assignment                   3B4A   558 END                          3B50   559 END                      
+    3B5B   560 IF                           3B65   560 DO                           3B65   561 Assignment               
+    3B71   562 RETURN                       3B76   563 END                          3B76   564 END                      
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Procedure Map                                            Page 20    
+    3B7C   565 END                          3B87   567 END                      
 
-    3B88   573 PROCEDURE                ESSENTIAL_COST
-    3BA3   575 Assignment                   3BA9   576 DO                           3BEE   577 IF                       
-    3C08   577 Assignment                   3C23   578 END                          3C2B   579 RETURN                   
-    3C3A   580 END                      
+    3B97   573 PROCEDURE                ESSENTIAL_COST
+    3BB2   575 Assignment                   3BB8   576 DO                           3BFD   577 IF                       
+    3C17   577 Assignment                   3C32   578 END                          3C3A   579 RETURN                   
+    3C49   580 END                      
 
-    3C4A   587 PROCEDURE                NONESSENTIAL_COST
-    3C68   590 Assignment                   3C6E   590 Assignment                   3D06   591 DO                       
-    3D4B   592 IF                           3DE1   592 Assignment                   3E0F   593 Assignment               
-    3E3E   594 END                          3E49   595 RETURN                       3E58   596 END                      
+    3C59   587 PROCEDURE                NONESSENTIAL_COST
+    3C77   590 Assignment                   3C7D   590 Assignment                   3D15   591 DO                       
+    3D5A   592 IF                           3DF0   592 Assignment                   3E1E   593 Assignment               
+    3E4D   594 END                          3E58   595 RETURN                       3E67   596 END                      
 
-    3E68   602 PROCEDURE                RUN_MINIMISATION
-    3E85   603 Assignment                   3EF7   604 PUT                          3F68   605 CALL                     
-    3F8B   606 CALL                         3FAE   607 CALL                         3FD1   608 CALL                     
-    3FF4   609 IF                           4001   609 DO                           4001   610 PUT                      
-    4072   611 CALL                         4095   612 CALL                         40B8   613 CALL                     
-    40DB   614 END                          40DB   615 Assignment                   410C   616 IF                       
-    4119   616 Assignment                   4164   617 END                      
+    3E77   602 PROCEDURE                RUN_MINIMISATION
+    3E94   603 Assignment                   3F06   604 PUT                          3F77   605 CALL                     
+    3F9A   606 CALL                         3FBD   607 CALL                         3FE0   608 CALL                     
+    4003   609 IF                           4010   609 DO                           4010   610 PUT                      
+    4081   611 CALL                         40A4   612 CALL                         40C7   613 CALL                     
+    40EA   614 END                          40EA   615 Assignment                   411B   616 IF                       
+    4128   616 Assignment                   4174   617 END                      
 
-    4174   630 PROCEDURE                PRINT_HEADER_MESSAGE
-    4195   632 PUT                          4281   634 END                      
+    4184   630 PROCEDURE                PRINT_HEADER_MESSAGE
+    41A5   632 PUT                          4291   634 END                      
 
-    4291   640 PROCEDURE                PRINT_MENU
-    42A8   641 CALL                         42F2   642 PUT                          436B   643 PUT                      
-    4528   652 END                      
+    42A1   640 PROCEDURE                PRINT_MENU
+    42B8   641 CALL                         4302   642 PUT                          437B   643 PUT                      
+    4538   652 END                      
 
-    4538   658 PROCEDURE                PRINT_INPUT_DATA
-    4555   661 PUT                          45CE   662 IF                           45DE   662 PUT                      
-    464F   663 ELSE                         4654   663 PUT                          476B   665 PUT                      
-    47E4   666 IF                           47F4   666 PUT                          4865   667 ELSE                     
-    486A   667 PUT                          4981   668 END                      
+    4548   658 PROCEDURE                PRINT_INPUT_DATA
+    4565   661 PUT                          45DE   662 IF                           45EE   662 PUT                      
+    465F   663 ELSE                         4664   663 PUT                          477B   665 PUT                      
+    47F4   666 IF                           4804   666 PUT                          4875   667 ELSE                     
+    487A   667 PUT                          4991   668 END                      
 
-    4991   674 PROCEDURE                OUTPUT_RESULTS
-    49AC   678 CALL                         49D6   681 CALL                         4A00   684 PUT                      
+    49A1   674 PROCEDURE                OUTPUT_RESULTS
+    49BC   678 CALL                         49E6   681 CALL                         4A10   684 PUT                      
 
-    4AFC   687 PROCEDURE                CELL
-    4B0D   689 RETURN                       4CA1   690 END                      
+    4B0C   687 PROCEDURE                CELL
+    4B1D   689 RETURN                       4CB1   690 END                      
 
-    4CB1   691 PROCEDURE                LITERALS
-    4CC6   693 Assignment                   4CCC   693 Assignment                   4CD2   694 DO                       
-    4D1D   695 IF                           4D9B   696 IF                           4DD9   696 Assignment               
-    4E45   697 ELSE                         4E4A   697 Assignment                   4EB6   698 ELSE                     
-    4EBB   698 Assignment                   4F2A   699 Assignment                   4F38   700 END                      
-    4F43   701 RETURN                       4F5D   702 END                      
+    4CC1   691 PROCEDURE                LITERALS
+    4CD6   693 Assignment                   4CDC   693 Assignment                   4CE2   694 DO                       
+    4D2D   695 IF                           4DAB   696 IF                           4DE9   696 Assignment               
+    4E55   697 ELSE                         4E5A   697 Assignment                   4EC6   698 ELSE                     
+    4ECB   698 Assignment                   4F3A   699 Assignment                   4F48   700 END                      
+    4F53   701 RETURN                       4F6D   702 END                      
 
-    4F68   703 BEGIN                    
-    4F87   705 PUT                          5003   706 PUT                          5137   708 DO                       
-    517F   709 PUT                          534C   711 END                          5357   712 END                      
-    5361   715 IF                           5371   715 RETURN                   
+    4F78   703 BEGIN                    
+    4F97   705 PUT                          5013   706 PUT                          5147   708 DO                       
+    518F   709 PUT                          535C   711 END                          5367   712 END                      
+    5371   715 IF                           5381   715 RETURN                   
 
-    537B   718 PROCEDURE                TICK
-    538C   720 IF                           539A   720 RETURN                       53AD   721 RETURN                   
-    53C0   722 END                      
+    538B   718 PROCEDURE                TICK
+    539C   720 IF                           53AA   720 RETURN                       53BD   721 RETURN                   
+    53D0   722 END                      
 
-    53CB   723 BEGIN                    
-    53EA   725 PUT                          5466   726 Assignment                   54E7   727 Assignment               
-    5572   728 DO                           55B4   729 PUT                          5628   730 PUT                      
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                               Procedure Map                                            Page 21    
-    574C   733 DO                           5794   734 IF                           57B1   734 PUT                      
-    5976   737 END                          5981   738 END                          598C   739 END                      
+    53DB   723 BEGIN                    
+    53FA   725 PUT                          5476   726 Assignment                   54F7   727 Assignment               
+    5582   728 DO                           55C4   729 PUT                          5638   730 PUT                      
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                               Procedure Map                                            Page 21    
+    575C   733 DO                           57A4   734 IF                           57C1   734 PUT                      
+    5986   737 END                          5991   738 END                          599C   739 END                      
 
-    5996   742 BEGIN                    
-    59B5   744 IF                           59C2   744 PUT                          5A3E   745 ELSE                     
-    5A43   745 PUT                          5ABF   746 PUT                          5B43   748 Assignment               
-    5B49   749 DO                           5B91   750 IF                           5BAE   750 DO                       
-    5BAE   751 PUT                          5C9A   752 Assignment                   5CAA   753 END                      
-    5CAA   754 END                          5CB5   756 Assignment                   5CB9   757 IF                       
-    5CC6   757 DO                           5D18   758 Assignment                   5D1C   759 DO                       
-    5D6E   760 IF                           5D8B   761 Assignment                   5DE6   762 END                      
-    5DF1   763 END                          5DFC   765 IF                           5E06   765 DO                       
-    5E06   766 PUT                          5E87   767 DO                           5ECF   768 PUT                      
-    5F53   769 Assignment                   5F59   769 Assignment                   5FF1   770 DO                       
-    6039   771 IF                           60D0   771 DO                           60D0   772 PUT                      
-    61CC   773 Assignment                   61DC   774 END                          61E2   775 Assignment               
-    6211   776 END                          621C   777 PUT                          62A0   778 END                      
-    62AB   779 PUT                          631F   780 END                          631F   781 END                      
-    6329   784 PUT                          644C   786 END                      
+    59A6   742 BEGIN                    
+    59C5   744 IF                           59D2   744 PUT                          5A4E   745 ELSE                     
+    5A53   745 PUT                          5ACF   746 PUT                          5B53   748 Assignment               
+    5B59   749 DO                           5BA1   750 IF                           5BBE   750 DO                       
+    5BBE   751 PUT                          5CAA   752 Assignment                   5CBA   753 END                      
+    5CBA   754 END                          5CC5   756 Assignment                   5CC9   757 IF                       
+    5CD6   757 DO                           5D28   758 Assignment                   5D2C   759 DO                       
+    5D7E   760 IF                           5D9B   761 Assignment                   5DF6   762 END                      
+    5E01   763 END                          5E0C   765 IF                           5E16   765 DO                       
+    5E16   766 PUT                          5E97   767 DO                           5EDF   768 PUT                      
+    5F63   769 Assignment                   5F69   769 Assignment                   6001   770 DO                       
+    6049   771 IF                           60E0   771 DO                           60E0   772 PUT                      
+    61DC   773 Assignment                   61EC   774 END                          61F2   775 Assignment               
+    6221   776 END                          622C   777 PUT                          62B0   778 END                      
+    62BB   779 PUT                          632F   780 END                          632F   781 END                      
+    6339   784 PUT                          645C   786 END                      
 
-    645C   792 PROCEDURE                PRINT_INFORMATION
-    647A   793 PUT                          676B   809 END                          6776   820 Assignment               
-    677C   820 Assignment                   6782   820 Assignment                   6788   821 Assignment               
-    678F   824 DO                           67AB   826 PUT                          6809   828 CALL                     
-    682B   829 SELECT                       685F   831 WHEN                     
-
-    686C   831 BEGIN                    
-    688B   832 CALL                         68AE   833 GO                           68BC   833 END                      
-    68C6   835 WHEN                     
-
-    68DE   835 BEGIN                    
-    68FD   836 IF                           690D   837 PUT                          697E   838 ELSE                     
-    6983   838 DO                           6983   839 IF                           6990   839 CALL                     
-    69B3   840 PUT                          6A0B   841 CALL                         6A55   842 Assignment               
-    6A5C   843 CALL                         6A7F   844 END                          6A7F   845 GO                       
-    6A8D   845 END                          6A97   847 WHEN                     
-
-    6AAF   847 BEGIN                    
-    6ACE   848 IF                           6ADB   848 DO                           6ADB   849 OPEN                     
-    6B4F   850 CALL                         6B99   851 PUT                          6BE9   852 CLOSE                    
-    6C39   853 PUT                          6CAA   854 END                          6CAA   855 ELSE                     
-    6CAF   855 PUT                          6D20   856 GO                           6D2E   856 END                      
-    6D38   858 WHEN                     
-
-    6D50   858 BEGIN                    
-    6D6F   859 CALL                         6D92   860 CALL                         6DB5   861 GO                       
-    6DC3   861 END                          6DCD   863 WHEN                         6DE5   864 STOP                     
-    6DF2   865 END                          6E11   866 END                          6E1C   867 END                      
-    6E21   867 Initialization           
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 22    
+    646C   792 PROCEDURE                PRINT_INFORMATION
+    648A   793 PUT                          677B   809 END                          6786   820 Assignment               
+    678C   820 Assignment                   6792   820 Assignment                   6798   821 Assignment               
+    679F   824 DO                           67BB   826 PUT                          6819   828 CALL                     
+    683B   829 GO                           6875   831 CALL                         689D   833 GO                       
+    68A2   835 IF                           68B5   837 PUT                          6926   838 ELSE                     
+    692B   838 DO                           692B   839 IF                           6938   839 CALL                     
+    695A   840 PUT                          69B2   841 CALL                         69FB   842 Assignment               
+    6A02   843 CALL                         6A24   844 END                          6A24   845 GO                       
+    6A29   847 IF                           6A3C   848 DO                           6A3C   849 OPEN                     
+    6AB0   850 CALL                         6AF9   851 PUT                          6B49   852 CLOSE                    
+    6B99   853 PUT                          6C0A   854 END                          6C0A   855 ELSE                     
+    6C0F   855 PUT                          6C80   856 GO                           6C85   858 CALL                     
+    6CAD   860 CALL                         6CCF   861 GO                           6CD4   863 STOP                     
+    6CE7   865 END                          6CF2   867 END                          6CF7   867 Initialization           
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                  Symbol Table and Cross-Reference Listing                              Page 22    
 ACTION               172  Char(30) Var                                          [ DSA-'40'x(32) ]
                             223   224   225   226   228   229   232   234   240   251 
 ALL_COVERED          743  Bit(1) Aligned                                        [ DSA-'29'x(1) ]
@@ -1213,7 +1199,7 @@ ALL_COVERED          743  Bit(1) Aligned                                        
 ALL_VERTICES_CONTAINED
                      287  Bit(1) Aligned                                        [ DSA-'31'x(1) ]
                             299   300   303   307 
-AMMEND_P_I_STATUS    518  Entry                                                 [ Code+'33DB'x ]
+AMMEND_P_I_STATUS    518  Entry                                                 [ Code+'33EA'x ]
                             613 
 B                     76  Bit(1) Aligned                                        [ DSA-'27'x(1) ]
                             107 
@@ -1244,7 +1230,7 @@ C                    416  Fixed Bin(15,0) Aligned                               
                             449   455   457   467   471   472   473 
 CEIL                  28  Builtin
                             726   727 
-CELL                 687  Entry                                                 [ Code+'4B01'x ]
+CELL                 687  Entry                                                 [ Code+'4B11'x ]
                             709 
 CHARACTER             28  Builtin
                              67 
@@ -1263,16 +1249,16 @@ DELETED              172  Bit(1) Aligned                                        
 DONT_CARE             31  (512) Fixed Bin(15,0) Aligned                         [ DSA-'082C'x(2) ]
                              84   131   253   261   262   667 
 ENTER_DATA           171  Entry                                                 [ Code+'09F6'x ]
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 23    
-                            832 
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                  Symbol Table and Cross-Reference Listing                              Page 23    
+                            831 
 EPI                  347  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
                             356   360 
 EPI_COVERS_MINTERM    35  (256) Bit(1) Static                                   [ BSS+'02'x.0(0.1) ]
                             365   366   368   378   423 
 EQUIVALENT            56  Entry                                                 [ Code+'4A'x ]
                             298   401   695 
-ESSENTIAL_COST       573  Entry                                                 [ Code+'3B97'x ]
+ESSENTIAL_COST       573  Entry                                                 [ Code+'3BA6'x ]
                             615 
 ESS_PIS              519  Bit(96) Aligned                                       [ DSA-'2C'x(12) ]
                             523   524   526   531   536 
@@ -1309,7 +1295,7 @@ INEPI_SUM             37  (3000) Bit(96) Aligned                                
 INPUT_ITEM           176  Char(30) Var                                          [ DSA-'44'x(32) ]
                             186   187   188   189   193   196   197   198 
 IRREDUNDANT_NEPI_SUMS
-                     415  Entry                                                 [ Code+'2721'x ]
+                     415  Entry                                                 [ Code+'2730'x ]
                             611 
 I_EQV_J              286  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
                             298   301 
@@ -1323,13 +1309,13 @@ L                    398  Fixed Bin(15,0) Aligned                               
                             402 
 L                    692  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
                             694 
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 24    
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                  Symbol Table and Cross-Reference Listing                              Page 24    
 LENGTH                28  Builtin
                             196 
 LITERALS             398  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
                             401   403 
-LITERALS             691  Entry                                                 [ Code+'4CBA'x ]
+LITERALS             691  Entry                                                 [ Code+'4CCA'x ]
                             709 
 LITS                 692  Char(10) Var                                          [ DSA-'30'x(12) ]
                             693   696   697   698   701 
@@ -1349,16 +1335,18 @@ M                    416  Fixed Bin(15,0) Aligned                               
                             422   423   428   447   453 
 M                    724  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
                             730   734 
-MENU                 826  Label                                                 [ Code+'67AB'x ]
+MENU                 826  Label                                                 [ Code+'67BB'x ]
                             833   845   856   861 
 MENU_ITEM            148  Char(30) Var                                          [ DSA-'40'x(32) ]
                             150   151   152 
+MENU_OPTION          831* (5) Label Variable Aligned                            [ DSA-'A5D8'x(8) ]
+                            829 
 MENU_SELECTION       147  Entry                                                 [ Code+'0744'x ]
                             829 
 MIN                   28  Builtin
                             730   734 
 MINIMUM_COST_SOLUTION
-                     489  Entry                                                 [ Code+'31A5'x ]
+                     489  Entry                                                 [ Code+'31B4'x ]
                             612 
 MINS_PER_BLOCK       724  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
                             727   730   734 
@@ -1367,12 +1355,12 @@ MINTERM               31  (512) Fixed Bin(15,0) Aligned                         
 MIN_COST             490  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
                             498   500   504 
 NEW_DATA              35  Bit(1) Static                                         [ BSS+'01'x(1) ]
-                            268   821   839   842   848 
+                            268   821   839   842   847 
 NE_COST              588  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
                             590   592   595 
 NE_PI                 31  (96) Fixed Bin(15,0) Aligned                          [ DSA-'18EC'x(2) ]
                             386   428   536   537   592   772 
-NONESSENTIAL_COST    587  Entry                                                 [ Code+'3C5C'x ]
+NONESSENTIAL_COST    587  Entry                                                 [ Code+'3C6B'x ]
                             495   616 
 NUM_BLOCKS           724  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
                             726   727   728 
@@ -1381,10 +1369,10 @@ NUM_COVERS           347  Fixed Bin(15,0) Aligned                               
 NUM_DONT_CARES        31  Fixed Bin(15,0) Aligned                               [ DSA-'24'x(2) ]
                              83    87   123   130   131   230   253   255   260   666 
                             667   820 
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                  Symbol Table and Cross-Reference Listing                              Page 25    
 NUM_INEPI_SUMS        31  Fixed Bin(15,0) Aligned                               [ DSA-'2C'x(2) ]
                             436   441   457   459   467   470   471   494   499   503 
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 25    
                             525   530   551   554   561   767 
 NUM_MINTERMS          31  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
                              79    84    85    87   123   126   127   230   236   238 
@@ -1398,12 +1386,12 @@ NUM_PIS               31  Fixed Bin(15,0) Aligned                               
 NUM_TERMS             31  Fixed Bin(15,0) Aligned                               [ DSA-'26'x(2) ]
                              87    93    96    97    98   113   114   115   124   179 
                             191   192   193   200   201   202   235   238   241   252 
-                            255   258   268   291   292   603   820   836 
+                            255   258   268   291   292   603   820   835 
 NUM_UMIN_NEPIS       416  Fixed Bin(15,0) Aligned                               [ DSA-'2A'x(2) ]
                             421   424   425   429   447 
 OR                   743  Char(2) Var                                           [ DSA-'28'x(4) ]
                             748   751   752   766   769   772   773 
-OUTPUT_RESULTS       674  Entry                                                 [ Code+'49A0'x ]
+OUTPUT_RESULTS       674  Entry                                                 [ Code+'49B0'x ]
                             841   850 
 P                    286  Fixed Bin(15,0) Aligned                               [ DSA-'2E'x(2) ]
                             310   311   312   313 
@@ -1432,30 +1420,30 @@ P                    743  Fixed Bin(15,0) Aligned                               
                             749   750   751   759   760   761   770   772 
 PI_COVERS_MINTERM     35  (256,256) Bit(1) Static                               [ BSS+'22'x.0(0.1) ]
                             336   355   367   379   428   734   761 
-PI_STATUS             41  (5) Char(30) Var Static Init()                        [ Static+'76'x(32) ]
+PI_STATUS             41  (5) Char(30) Var Static Init()                        [ Static+'7A'x(32) ]
                             709 
 PRIME_IMPLICANTS     284  Entry                                                 [ Code+'1AAA'x ]
                             605 
 PRINT_HEADER_MESSAGE
-                     630  Entry                                                 [ Code+'4189'x ]
+                     630  Entry                                                 [ Code+'4199'x ]
                             214   641   678 
-PRINT_INFORMATION    792  Entry                                                 [ Code+'646E'x ]
-                            859 
-PRINT_INPUT_DATA     658  Entry                                                 [ Code+'4549'x ]
+PRINT_INFORMATION    792  Entry                                                 [ Code+'647E'x ]
+                            858 
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                  Symbol Table and Cross-Reference Listing                              Page 26    
+PRINT_INPUT_DATA     658  Entry                                                 [ Code+'4559'x ]
                             215   681 
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 26    
-PRINT_MENU           640  Entry                                                 [ Code+'429C'x ]
+PRINT_MENU           640  Entry                                                 [ Code+'42AC'x ]
                             828 
 P_I                   31  (4,256) Fixed Bin(15,0) Aligned                       [ DSA-'182C'x(2) ]
                             311   312   313   317   318   336   350   360   367   379 
                             385   400   401   403   536   537   577   592   689   695 
                             696   709   734   750   760 
-P_I_CHART            331  Entry                                                 [ Code+'1E69'x ]
+P_I_CHART            331  Entry                                                 [ Code+'1E6F'x ]
                             606 
-P_I_COST             397  Entry                                                 [ Code+'2583'x ]
+P_I_COST             397  Entry                                                 [ Code+'2592'x ]
                             608 
-P_I_STATUS           346  Entry                                                 [ Code+'203C'x ]
+P_I_STATUS           346  Entry                                                 [ Code+'2048'x ]
                             607 
 REDUNDANT_SUMS       418  Bit(1) Aligned                                        [ DSA-'0C37'x(1) ]
                             469   474   479 
@@ -1464,11 +1452,11 @@ REDUNDANT_SUMS       491  Bit(1) Aligned                                        
 RED_PIS              519  Bit(96) Aligned                                       [ DSA-'38'x(12) ]
                             524   527   537 
 REMOVE_REDUNDANT_SUMS
-                     548  Entry                                                 [ Code+'39A2'x ]
+                     548  Entry                                                 [ Code+'39B1'x ]
                             479   509 
 RESULTS_FILE          43  File Aligned External                                 [ Ext+'00'x(12) ]
                             849   850   851   852 
-RUN_MINIMISATION     602  Entry                                                 [ Code+'3E79'x ]
+RUN_MINIMISATION     602  Entry                                                 [ Code+'3E88'x ]
                             839 
 S                    416  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
                             457   459   461   470   471   472 
@@ -1501,10 +1489,10 @@ T                     76  Fixed Bin(15,0) Aligned                               
                              79    80    81    83    84    85   106   124   125   127 
                             131 
 T                    172  Fixed Bin(15,0) Aligned                               [ DSA-'46'x(2) ]
+Aug 14, 2024  11:57                                       /*                                                            
+1.3.1                                  Symbol Table and Cross-Reference Listing                              Page 27    
                             189   190   196   197   198   199   200   202   235   236 
                             241   244   252   253   258   261 
-Jul 27, 2024  02:54                                       /*                                                            
-1.3.0                                  Symbol Table and Cross-Reference Listing                              Page 27    
 T                    659  Fixed Bin(15,0) Aligned                               [ DSA-'22'x(2) ]
                             663   667 
 TERM                  31  (1024) Fixed Bin(15,0) Aligned                        [ DSA-'102C'x(2) ]
@@ -1515,7 +1503,7 @@ TERM_I               286  Fixed Bin(15,0) Aligned                               
                             294   296   298   300   301   312   317 
 TERM_J               286  Fixed Bin(15,0) Aligned                               [ DSA-'28'x(2) ]
                             294   296   298   300   311   313   318 
-TICK                 718  Entry                                                 [ Code+'5380'x ]
+TICK                 718  Entry                                                 [ Code+'5390'x ]
                             734 
 TRANSLATE             28  Builtin
                             187   226 
@@ -1533,7 +1521,7 @@ VALUE                 66  Fixed Bin(15,0) Aligned Parameter                     
                              67 
 VERIFY                28  Builtin
                              67   151   188   224 
-VERSION               39  Char(4) Static Init()                                 [ Static+'72'x(4) ]
+VERSION               39  Char(4) Static Init()                                 [ Static+'76'x(4) ]
                             632 
 VERTEX               286  Fixed Bin(15,0) Aligned                               [ DSA-'2C'x(2) ]
                             300   301   302   303 
