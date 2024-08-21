@@ -1,6 +1,6 @@
 # Minimisation of boolean functions
 
-## A vintage PL/I implementation from 1986 running again
+## A vintage PL/I implementation from 1986 back running again
 
 > [!NOTE]
 > This is not a solution for modern applications
